@@ -1,0 +1,69 @@
+﻿ <!--begin::Form-->
+<div class="kt-form kt-form--fit kt-form--label-right">
+    <div class="portlet__foot">
+        <div class="form-group">
+            <div class="col-lg-12">
+                @(Html.Kendo().Grid<ds.portal.leads.Models.LeadViewModel>()
+                        .Name("CompanyleadsGrid")
+                        .Columns(columns =>
+                        {
+                            columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-danger' style='cursor:pointer;'onclick=PerformLeadDelete('#:Lead_Id#') title='Delete'> <span style='text-align:center;' class='fa fa-trash-alt'></span></a></div>").Width(30).ClientHeaderTemplate(" ");
+                            columns.Bound(p => p.Lead_Id).Title("Id").ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformLeadEdit('#:encodeLeadId#') title='#:Lead_Id#'>#:Lead_Id#</a>").Width(70);
+                            columns.Bound(p => p.Lead_DateOfEnquiry_D).Format("{0:dd/MM/yyyy}").Title("Enquiry").Width(120);
+                            columns.Bound(p => p.Lead_ContactName).ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformLeadEdit('#:encodeLeadId#') title='#:Lead_ContactName#'>#:Lead_ContactName#</a>").Title("Contact Name").Width(180);
+                            columns.Bound(p => p.Lead_Contact_Mobile).ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformLeadEdit('#:encodeLeadId#','true') title='#:Lead_Contact_Mobile#'>#:Lead_Contact_Mobile#</a>").Title("Mobile").Width(120);
+                            columns.Bound(p => p.Lead_CourseTitle).Title("Course Level").Width(160);
+                            columns.Bound(p => p.Lead_LastResult).Title("Last Result").Width(160);
+                            columns.Bound(p => p.Lead_Status).ClientTemplate("<span class='kt-badge kt-badge--inline kt-badge--pill #= Lead_Status_Class #'>#= Lead_Status #</span>").HtmlAttributes(new { style = "text-align:center" }).Title("Status").Width(100);
+                           // columns.Bound(p => p.Lead_Last_Action).HtmlAttributes(new { style = "text-align:center" }).Title("Last Action").Width(150);
+                            //if (hasAdminRole)
+                            //{
+                            //    columns.Bound(p => p.Users_Username).ClientTemplate("<a style='cursor:pointer' onclick='return openSalesAdvisor(#= Lead_Id_SalesAdvisor#,#=Lead_Id#)'> #= Users_Username # <a/>").Title("Assigned to").HtmlAttributes(new { style = "text-align:center" }).Width(180);
+                            //    columns.Bound(p => p.Lead_IsDuplicate).ClientTemplate("<a style='cursor:pointer' onclick='return duplicateOnclick(#= Lead_IsDuplicate#,#=Lead_Id#)'> #= Lead_IsDuplicate == 1 ? 'Yes' :'No' # <a/>").Title("Duplicated").HtmlAttributes(new { style = "text-align:center" }).Width(120);
+                            //}
+                            // columns.Bound(p => p.CourseLevelsEnquiry).Title("Course Level Enquiry").Width(150);
+                        })
+                        .Resizable(resize => resize.Columns(true))
+                        .Reorderable(x => x.Columns(true))
+                        .ColumnMenu(c => c.Columns(true))
+                        .Scrollable()
+                        .Sortable()
+                        .Filterable(f => f.Messages(m => m.IsFalse("No")).Messages(m => m.IsTrue("Yes")))
+                        .Sortable(sortable =>
+                        {
+                            sortable.SortMode(GridSortMode.SingleColumn);
+                        })
+                        .Pageable()
+                        .NoRecords()
+                        .Filterable()
+                        .Pageable(pageable => pageable
+                        .Refresh(true)
+                        .PageSizes(true)
+                        .ButtonCount(5))
+                        .DataSource(dataSource =>
+                        dataSource
+                        .WebApi()
+                        .Model(model =>
+                        {
+                            model.Id(p => p.Lead_Id);
+                            model.Field(p => p.Lead_Id_SalesAdvisor).DefaultValue(1);
+                        })
+                        //.Events(events => events.Error("error_handler"))
+                        .Read(read => read.Action("GetLeadByCompany", "CompanyApi", new { company_Id = ViewBag.Company_Id }))
+                        .PageSize(20)
+                        )
+                    )
+
+            </div>
+        </div>
+
+    </div>
+    <script>
+        //function dataBound() {
+        //    this.expandRow(this.tbody.find("tr.k-master-row").first());
+        //}
+    </script>
+   
+</div>
+<!--end::Form-->
+

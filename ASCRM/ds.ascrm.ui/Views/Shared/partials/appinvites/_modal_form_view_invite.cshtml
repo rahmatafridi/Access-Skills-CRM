@@ -1,0 +1,52 @@
+﻿<div class="modal fade" id="kt_modal_invite_view" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Invite</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="kt-form kt-form--label-right">
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <div v-html="htmlEmail">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="kt_modal_invite_view1"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none; overflow-x: hidden; overflow-y: auto;" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document" >
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Invite Preview </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="kt-form kt-form--label-right">
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <div v-html="htmlEmail">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-info" v-on:click="PreviousView">Previous</button>
+
+                    <button type="button" class="btn btn-primary" v-on:click="AddEditAppInvite">Submit</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

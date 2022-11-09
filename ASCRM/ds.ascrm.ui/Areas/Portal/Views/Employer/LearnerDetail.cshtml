@@ -1,0 +1,913 @@
+﻿@using Kendo.Mvc.UI
+
+@{ ViewData["Title"] = "Learner Detail";
+
+    Layout = "~/Views/Shared/_Layout_Portal.cshtml";
+
+    var role = ViewBag.Role;
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+    var canRoleManagerAccessContent = (permissions == null) ? false : (bool)permissions["AC_CCT"];
+    var learnerId = ViewBag.LearnerId; 
+    
+    }
+<style>
+    .matrixcolors {
+        color: #3c763d;
+        background-color: #dff0d8;
+        border-color: #d6e9c6;
+    }
+
+    .matrixcolorsfull {
+        color: #31708f;
+        background-color: #d9edf7;
+        border-color: #bce8f1;
+    }
+
+    .flip-card {
+        background-color: transparent;
+        width: 400px;
+        height: 350px;
+        perspective: 1000px;
+    }
+
+    .flip-card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        transition: transform 0.6s;
+        transform-style: preserve-3d;
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    }
+
+    .flip-card:hover .flip-card-inner {
+        transform: rotateY(180deg);
+    }
+
+    .flip-card-front, .flip-card-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+    }
+
+    .flip-card-front {
+        background-color: #fff;
+        color: black;
+    }
+
+    .flip-card-back {
+        background-color: #fff;
+        color: black;
+        transform: rotateY(180deg);
+    }
+</style>
+<style>
+    .cover {
+        height: 78px;
+        overflow: hidden;
+        border-radius: 4px 4px 0 0;
+    }
+    .user {
+        border-radius: 50%;
+        display: block;
+        height: 120px;
+        margin: -55px auto 0;
+        overflow: hidden;
+        width: 120px;
+    }
+    .user img {
+        background: none repeat scroll 0 0 #FFFFFF;
+        border: 0px solid #FFFFFF;
+        width: 100%;
+    }
+     .content {
+        background-color: rgba(0, 0, 0, 0);
+        box-shadow: none;
+        padding: 10px 20px 20px;
+    }
+    .stats-container {
+        width: 100%;
+        margin-top: 50px;
+    }
+    .stats {
+        display: block;
+        float: left;
+        width: 33.333333%;
+        text-align: center;
+    }
+  
+
+    .panel .btn-group {
+        margin: 15px 0 30px;
+    }
+
+        .panel .btn-group .btn {
+            transition: background-color .3s ease;
+        }
+
+    .table-filter {
+        background-color: #fff;
+        border-bottom: 1px solid #eee;
+        width: 90%;
+        margin: auto;
+    }
+
+        .table-filter tbody tr:hover {
+            cursor: pointer;
+            background-color: #eee;
+        }
+
+        .table-filter tbody tr td {
+            padding: 10px;
+            vertical-align: middle;
+            border-top-color: #fefefe;
+        }
+
+        .table-filter tbody tr.selected td {
+            background-color: #eee;
+        }
+
+        .table-filter tr td:first-child {
+            width: 90%;
+        }
+
+        .table-filter tr td:nth-child(2) {
+            width: 10%;
+        }
+
+        .table-filter tr:nth-of-type(odd) {
+            background-color: #ccc;
+        }
+
+
+
+    /* sub table */
+    .table-user-content tbody tr:hover {
+        /*cursor: pointer;*/
+        background-color: #eee;
+    }
+
+    .table-user-content tbody tr td {
+        padding: 10px;
+        vertical-align: middle;
+        border-top-color: #ccc;
+    }
+
+    .table-user-content tbody tr.selected td {
+        background-color: #eee;
+    }
+
+    .table-user-content tr td:first-child {
+        width: 50%;
+    }
+
+    .table-user-content tr td:nth-child(2) {
+        width: 80%;
+    }
+
+    .table-user-content tr:nth-of-type(odd) {
+        background-color: #fcfcfc;
+    }
+    /* sub table */
+
+
+
+    .ckbox {
+        position: relative;
+    }
+
+        .ckbox input[type="checkbox"] {
+            opacity: 0;
+        }
+
+        .ckbox label {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+            .ckbox label:before {
+                content: '';
+                top: 1px;
+                left: 0;
+                width: 18px;
+                height: 18px;
+                display: block;
+                position: absolute;
+                border-radius: 2px;
+                border: 1px solid #bbb;
+                background-color: #fff;
+            }
+
+        .ckbox input[type="checkbox"]:checked + label:before {
+            border-color: #2BBCDE;
+            background-color: #2BBCDE;
+        }
+
+        .ckbox input[type="checkbox"]:checked + label:after {
+            top: 3px;
+            left: 3.5px;
+            content: '\e013';
+            color: #fff;
+            font-size: 11px;
+            font-family: 'Glyphicons Halflings';
+            position: absolute;
+        }
+
+    .table-filter .star {
+        color: #ccc;
+        text-align: center;
+        display: block;
+    }
+
+        .table-filter .star.star-checked {
+            color: #F0AD4E;
+        }
+
+        .table-filter .star:hover {
+            color: #ccc;
+        }
+
+        .table-filter .star.star-checked:hover {
+            color: #F0AD4E;
+        }
+
+    .table-filter .media-photo {
+        width: 35px;
+    }
+
+    /*.table-filter .media-body {
+            display: block;*/
+    /* Had to use this style to force the div to expand (wasn't necessary with my bootstrap version 3.3.6) */
+    /* }*/
+
+    .table-filter .media-meta {
+        font-size: 12px;
+        font-weight: 500;
+        color: #000;
+    }
+
+    .table-filter .media .title {
+        color: #2BBCDE;
+        font-size: 16px;
+        font-weight: bold;
+        line-height: normal;
+        margin: 0;
+    }
+
+        .table-filter .media .title span {
+            font-size: .8em;
+            margin-right: 20px;
+        }
+
+            .table-filter .media .title span.notstarted {
+                color: #d9534f;
+            }
+
+            .table-filter .media .title span.inprogress {
+                color: #f0ad4e;
+            }
+
+            .table-filter .media .title span.completedtopic {
+                color: #5cb85c;
+            }
+
+    .table-filter .media .summary {
+        font-size: 15px;
+    }
+
+    .clickable {
+        cursor: pointer;
+    }
+
+    .right-col {
+        text-align: center;
+    }
+</style>
+
+<link href="~/css/summarynote.css" rel="stylesheet" />
+
+<link href="~/css/Dashboard/main.css" rel="stylesheet" />
+@*<link href="~/css/flipcard.css" rel="stylesheet" />*@
+<div class="kt-portlet" id="dv_Portal_EmployerLearnerDetail">
+    <input type="hidden" id="learnerId" />
+    <div class="kt-portlet__head">
+        <div class="form__actions kt-portlet__foot">
+            <label style="font-size: large;font-weight:500;margin-left:-10px;margin-top:10px;">Learner Detail</label>
+        </div>
+        <div class="kt-portlet__head-toolbar">
+
+        </div>
+    </div>
+    <div class="kt-portlet__head">
+        <div class="form__actions kt-portlet__foot">
+            <label style="font-size: large;font-weight:500;margin-left:-10px;margin-top:10px;">Learner Detail</label>
+        </div>
+        <div class="kt-portlet__head-toolbar">
+
+        </div>
+    </div>
+    <div class="kt-portlet__body">
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#kt_tabs_1_1">
+                    <i class="fa fa-id-card"></i> Basic
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_2" onclick="">
+                    <i class="fa fa-address-card"></i> Matrix
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_3" onclick="">
+                    <i class="fa fa-address-card"></i> Documents
+                </a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="kt_tabs_1_1" role="tabpanel">
+
+                <div>
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="flip-card">
+                                <div class="flip-card-inner">
+                                    <div class="flip-card-front">
+                                        <div class="cover">
+                                            <img  src="~/Images/portal_learner1.jpeg" />
+                                            @*<img src="../../App_Resources/images/portal_learner1.jpeg" />*@
+                                        </div>
+                                        <div class="user">
+                                            <img class="img-circle"  alt="profile" src="~/Images/avatar.png" />
+                                            @*<%--<img class="img-circle" src="" />--%><img class="img-circle" alt="profile" src='../../library/images/avatar.png'>*@
+                                        </div>
+                                        <div class="content">
+                                            <div class="main">
+                                                <h3 class="name">
+                                                    <label>{{Name}}</label>
+                                                </h3>
+                                                <p class="profession">
+                                                    Learner Id: {{LearnerId}}
+                                                    @*<asp:Label ID="lbl_learner_id" runat="server" Text=""></asp:Label>*@
+                                                </p>
+                                                <p class="text-center">
+                                                    Currently on
+                                                    @*<asp:Label ID="lbl_learner_course" runat="server" Text=""></asp:Label>*@
+
+                                                </p>
+
+                                                <div class="progressbar" style="background-color: #d3d3d378;">
+                                                    <div style="width:'{{iPercentageCompletion}}'"></div>
+                                                </div>
+
+                                                <p class="text-center">
+                                                    Completed
+                                                    <label>{{iPercentageCompletion}}%</label>
+
+                                                </p>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="flip-card-back">
+                                        <div>
+                                            <h6 style="color:black;margin-top:8px;">
+                                                {{LearnerNameAndId}}
+                                            </h6>
+                                            <hr />
+                                        </div>
+                                        <div>
+                                            <div>
+                                                <h4 class="text-center" style="color:black; font-size:15px;">
+                                                    Enrolment Date: {{LearnerEnrolDate}}
+                                                    @*<asp:Label ID="LearnerEnrolDate" runat="server"></asp:Label>*@
+                                                </h4>
+                                                <p class="text-center" style="color:black; font-size:15px;">
+                                                    Planned End Date: {{Learner_PlannedEndDate}}
+                                                </p>
+
+                                                <div class="stats-container">
+                                                    <div class="stats">
+                                                        <span>Completed Tasks</span>
+                                                        <br />
+                                                        {{NbTopicsCompleted}}
+
+                                                    </div>
+                                                    <div class="stats">
+                                                        <span>Tasks to be Completed</span>
+                                                        <br />
+                                                        {{NbTopicsToBeCompleted}}
+
+                                                    </div>
+                                                    <div class="stats">
+                                                        <span>Progress</span>
+                                                        <br />
+                                                        {{iPercentageCompletion}} %
+
+                                                    </div>
+                                                </div>
+                                                <div class="space-20"></div>
+                                            </div>
+                                            <div class="main1" style="color:black; font-size:15px;">
+                                                <br />
+                                                <span class="text-center">Next Task: </span>
+                                                <br />
+                                                <span class="text-center">
+                                                    {{TitleTopicNext}}
+                                                </span>
+
+                                            </div>
+                                        </div>
+                                        <div class="footer">
+                                            <div class="social-links text-center">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+
+                        <div class="col-md-4 col-sm-4">
+                            <div class="flip-card">
+                                <div class="flip-card-inner">
+                                    <div class="flip-card-front">
+                                        <label>Learner Notes</label>
+                                        <ul class="timeline" id="front_notes">
+                                        </ul>
+                                    </div>
+                                    <div class="flip-card-back">
+                                        <label>More Note....</label>
+                                        <div class="content" style="max-height: 330px; overflow-y: scroll;">
+
+                                            <ul class="timeline" id="back_notes">
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+
+
+
+                        <div class="col-md-4 col-sm-4">
+                            <div class="flip-card">
+                                <div class="flip-card-inner">
+                                    <div class="flip-card-front">
+
+                                        <div class="content">
+
+                                            <div class="stats-container">
+                                                <div style="color:black; font-size:15px;">
+                                                    <span style="font-weight:bold">Employer</span>
+                                                    <br />
+                                                    {{Employer_Name}}
+
+                                                </div>
+                                                <div style="color:black; font-size:15px;">
+                                                    <span style="font-weight:bold">Address</span>
+                                                    <br />
+                                                    {{Employer_Address}}
+
+                                                </div>
+                                                <div style="color:black; font-size:15px;">
+                                                    <span style="font-weight:bold">Contact Name</span>
+                                                    <br />
+                                                    {{Employer_ContactName}}
+
+                                                </div>
+                                                <div style="color:black; font-size:15px;">
+                                                    <span style="font-weight:bold">Contact Number</span>
+                                                    <br />
+                                                    {{Employer_ContactNumber1}}
+
+                                                </div>
+                                                <div style="color:black; font-size:15px;">
+                                                    <span style="font-weight:bold">Postcode</span>
+                                                    <br />
+                                                    {{Employer_PostCode1}}
+
+                                                </div>
+                                                <div style="color:black; font-size:15px;">
+                                                    <span style="font-weight:bold">Email</span>
+                                                    <br />
+                                                    {{Employer_Email1}}
+
+                                                </div>
+                                            </div>
+
+
+
+
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <lable id="lblCourseSummaryTitle"></lable>
+                        </div>
+                        <div class="panel-body">
+                            <div class="pull-left">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-danger btn-filter" data-target="notstarted">Not Started</button>
+                                    <button type="button" class="btn btn-warning btn-filter" data-target="inprogress">In Progress</button>
+                                    <button type="button" class="btn btn-success btn-filter" data-target="completedtopic">Completed</button>
+                                    <button type="button" class="btn btn-default btn-filter" data-target="all">View All</button>
+                                </div>
+                            </div>
+                            <div class="table-container">
+                                <table class="table table-filter" id="grid">
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="target"></div>
+
+            </div>
+            <div class="tab-pane " id="kt_tabs_1_2" role="tabpanel">
+                <section class="content">
+                    <div class="kt-portlet__body">
+
+                        <div class="box-header with-border">
+                            <div class="row">
+                                <div class="col-lg-5">
+                                    <label>Choose a matrix or use the buttons to generate full matrix report </label>
+                                    <select class="form-control" v-model="matrixId" v-on:change="changeMatrixLable">
+                                        <option v-for="item in MatrixLable" :value="item.SSMB_Id">
+                                            {{item.SSMB_Title}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <div id="matrixdata" style="margin-top:10px;">
+
+
+                                    <div class="col-lg-12 matrixcolors">
+                                        <label style="font-size: 20px; font-weight: bold; margin-top: 7px;" v-if="IsSummary">Summary</label>
+                                        @*<div class="col-lg-1">*@
+                                        <div>
+                                            <table>
+                                                <tr>
+                                                    <td v-for="item in Summary" style=" display: inline-block; margin: 0px 12px">
+                                                        <span class="checkbox-inline">
+
+                                                            <input type="checkbox" disabled v-model="item.SSML_IsCompleted"><span style="margin-left:3px;margin-right:3px;">{{item.SSML_Id_LevelKey}}{{"."}}{{item.SSML_Id_LevelValue}}</span>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <div>
+
+                                            </div>
+
+                                        </div>
+                                        @*</div>*@
+                                    </div>
+
+                                    <div class="col-lg-12 matrixcolorsfull" style="margin-top:15px;">
+                                        <label style="font-weight:bold;font-size:20px;" v-if="IsSummary">{{SSM_Name}}</label>
+                                        @*<div class="col-lg-1">*@
+                                        <div>
+                                            <table>
+                                                <tr>
+                                                    <td v-for="item in FullSummary" style=" display: inline-block; margin: 0px 12px">
+                                                        <input type="checkbox" disabled v-model="item.SSML_IsCompleted"><span style="margin-left: 3px; margin-right: 3px;"> {{item.SSML_Id_LevelKey}}{{"."}}{{item.SSML_Id_LevelValue}}</span>
+
+                                                    </td>
+                                                </tr>
+                                            </table>
+
+
+
+
+                                        </div>
+                                        @*</div>*@
+                                    </div>
+                                </div>
+                                <div id="matrixview" style="margin-top:10px;">
+                                    <span v-html="htmlContent"></span>
+                                </div>
+                            </div>
+
+                            <div class="" style="margin-top:20px;">
+                                <button class="btn btn-sm btn-primary" id="btndownload" v-on:click="DownlaodCompleteSummary()">Downlaod Complete Summary</button>
+
+                                <button class="btn btn-sm btn-primary" id="btnview" v-on:click="ViewSummary()">View Complete Summary</button>
+                                <button class="btn btn-sm btn-defult" id="btncancel" v-on:click="ViewCancel()">Cancel</button>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+            <div class="tab-pane " id="kt_tabs_1_3" role="tabpanel">
+                <div class="selectDocOption">
+                    <h3>Select Document Type</h3>
+                    <select id="docId" @@change="DocTypeChange" class="form-control">
+                        <option value="0">-- Select document type --</option>
+                        @*<option value="SignUpDocsSection">Learner Sign Up Documentation</option>
+                            <option value="PortfolioActivitySection">Portfolio Activity</option>*@
+                        <option value="IV-EVDocsSection">IV-EV Documentation</option>
+                    </select>
+
+                </div>
+                <div>
+                    <table class="table table-bordered" id="doctable">
+                        <thead>
+                            <tr class="info">
+                                <th>Id</th>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Upload Date	</th>
+                                <th>Uploaded By	</th>
+                                <th>Download	</th>
+                            </tr>
+                        </thead>
+                        <tbody v-for="item in Docs">
+                            <tr>
+                                <th>{{item.LearnerDocs_Id}}</th>
+                                <th>{{item.LearnerDocs_Caption}}</th>
+                                <th>{{item.DocCat_Title}}</th>
+                                <th>{{item.CreatedDate}}</th>
+                                <th>{{item.Users_Username}}</th>
+                                <th><button class="btn btn-primary">Downlaod</button></th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+</div>
+
+<script src="~/lib/pdf.js"></script>
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    @*<script src="~/js/Portal/Account/LearnerDetail.js"></script>*@
+    <script src="~/js/Portal/Employer/LearnerDetail.js"></script>
+    <script>
+        function BindGridView(id) {
+
+            var duedate_completed_label = '';
+            var filter_label = 'notstarted';
+            var filter_label_caption = 'NOT STARTED';
+            $.ajax({
+                type: "GET",
+                url: "/api/PortalCourseSummaryApi/GetCourseTopicsForAccount",
+                data: { id:id},
+                contentType: "application/json",
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+                    for (var i = 0; i < data.length; i++) {
+                        // $("#grid").append("<tr><td>" + data.d[i].TopicName +
+                        //                                "</td><td>" + data.d[i].SSJLP_Id + "</td></tr>");
+
+                        //starting TR MAIN
+                        switch (data[i].AlertColour) {
+                            case 'red_alert_icon_small.gif':
+                                filter_label = 'inprogress';
+                                filter_label_caption = 'IN PROGRESS';
+                                break;
+                            case '':
+                                filter_label = 'completedtopic';
+                                filter_label_caption = 'COMPLETED';
+                                break;
+                            case 'default.png':
+                                filter_label = 'notstarted';
+                                filter_label_caption = 'NOT STARTED';
+                                break;
+                            default:
+                                filter_label = 'notstarted';
+                                filter_label_caption = 'NOT STARTED';
+
+                        }
+                        if (data[i].Checkpointdate != "Due Date: " && data[i].Checkpointdate != "") {
+                            filter_label = 'inprogress';
+                            filter_label_caption = 'IN PROGRESS';
+                            duedate_completed_label = data[i].Checkpointdate;
+
+                        } else {
+                            filter_label = 'notstarted';
+                            filter_label_caption = 'NOT STARTED';
+                            duedate_completed_label = "";
+
+                        }
+                        if (data[i].CompletedDate != "" && data[i].IsCompleted == "Yes") {
+                            filter_label = 'completedtopic';
+                            filter_label_caption = 'COMPLETED';
+                            duedate_completed_label = data[i].CompletedDate;
+
+                        } else {
+                            duedate_completed_label = "";
+                        }
+                        //completion date or due date or nothing if it is not started
+                        //  duedate_completed_label = ""; //data.d[i].Checkpointdate + " | " + data.d[i].CompletedDate
+                        var iMaxFiles = '';
+                        var iMaxFilesIcon = "";
+                        var UploadFile = "";
+                        if (data[i].Documents.length > 0) {
+                            iMaxFiles = "View Files (" + data[i].Documents.length + ")";
+                            iMaxFilesIcon = "<i class='glyphicon fa fa-download btn-lg  pull-right'></i>";
+                        }
+                        //if (data[i].isWorkSubmit == false && filter_label_caption == "IN PROGRESS") {
+                        //    UploadFile = "<button class='btn btn-primary' onclick='uploaddoc(" + data[i].SSJLP_Id + ")'>Upload</button>"
+                        //}
+
+                        $("#grid").append("<tr data-status='" + filter_label + "' class='clickable warning dropdown-deliverable selected ' data-for='#details_" + i + "' "
+                            + "> "
+                            + "<td> "
+
+                            + "<div class='media' id=" + '#' + data[i].SSJLP_Id + "> "
+                            + "<div class='media-body'>"
+                            + "<span class='media-meta pull-right'>" + duedate_completed_label + "</span>"
+                            + "<h4 class='title'>  " + "" + ""
+                            + "<span class='pull-right " + filter_label + "'>" + filter_label_caption + "</span>"
+                            + "</h4>"
+                            + "<p class='summary'><strong>" + data[i].TopicName + "</strong></p>"
+                            + "</div>"
+                            + "</div>"
+                            + "</td>"
+                            + "<td>"
+                            + "<div class='hasdocuments pull-right clickable warning dropdown-deliverable' data-for='#details_" + i + "' >"
+                            + "<span class='media-meta pull-right'> " + iMaxFiles
+                            + "</span><br/>"
+                            + iMaxFilesIcon
+                            + "</div>"
+                            + "</td>"
+                            + "<td> "
+                            + "<span class='pull-right'> "
+                            + "</span><br/>"
+                            + UploadFile
+                            + "</td>"
+                            + "</tr>");
+
+                        if (data[i].Documents.length > 0) {
+                            var sTr = "";
+                            for (var j = 0; j < data[i].Documents.length; j++) {
+
+                                sTr = sTr + "<tr>"
+                                    + "<td width='40%'>" + data[i].Documents[j].DocTopic + "</td>"
+                                    + "<td width='60%'>" + data[i].Documents[j].FileName + "</td>"
+                                    + "<td class='right-col ' data-id='" + data[i].Documents[j].DocumentId + "'>Download</td>"
+                                    + "</tr>"
+
+
+                            } //end for
+                            $("#grid").append("<tr style='padding: 0'>"
+                                + "<td colspan='2'>"
+                                + "<div class='deliverable-infos' id='details_" + i + "'>"
+                                + "<table class='table table-condensed table-user-content' id='hidden_table_" + i + "'>"
+                                + "<tbody>"
+                                + sTr
+                                + "</tbody>"
+                                + "</table>"
+                                + "</div>"
+                                + "</td>"
+                                + "</tr>");
+
+
+                        }//end if has documents
+
+                        //TR MAIN ENDS
+                    }
+                }
+                ,
+                complete: function () {
+                    $('.deliverable-infos').hide();
+
+                }
+            })
+        }
+        function Bind_Notes(id) {
+            var bjump = false;
+            var k = 0;
+            var note_length = 0;
+            $.ajax({
+                type: "GET",
+                url: "/api/PortalCourseSummaryApi/GetLearnerNotes",
+                data: { id: id },
+                contentType: "application/json",
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+                    for (var i = 0; i < data.length; i++) {
+
+                        note_length = note_length + data[i].LearnerNotes_Note.length;
+
+                        if (note_length < 250) {
+                            //first 3 in front
+                            $("#front_notes").append(make_li(i, data[i].LearnerNotes_Note, data[i].NoteDate, data[i].NoteDateTime));
+                            k++;
+
+                        } else {
+                            //  last 3 in the back
+                            $("#back_notes").append(make_li(i, data[i].LearnerNotes_Note, data[i].NoteDate, data[i].NoteDateTime));
+                            k++;
+                        }
+
+                    }
+                }
+                ,
+                complete: function () {
+                    //$('.deliverable-infos').hide();
+
+                }
+            })
+        }
+
+
+        function make_li(noteid, note, notedate, notetime) {
+            var element = "<li data-for='#note_" + noteid + "' >"
+                + "<div class='timeline-panel'>"
+                + "<div class='timeline-body'>"
+                + "<p>" + note + "</p>"
+                + "</div>"
+                + "<div class='timeline-footer'>"
+                + "<p>" + notedate + " " + notetime + "</p>"
+                + "</div>"
+                + "</div>"
+                + "</li>";
+            return element;
+
+        }
+
+        var _learnerId;
+        $(document).ready(function () {
+            $("#matrixdata").hide();
+            $("#doctable").hide();
+            $("#btncancel").hide();
+
+            @*if (@learnerId) {*@
+                _learnerId = @learnerId;
+                $("#learnerId").val(_learnerId);
+            //}
+            Bind_Notes(_learnerId);
+
+            BindGridView(_learnerId);
+            app.LoadLearnerProfile();
+            app.LoadEmployeeProfile();
+            app.GetMetricLable();
+            app.getOnLoad();
+            $('.ckbox label').on('click', function () {
+                $(this).parents('tr').toggleClass('selected');
+            });
+
+            $('.btn-filter').on('click', function () {
+                var $target = $(this).data('target');
+                if ($target != 'all') {
+                    $('.table tr').css('display', 'none');
+                    $('.table tr[data-status="' + $target + '"]').fadeIn('slow');
+                } else {
+                    $('.table tr').css('display', 'none').fadeIn('slow');
+                    $('.table tr[data-status="' + $target + '"]').fadeOut('slow');
+                }
+            });
+
+            $('.downloading').on('click', function () {
+                var $docid = $(this).data('id');
+                alert($docid);
+            });
+
+            $('.deliverable-infos').hide();
+        })
+    </script>
+
+}

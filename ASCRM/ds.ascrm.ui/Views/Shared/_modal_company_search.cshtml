@@ -1,0 +1,367 @@
+﻿@*<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>*@
+
+<style>
+    .searchHeader {
+        font-size: 16px;
+        font: bold;
+    }
+    .searchBody {
+        margin: 10px 10px 10px 10px;
+        padding-left:10px;
+    }
+    .searchBar {
+/*        border-top: 1px solid #9696E0;
+*/   
+
+    }
+    #mainCompany {
+        height: 700px;
+        overflow-y: auto;
+    }
+    span a :hover {
+        color: red;
+    }
+
+    span a:active {
+        color: green
+    }
+</style>
+<div id="dv_company_search">
+    <div class="modal fade" id="kt_modal_company_search" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         style="display: none;" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content" id="mainCompany">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Search Companies </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    @*@Html.Hidden("last_result_val")*@
+
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        @*<div class="col-lg-4">
+                                <label>Id</label>
+                                <input class="form-control " id="text_id" />
+                            </div>*@
+                        <div class="col-lg-12">
+                            @*<label>Company Name</label>*@
+                            <input class="form-control" v-on:keyup="searchOn" />
+                        </div>
+
+                    </div>
+                    <br />
+                    <div class="kt-portlet__body">
+                        <div v-if="loading">
+                            <div class="row">
+
+
+                                <div class="col-lg-6">
+
+
+                                    <div class="col-12" v-for="(load, index) in companyLoad.list">
+
+                                        <div>
+                                            <div class="searchBar">
+                                            </div>
+                                            @*<div class="searchHeader" v-if="!loading">
+                                                <span >{{load.let}}</span>
+                                                <br />
+
+                                            </div>*@
+                                            <div class="searchBody">
+                                                <span v-if="loading">
+                                                    <a :href="'/Company/Edit?id=' + load.encodedId">  {{load.name}} <span v-if="load.sa !=null"> {{"-"}} {{load.sa}}</span> </a>
+
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <div else>
+
+                            <div class="row">
+
+
+                                <div class="col-lg-4">
+
+
+                                    <div class="col-12" v-for="(load, index) in companyLoad.list">
+
+                                        <div>
+
+                                            <div class="searchHeader" v-if="!loading">
+                                                <span v-on:click="getCompany(load.let)">
+                                                    <a style="cursor:grab">{{load.let}} </a>
+                                                </span>
+
+                                            </div>
+                                            <div class="searchBody">
+                                                <span v-if="loading">
+                                                    @*<a :href="'/Company/Edit?id=' + load.encodedId">  {{load.name}}  {{load.sa}}</a>*@
+
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <div class="col-lg-4">
+
+
+                                    <div class="col-12" v-for="(load, index) in companyLoad2.list">
+
+                                        <div>
+
+                                            <div class="searchHeader">
+                                                <span v-on:click="getCompany(load.let)">
+                                                    <a style="cursor:grab">{{load.let}} </a>
+                                                </span>
+
+                                            </div>
+                                            <div class="searchBody">
+                                                <span v-if="loading">
+                                                    @*<a :href="'/Company/Edit?id=' + load.encodedId">  {{load.name}}  {{load.sa}}</a>*@
+
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <div class="col-lg-4">
+
+
+                                    <div class="col-12" v-for="(load, index) in companyNumber">
+
+                                        <div>
+
+                                            <div class="searchHeader">
+                                                <span v-on:click="getCompany(load.let)">
+                                                    <a style="cursor:grab">{{load.let}} </a>
+
+                                                </span>
+
+                                            </div>
+                                            <div class="searchBody">
+                                                <span v-if="loading">
+                                                    @*<a :href="'/Company/Edit?id=' + load.encodedId">  {{load.name}}  {{load.sa}}</a>*@
+
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    @*<div class="box-header with-border" style="width:100%!important;">
+                                   @(Html.Kendo().Grid<ds.portal.companies.Models.CompanyModel>()
+                                           .Name("companyGrid")
+                                           .Columns(columns =>
+                                           {
+                                               columns.Bound(p => p.id).Hidden();
+                                               columns.Bound(p => p.id).Title("Id").ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformEdit('#:encodedId#') title='#:id#'>#:id#</a>").Width(10); ;
+                                               columns.Bound(p => p.name).Title("Company Name").ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformEdit('#:encodedId#') title='#:name#'>#:name#</a>").Width(70); ;
+                                               columns.Bound(p => p.sales_advisor).Title("Sales Advisor").Width(20);
+
+                                           })
+                        .Resizable(resize => resize.Columns(true))
+                               .Reorderable(x => x.Columns(true))
+                               .ColumnMenu(c => c.Columns(true))
+                               .Scrollable()
+                               .Sortable()
+                               .Filterable(f => f.Messages(m => m.IsFalse("No")).Messages(m => m.IsTrue("Yes")))
+                               .Sortable(sortable =>
+                               {
+                                   sortable.SortMode(GridSortMode.SingleColumn);
+                               })
+                               .Pageable()
+                               .NoRecords()
+                               .Filterable()
+                               .Pageable(pageable => pageable
+                               .Refresh(true)
+                               .PageSizes(true)
+                               .ButtonCount(5))
+                               .DataSource(dataSource =>
+                               dataSource
+                               .WebApi()
+                               .Model(model =>
+                               {
+                                   //model.Id(p => p.Lead_Id);
+                                   //model.Field(p => p.AgreedPaymentSchemeId).DefaultValue("#:Id#");
+                               })
+                               //.Events(events => events.Error("error_handler"))
+                               //.Read(read => read.Action("GetModalLeadsLastResults", "LeadApi").Data("getSelectedValueLastResult"))
+                               .PageSize(20)
+                               )
+                          )
+
+                               </div>*@
+
+
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="kt_modal_company_Load" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         style="display: none;" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content" id="mainCompany">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Companies </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    @*@Html.Hidden("last_result_val")*@
+
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        @*<div class="col-lg-4">
+                                <label>Id</label>
+                                <input class="form-control " id="text_id" />
+                            </div>*@
+                        <!--<div class="col-lg-12">-->
+                            @*<label>Company Name</label>*@
+                            <!--<input class="form-control" v-on:keyup="searchOn" />
+                        </div>-->
+
+                    </div>
+                    <br />
+                    <div class="kt-portlet__body">
+
+                        <div class="row">
+
+
+                            <div class="col-lg-6">
+
+
+                                <div class="col-12" v-for="(load, index) in LoadCompanyOneList">
+
+                                    <div>
+                                        <div class="searchBar">
+                                        </div>
+
+                                        <div class="searchBody">
+                                            <span>
+                                                <a :href="'/Company/Edit?id=' + load.encodedId">  {{load.name}} <span v-if="load.sa !=null"> {{"-"}} {{load.sa}}</span> </a>
+
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="col-lg-6">
+
+
+                                <div class="col-12" v-for="(load, index) in LoadCompanyTwoList">
+
+                                    <div>
+                                        <div class="searchBar">
+                                        </div>
+
+                                        <div class="searchBody">
+                                            <span>
+                                                <a :href="'/Company/Edit?id=' + load.encodedId">  {{load.name}} <span v-if="load.sa !=null"> {{"-"}} {{load.sa}}</span> </a>
+
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+                  
+
+
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+        <script src="~/lib/vue/vue.js"></script>
+        @*<script src="~/lib/vue/vuelidate.min.js"></script>
+        <script src="~/lib/vue/validators.min.js"></script>
+        <script src="~/js/Admin/Leads/Manage.js"></script>*@
+<script src="~/js/Admin/Companies/CompanySearch.js"></script>
+
+    }
+
+<script>
+  
+    var totalAdj = 0;
+    var totalInvoiceAm = 0;
+    var totalDiff = 0;
+    var poValue = 0;
+    //var poLedgerModels = [];
+    var i = 1;
+    var show = false;
+
+    $(document).ready(function () {
+
+        $("#text_name").keyup(function () {
+            $("#text_id").val("");
+            //$("#companyGrid").data("kendoGrid").refresh();
+            //$("#companyGrid").data("kendoGrid").dataSource.data([]);
+
+            var id = $(this).val();
+            $.ajax({
+                url: "/api/CompanyApi/CompanySearchAtZ",
+                data: { name: id },
+                type: "GET",
+                contentType: "application/json",
+                dataType: "json",
+                async: false
+            }).done(function (response) {
+
+                let grid = $("#companyGrid").data("kendoGrid");
+                console.log(response);
+
+                //for (var i = 0; i < response.Data.length; i++) {
+
+                //    grid.dataSource.add({
+                //        encodedId: response.Data[i].encodedId, id: response.Data[i].id, name: response.Data[i].name, sales_advisor: response.Data[i].sales_advisor
+                //    });
+
+                //}
+
+            });
+
+        });
+    })
+
+
+</script>
+

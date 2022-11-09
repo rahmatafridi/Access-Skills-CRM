@@ -1,0 +1,678 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+    var canRoleManagerEditLead = (permissions == null) ? false : (bool)permissions["MD_LEAD_EDIT"];
+    var canRoleManagerCreateLead = (permissions == null) ? false : (bool)permissions["MD_LEAD_CREATE"];
+
+    var canRoleManagerViewActivity = (permissions == null) ? false : (bool)permissions["MD_LEAD_ACT_VIEW"];
+    var canRoleManagerCreateActivity = (permissions == null) ? false : (bool)permissions["MD_LEAD_ACT_CREATE"];
+    var canRoleManagerEditActivity = (permissions == null) ? false : (bool)permissions["MD_LEAD_ACT_EDIT"];
+    var canRoleManagerDeleteActivity = (permissions == null) ? false : (bool)permissions["MD_LEAD_ACT_DEL"];
+
+    var canRoleManagerViewNotes = (permissions == null) ? false : (bool)permissions["MD_LEAD_NOTE_VIEW"];
+    var canRoleManagerCreateNotes = (permissions == null) ? false : (bool)permissions["MD_LEAD_NOTE_CREATE"];
+    var canRoleManagerEditNotes = (permissions == null) ? false : (bool)permissions["MD_LEAD_NOTE_EDIT"];
+    var canRoleManagerDeleteNotes = (permissions == null) ? false : (bool)permissions["MD_LEAD_NOTE_DEL"];
+
+    var canRoleManagerViewDocument = (permissions == null) ? false : (bool)permissions["MD_LEAD_DOC_VIEW"];
+    var canRoleManagerCreateDocument = (permissions == null) ? false : (bool)permissions["MD_LEAD_DOC_CREATE"];
+    var canRoleManagerEditDocument = (permissions == null) ? false : (bool)permissions["MD_LEAD_DOC_EDIT"];
+    var canRoleManagerDeleteDocument = (permissions == null) ? false : (bool)permissions["MD_LEAD_DOC_DEL"];
+    var leadId = ViewBag.Lead_Id;
+    var acceptDocumentTypes = ViewBag.acceptDocumentTypes;
+    var isMultipleDocumentUpload = ViewBag.isMultipleDocumentUpload;
+    var maxDocumentUpload = ViewBag.maxDocumentUpload;
+    var maxDocumentFileSize = ViewBag.maxDocumentFileSize;
+}
+<style>
+
+    .form-group {
+        margin-bottom: 1rem !important;
+    }
+
+    .link-text:hover {
+        color: #22b9ff !important;
+    }
+
+    .kt-portlet .kt-portlet__foot {
+        padding: 18px 10px 10px 0px !important;
+    }
+</style>
+<input type="hidden" id="hfd_roleName" value="@ViewBag.RoleName" />
+<input type="hidden" id="hfd_userId" value="@ViewBag.UserId" />
+<div class="content" id="dv_Create_Lead">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <div class="kt-form__actions kt-portlet__foot">
+                <label id="lblEditHeader" style="font-size: large;font-weight: 500;margin-right: 5px">Lead</label>
+            </div>
+            <div class="kt-portlet__head-toolbar">
+                <a href="/Lead/Manage" class="btn btn-clean kt-margin-r-10">
+                    <i class="la la-arrow-left"></i>
+                    <span class="kt-hidden-mobile">Cancel</span>
+                </a>
+            </div>
+        </div>
+        <section class="content">
+            <div class="kt-portlet__body">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="#kt_tabs_1_1">
+                            <i class="fa fa-id-card"></i> Details
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_2">
+                            <i class="fa fa-chart-bar"></i> Payment Registration
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_3">
+                            <i class="fa fa-address-card"></i> Address
+                        </a>
+                    </li>
+
+                    @if (canRoleManagerViewNotes == true)
+                    {
+                        <li class="nav-item" v-if="parameters.id > 0">
+                            <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_4">
+                                <i class="fa fa-chart-pie"></i> Notes
+                            </a>
+                        </li>
+                    }
+                    @if (canRoleManagerViewDocument == true)
+                    {
+                        <li class="nav-item" v-if="parameters.id > 0">
+                            <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_5">
+                                <i class="fa fa-file"></i> Documents
+                            </a>
+                        </li>
+                    }
+
+                    @if (canRoleManagerViewActivity == true)
+                    {
+                        <li class="nav-item" v-if="parameters.id > 0">
+                            <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_6">
+                                <i class="fa fa-history"></i> Activities
+                            </a>
+                        </li>
+                    }
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="kt_tabs_1_1" role="tabpanel">
+                        <div class="form-group row">
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label>* Contact:</label>
+                                <input type="text" id="txtContactName" v-model="lead.Lead_ContactName" class="form-control" disabled/>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label>First Name:</label>
+                                <input type="text" v-model="lead.Lead_Contact_FirstName" class="form-control" disabled/>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label>Last Name:</label>
+                                <input type="text" v-model="lead.Lead_Contact_LastName" class="form-control" disabled/>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6" id="dv_SalesAdvisor">
+                                <label>Sales Advisor:</label>
+                                <select class="form-control" id="ddl_SalesAdvisor" v-model="lead.Lead_Id_SalesAdvisor">
+                                    <option v-for="SalesAdvisor in SalesAdvisors" v-bind:value="SalesAdvisor.Users_ID" v-text="SalesAdvisor.Users_UserName"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label class="">Phone:</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i class="la la-phone"></i></span></div>
+                                    <input disabled type="text" class="form-control" v-model="lead.Lead_Contact_Phone">
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label class="">Company Name:</label>
+                                <input disabled type="text" class="form-control" maxlength="50" v-model="lead.Lead_Contact_Company_Name">
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label class="">Status:</label>
+                                <select id="ddlStatus" class="form-control" v-model="lead.Lead_Id_Status">
+                                    <option v-for="LeadStatus in LeadStatuses" v-bind:value="LeadStatus.id" v-text="LeadStatus.description"></option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-xl-3 col-sm-6">
+                                <label class="">Enquiry Date:</label>
+                                <div class="input-group date">
+                                    <input type="text" class="form-control" id="txt_DateEnquiry" v-model="lead.Lead_DateOfEnquiry" disabled>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label> Mobile:</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i class="la la-phone"></i></span></div>
+                                    <input disabled type="text" class="form-control" v-model="lead.Lead_Contact_Mobile">
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label class="">Company PostCode:</label>
+                                <input disabled type="text" class="form-control" maxlength="10" v-model="lead.LEAD_Contact_Company_PostCode">
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label class="">Pathway:</label>
+                                <select id="ddlPathway" class="form-control" v-model="lead.Lead_Contact_Id_Pathway">
+                                    <option v-for="Pathway in Pathways" v-bind:value="Pathway.id" v-text="Pathway.description"></option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label class="">Source of Enquiry:</label>
+                                <select id="ddlSourceOfEnquiry" class="form-control" v-model="lead.Lead_Id_SourceOfEnquiry">
+                                    <option v-for="Source in Sources" v-bind:value="Source.id" v-text="Source.description"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label class="">* Email:</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i class="la la-at"></i></span></div>
+                                    <input disabled type="email" class="form-control" v-model="lead.Lead_Contact_Email" v-bind:class="{ 'is-invalid': isSubmitted && $v.lead.Lead_Contact_Email.$invalid }" aria-describedby="basic-addon1">
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label>Department:</label>
+                                <select id="ddlDepartment" class="form-control" v-model="lead.Lead_Contact_Id_Department">
+                                    <option v-for="Department in Departments" v-bind:value="Department.id" v-text="Department.description"></option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label>Course Level Enquiry:</label>
+                                <select class="form-control" id="ddl_CourseLevelEnquiry" v-model="lead.Lead_Id_CourseLevel_Enquiry" v-bind:class="{ 'is-invalid': isSubmitted && $v.lead.Lead_Id_CourseLevel_Enquiry.$invalid }">
+                                    <option v-for="CourseLevel in CourseLevelEnquiries" v-bind:value="CourseLevel.id" v-text="CourseLevel.description"></option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label>* Course Level to Apply:</label>
+                                <select class="form-control" id="ddl_CourseLevel" v-model="lead.Lead_Id_CourseLevel" v-bind:class="{ 'is-invalid': isSubmitted && $v.lead.Lead_Id_CourseLevel.$invalid }">
+                                    <option v-for="CourseLevel in CourseLevels" v-bind:value="CourseLevel.id" v-text="CourseLevel.description"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label class="">* Job Title:</label>
+                                <select id="ddlJobTitle" class="form-control" v-model="lead.Lead_Contact_Id_JobTitle" v-bind:class="{ 'is-invalid': isSubmitted && $v.lead.Lead_Contact_Id_JobTitle.$invalid }">
+                                    <option v-for="JobTitle in JobTitles" v-bind:value="JobTitle.id" v-text="JobTitle.description"></option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label class="">Last Results:</label>
+                                <select id="ddl_LastResults" class="form-control" v-model="lead.Lead_Id_LastResult">
+                                    <option v-for="LastResult in LastResults" v-bind:value="LastResult.id" v-text="LastResult.description"></option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-xl-3 col-sm-6">
+                                <label class="col-lg-4 col-md-4 col-sm-6">Is Duplicate</label>
+                                <div class="col-lg-9 col-xl-6">
+                                    <span class="kt-switch">
+                                        <label>
+                                            <input disabled type="checkbox" v-model="lead.Lead_IsDuplicate" readonly checked="checked" name="is_duplicate">
+                                            <span></span>
+                                        </label>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-xl-3 col-sm-6">
+                                <label class="col-lg-6 col-md-4 col-sm-6">Is Validate Duplicate</label>
+                                <div class="col-lg-9 col-xl-6">
+                                    <span class="kt-switch">
+                                        <label>
+                                            <input disabled id="chk_IsValidateDuplicate" type="checkbox" v-model="lead.Lead_is_validated_duplicate" checked="checked" name="Lead_is_validated_duplicate">
+                                            <span></span>
+                                        </label>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="kt_tabs_1_2" role="tabpanel">
+                        <div class="form-group row">
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label class="">Preferred Time of Contact:</label>
+                                <div class="input-group timepicker">
+                                    <input type="text" class="form-control" id="txt_PreferredTimeToContact" disabled v-model="lead.Lead_PreferredTimeToContact">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            <i class="la la-clock-o"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label class="">Website:</label>
+                                <input disabled type="text" class="form-control" v-model="lead.Lead_Contact_Website">
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label class="">Registration:</label>
+                                <select id="ddlRegistration" class="form-control" v-model="lead.Lead_Contact_Id_Registration">
+                                    <option v-for="Registration in Registrations" v-bind:value="Registration.id" v-text="Registration.description"></option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label class="">Agreed Payment Scheme:</label>
+                                <select id="ddlTrainingProvider" class="form-control" v-model="lead.Lead_Id_TrainingProvider">
+                                    <option v-for="TrainingProvider in TrainingProviders" v-bind:value="TrainingProvider.id" v-text="TrainingProvider.description"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label>Learner Enrolled?</label>
+                                <select id="ddlLearnerEnrolled" class="form-control" v-model="lead.Lead_LearnersEnrolled">
+                                    <option v-for="enrolled in LearnerEnrolleds" v-bind:value="enrolled.id" v-text="enrolled.description"></option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label class="">Enrolment Cancelled Date:</label>
+                                <div class="input-group date">
+                                    <input type="text" class="form-control" id="txt_DealClosedDate" v-model="lead.Lead_DealClosedDate" disabled>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label class="">Enrolment Cancelled?</label>
+                                <select id="ddlEnrolmentCancelled" class="form-control" v-model="lead.Lead_IsDealClosed">
+                                    <option v-for="DealClosed in DealClosedOption" v-bind:value="DealClosed.id" v-text="DealClosed.description"></option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label class="">Learner Enrolment Date:</label>
+                                <div class="input-group date">
+                                    <input type="text" class="form-control" id="txt_DateCancellation" v-model="lead.Lead_DateCancellation" disabled>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label class="">Web Message:</label>
+                                <input disabled type="text" class="form-control" v-model="lead.Lead_Contact_WebMessage" />
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                <label>Web Subject:</label>
+                                <textarea disabled class="form-control" v-model="lead.Lead_Contact_WebSubject"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="kt_tabs_1_3" role="tabpanel">
+                        <div class="kt-form kt-form--fit kt-form--label-right">
+                            <div class="portlet__foot">
+                                <div class="form-group">
+                                    <div class="col-lg-12">
+                                        <div class="form-group row">
+                                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                                <label>Address Line 1:</label>
+                                                <input disabled type="email" class="form-control" v-model="lead.Lead_Contact_Address1">
+                                            </div>
+                                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                                <label>Address Line 2:</label>
+                                                <input disabled type="email" class="form-control" v-model="lead.Lead_Contact_Address2">
+                                            </div>
+                                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                                <label>Address Line 3:</label>
+                                                <input disabled type="email" class="form-control" v-model="lead.Lead_Contact_Address3">
+                                            </div>
+                                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                                <label>Postcode:</label>
+                                                <input disabled type="email" class="form-control" v-model="lead.Lead_Contact_Postcode">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                                <label class="">County:</label>
+                                                <input disabled type="text" class="form-control" v-model="lead.Lead_Contact_County" />
+                                            </div>
+                                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                                <label class="">Town/City:</label>
+                                                <input disabled type="text" class="form-control" v-model="lead.Lead_Contact_TownCity">
+                                            </div>
+                                            <div class="col-lg-3 col-md-3 col-sm-6">
+                                                <label class="">Country:</label>
+                                                <select id="ddlCountry" class="form-control" v-model="lead.Lead_Contact_Id_Country">
+                                                    <option v-for="Country in Countries" v-bind:value="Country.id" v-text="Country.description"></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="tab-pane" id="kt_tabs_1_4" role="tabpanel">
+                        <div class="kt-portlet__head-label">
+                            <button type="button" class="btn btn-bold btn-label-brand btn-sm" v-on:click="NewNote"><i class="fa fa-plus"></i> Add Note</button>
+                        </div>
+                        <br />
+                        <div class="kt-portlet">
+                            @(Html.Kendo().Grid<ds.portal.leads.Models.Notes>()
+                                            .Name("notesGrid")
+                                            .Columns(columns =>
+                                            {
+                                                            //columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-brand' style='cursor:pointer;' onclick=PerformNoteEdit('#:Note_Id#') title='Edit'><span style='text-align:center;' class='fa fa-pen'></span></a>" +
+                                                            //    "&nbsp;&nbsp;<a class='kt-font-danger' style='cursor:pointer;'onclick=PerformNoteDelete('#:Note_Id#') title='Delete'> <span style='text-align:center;' class='fa fa-trash-alt'></span></a></div>").Width(55).ClientHeaderTemplate(" ");
+                                                            columns.Bound(p => p.Note_Description).Title("Notes");
+                                                columns.Bound(p => p.Note_Category).Title("Category");
+                                                columns.Bound(p => p.Note_CreatedByUserName).Title("By").Width("200px");
+                                                columns.Bound(p => p.Note_DateCreated).Format("{0:dd/MM/yyyy HH:mm}").Title("Date").Width("180px");
+                                            })
+                                            .HtmlAttributes(new { style = "height: 100%;" })
+                                                .Resizable(resize => resize.Columns(true))
+                                            .Reorderable(x => x.Columns(true))
+                                            .ColumnMenu(c => c.Columns(true))
+                                            .Scrollable(scr => scr.Height(300))
+                                            .Sortable()
+                                            .Pageable()
+                                            .NoRecords()
+                                            .Filterable()
+                                            .Pageable(pageable => pageable
+                                            .Refresh(true)
+                                            .PageSizes(true)
+                                            .ButtonCount(5))
+                                            .DataSource(dataSource =>
+                                            dataSource
+                                            .WebApi()
+                                            .Model(model =>
+                                            {
+                                                model.Id(p => p.Note_Id);
+                                            })
+                                            .Events(events => events.Error("error_handler"))
+                                            .Read(read => read.Action("GetAllLeadNotes", "LeadApi", new { lead_Id = ViewBag.Lead_Id }))
+                                            .PageSize(20)
+                                            )
+                            )
+                        </div>
+
+                        <div class="modal fade" id="kt_modal_notes" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+                            <div class="modal-dialog" role="note">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Notes</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label class="form-control-label">Category:</label>
+                                            <select class="form-control" v-model="Note.Note_Id_Category" v-bind:class="{ 'is-invalid': isNotesSubmitted && $v.Note.Note_Id_Category.$invalid }">
+                                                <option v-for="notesCat in NotesCategories" v-bind:value="notesCat.id" v-text="notesCat.description"></option>
+                                            </select>
+                                            <span v-if="isNotesSubmitted && $v.Note.Note_Id_Category.$invalid" class="form-text text-danger">Category is required</span>
+                                            <span class="form-text text-muted">Please select category</span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="recipient-name" class="form-control-label">Notes:</label>
+                                            <textarea class="form-control" v-model="Note.Note_Description" v-bind:class="{ 'is-invalid': isNotesSubmitted && $v.Note.Note_Description.$invalid }">
+
+                                                        </textarea>
+                                            <span v-if="isNotesSubmitted && $v.Note.Note_Description.$invalid" class="form-text text-danger">Notes is required</span>
+                                            <span class="form-text text-muted">Please enter your notes</span>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                        <button type="submit" v-on:click="submitNotes" class="btn btn-success">Submit</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="kt_tabs_1_5" role="tabpanel">
+                        <div class="kt-portlet">
+                                            @(Html.Kendo().Grid<ds.portal.leads.Models.Documents>()
+                                                .Name("DocumentsGrid")
+                                                .Columns(columns =>
+                                                {
+                                                    //columns.Template("<div class='gridactionbuttonscontainer'>" +
+                                                    //        //"<a class='kt-font-brand' style='cursor:pointer;' onclick=PerformNoteEdit('#:Document_Id#') title='Edit'><span style='text-align:center;' class='fa fa-pen'></span></a> &nbsp;&nbsp;" +
+                                                    //        "<a class='kt-font-brand' style='cursor:pointer;' href='api/LeadApi/DownloadFile?document_Id=#:Document_Id#' title='Download'><span style = 'text-align:center;' class='fa fa-file-download'></span></a>" +
+                                                    //        "&nbsp;&nbsp;<a class='kt-font-danger' style='cursor:pointer;'onclick=PerformDocumentDelete('#:Document_Id#') title='Delete'> <span style='text-align:center;' class='fa fa-trash-alt'></span></a></div>").Width(55).ClientHeaderTemplate(" ");
+                                                    columns.Bound(p => p.Document_Name).Title("Name");
+                                                    columns.Bound(p => p.Document_Category).Title("Category");
+                                                    columns.Bound(p => p.Document_Description).Title("Description");
+                                                    columns.Bound(p => p.Document_CreatedByUserName).Title("By").Width("200px");
+                                                    columns.Bound(p => p.Document_DateCreated).Format("{0:dd/MM/yyyy HH:mm}").Title("Date").Width("180px");
+                                                })
+                                                .HtmlAttributes(new { style = "height: 100%;" })
+                                                    .Resizable(resize => resize.Columns(true))
+                                                .Reorderable(x => x.Columns(true))
+                                                .ColumnMenu(c => c.Columns(true))
+                                                .Scrollable(scr => scr.Height(300))
+                                                .Sortable()
+                                                .Pageable()
+                                                .NoRecords()
+                                                .Filterable()
+                                                .Pageable(pageable => pageable
+                                                .Refresh(true)
+                                                .PageSizes(true)
+                                                .ButtonCount(5))
+                                                .DataSource(dataSource =>
+                                                dataSource
+                                                .WebApi()
+                                                .Model(model =>
+                                                {
+                                                    model.Id(p => p.Document_Id);
+                                                })
+                                                .Events(events => events.Error("error_handler"))
+                                                .Read(read => read.Action("GetAllLeadDocuments", "LeadApi", new { lead_Id = ViewBag.Lead_Id }))
+                                                .PageSize(20)
+                                                )
+                                            )
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="kt_tabs_1_6" role="tabpanel">
+                        <div class="kt-portlet">
+                                @(Html.Kendo().Grid<ds.portal.leads.Models.ActivityViewModel>()
+                            .Name("ActivitiesGrid")
+                            .Columns(columns =>
+                            {
+                                columns.Bound(p => p.Activity_Type).Title("Type");
+                                                        //columns.Bound(p => p.Activity_PhoneActions).Title("Action");
+                                                        columns.Bound(p => p.Activity_PhoneActions).ClientTemplate(
+                                "# if (Activity_Id_Type == 1 ) { #" +
+                                    "#: Activity_PhoneActions #" +
+                                "# } else if (Activity_Id_Type == 2 ) { #" +
+                                    "#: Activity_EmailActions #" +
+                                "# } else { #" +
+                                    "#: Activity_MeetingActions #" +
+                                "# } #"
+                            ).Title("Action");
+                                columns.Bound(p => p.Activity_Note).Title("Notes");
+                                columns.Bound(p => p.Activity_CreatedByUserName).Title("Created By").Width("200px");
+                                columns.Bound(p => p.Activity_Date).Format("{0:dd/MM/yyyy HH:mm}").Title("Activity Date").Width("180px");
+                            })
+                            .HtmlAttributes(new { style = "height: 100%;" })
+                            .Scrollable(scr => scr.Height(300))
+                                .Resizable(resize => resize.Columns(true))
+                            .Reorderable(x => x.Columns(true))
+                            .ColumnMenu(c => c.Columns(true))
+                            .NoRecords()
+                            .Sortable()
+                            .Pageable()
+                            .Filterable()
+                            .Pageable(pageable => pageable
+                            .Refresh(true)
+                            .PageSizes(true)
+                            .ButtonCount(5))
+                            .DataSource(dataSource =>
+                            dataSource
+                            .WebApi()
+                            .Model(model =>
+                            {
+                                model.Id(p => p.Activity_Id);
+                            })
+                            .Events(events => events.Error("error_handler"))
+                            .Read(read => read.Action("GetAllLeadActivities", "LeadApi", new { lead_Id = ViewBag.Lead_Id }))
+                            .PageSize(20)
+                            )
+                                )
+                         
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<div class="content">
+    <div class="kt-portlet">
+        <section class="content">
+            <div class="kt-portlet__body">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="#kt_tabs_1_1_1">
+                            <i class="fa fa-history"></i> History
+                        </a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="kt_tabs_1_1_1" role="tabpanel">
+                        @(Html.Kendo().Grid<ds.portal.leads.Models.HistoryModel>()
+                            .Name("historyGrid")
+                            .Columns(columns =>
+                            {
+                                columns.Bound(p => p.module).Title("Area");
+                                columns.Bound(p => p.action_title).Title("Type");
+                                columns.Bound(p => p.action_type).Title("Action Type");
+                                columns.Bound(p => p.username).Title("By");
+                                columns.Bound(p => p.date_time).Title("Date Time");
+                            })
+                            .HtmlAttributes(new { style = "height: 100%;" })
+                            .Scrollable(scr => scr.Height(300))
+                            .Sortable()
+                            .Resizable(resize => resize.Columns(true))
+                            .Reorderable(x => x.Columns(true))
+                            .ColumnMenu(c => c.Columns(true))
+                            .Pageable()
+                            .NoRecords()
+                            .Filterable()
+                            .Pageable(pageable => pageable
+                            .Refresh(true)
+                            .PageSizes(true)
+                            .ButtonCount(5))
+                            .DataSource(dataSource =>
+                            dataSource
+                            .WebApi()
+                            .Model(model =>
+                            {
+                                model.Id(p => p.history_action_id);
+                            })
+                            .Read(read => read.Action("GetAllHistory", "LeadApi", new { lead_id = ViewBag.Lead_Id }))
+                            .PageSize(10)
+                            )
+                        )
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    <script src="~/lib/vue-router/vue-router.min.js"></script>
+    <script src="~/js/Admin/Leads/Create.js"></script>
+
+
+    <script>
+        var _canRoleManagerEditLead;
+        var _canRoleManagerCreateLead;
+
+        var _canRoleManagerViewActivity;
+        var _canRoleManagerCreateActivity;
+        var _canRoleManagerEditActivity;
+        var _canRoleManagerDeleteActivity;
+
+        var _canRoleManagerViewNotes;
+        var _canRoleManagerCreateNotes;
+        var _canRoleManagerEditNotes;
+        var _canRoleManagerDeleteNotes;
+
+        var _canRoleManagerViewDocument;
+        var _canRoleManagerCreateDocument;
+        var _canRoleManagerEditDocument;
+        var _canRoleManagerDeleteDocument;
+        var _leadId;
+        var _acceptDocumentTypes;
+        var _allowedExtensions = [];
+        var _isMultipleDocumentUpload;
+        var _maxDocumentUpload;
+        var _maxDocumentFileSize;
+
+       $(document).ready(function () {
+            _canRoleManagerEditLead = @canRoleManagerEditLead.ToString().ToLower();
+            _canRoleManagerCreateLead = @canRoleManagerCreateLead.ToString().ToLower();
+
+            _canRoleManagerViewActivity = @canRoleManagerViewActivity.ToString().ToLower();
+            _canRoleManagerCreateActivity = @canRoleManagerCreateActivity.ToString().ToLower();
+            _canRoleManagerEditActivity = @canRoleManagerEditActivity.ToString().ToLower();
+            _canRoleManagerDeleteActivity = @canRoleManagerDeleteActivity.ToString().ToLower();
+
+            _canRoleManagerViewNotes = @canRoleManagerViewNotes.ToString().ToLower();
+            _canRoleManagerCreateNotes = @canRoleManagerCreateNotes.ToString().ToLower();
+            _canRoleManagerEditNotes = @canRoleManagerEditNotes.ToString().ToLower();
+            _canRoleManagerDeleteNotes = @canRoleManagerDeleteNotes.ToString().ToLower();
+
+            _canRoleManagerViewDocument = @canRoleManagerViewDocument.ToString().ToLower();
+            _canRoleManagerCreateDocument = @canRoleManagerCreateDocument.ToString().ToLower();
+            _canRoleManagerEditDocument = @canRoleManagerEditDocument.ToString().ToLower();
+           _canRoleManagerDeleteDocument = @canRoleManagerDeleteDocument.ToString().ToLower();
+           _leadId = @leadId;
+
+           _acceptDocumentTypes = '@acceptDocumentTypes';
+           _isMultipleDocumentUpload = (@isMultipleDocumentUpload == 1) ? true : false;
+           _maxDocumentUpload = @maxDocumentUpload;
+           _maxDocumentFileSize = @maxDocumentFileSize;
+
+
+           $("#ddl_SalesAdvisor").attr("disabled", "disabled");
+           $("#ddlSourceOfEnquiry").attr("disabled", "disabled");
+           $("#ddl_CourseLevelEnquiry").attr("disabled", "disabled");
+           $("#ddl_CourseLevel").attr("disabled", "disabled");
+           $("#ddl_LastResults").attr("disabled", "disabled");
+           $("#ddlJobTitle").attr("disabled", "disabled");
+           $("#ddlDepartment").attr("disabled", "disabled");
+           $("#ddlStatus").attr("disabled", "disabled");
+           $("#ddlRegistration").attr("disabled", "disabled");
+           $("#ddlTrainingProvider").attr("disabled", "disabled");
+           $("#ddlPathway").attr("disabled", "disabled");
+           $("#ddlEnrolmentCancelled").attr("disabled", "disabled");
+           $("#ddlLearnerEnrolled").attr("disabled", "disabled");
+           $("#ddlCountry").attr("disabled", "disabled");
+
+           if (!_canRoleManagerEditLead && !_canRoleManagerCreateLead) {
+               window.location.href = '/Error/PermissionDenied';
+           }
+            app.mounted();
+       });
+    </script>
+}

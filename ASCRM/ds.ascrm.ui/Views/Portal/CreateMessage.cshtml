@@ -1,0 +1,127 @@
+﻿
+@{     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var role = ViewBag.Role;
+
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+    var canRoleManagerAccessMessage = (permissions == null) ? false : (bool)permissions["AC_MSG"];
+    var canRoleManagerAccessMessageEmployee = (permissions == null) ? false : (bool)permissions["ACE_MG"];
+
+    }
+
+<style>
+
+    .form-group {
+        margin-bottom: 1rem !important;
+    }
+
+    .link-text:hover {
+        color: #22b9ff !important;
+    }
+
+    .kt-portlet .kt-portlet__foot {
+        padding: 18px 10px 10px 0px !important;
+    }
+
+    .k-dropdown-wrap > .k-input, .k-dropdown .k-dropdown-wrap .k-select, .k-list, .k-reset {
+        background-color: white;
+    }
+</style>
+
+
+
+<div class="content" id="dv_Create_Massage">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <div class="kt-form__actions kt-portlet__foot">
+                <label id="lblEditHeader" style="font-size: large;font-weight: 500;margin-right: 5px">Write Message</label>
+            </div>
+            <div class="kt-portlet__head-toolbar">
+                <a asp-area="Portal" asp-controller="Message" asp-action="Manage" class="btn btn-clean kt-margin-r-10 btn-sm btn-outline-info">
+                    <i class="la la-arrow-left"></i>
+                    <span class="kt-hidden-mobile">Cancel</span>
+                </a>
+                <div class="btn-group">
+
+                    &nbsp;
+                    <button type="button" v-on:click="submitted()" class="btn btn-sm btn-brand">
+                        <i class="la la-check"></i>
+                        <span class="kt-hidden-mobile">Send</span>
+                    </button>
+            
+                </div>
+
+
+            </div>
+        </div>
+        <section class="content">
+            <div class="kt-portlet__body">
+                <div class="row">
+                    <div class="col-lg-1"></div>
+                    <div class="col-lg-10">
+                        <div class="form-group">
+                            <label>Topic</label>
+                            <select class="form-control" v-model="massage.topic_id">
+                                <option v-for="item in Topices"  v-bind:value="item.SSJLP_Id" v-text="item.SSJLP_Topic"></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Subject</label>
+                            <input type="text" v-model="massage.subject"  class="form-control"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Message</label>
+                            <textarea rows="4" class="form-control input-lg summernote" name="message" id="message"></textarea>
+                        </div>
+                        </div>
+                        <div class="col-lg-1"></div>
+
+                    </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+@*<partial name="~/Views/Shared/partials/lead/history/_portlet_history.cshtml" />*@
+
+
+@section Scripts{
+
+
+
+    <script src="~/lib/vue/vue.js" type="application/javascript"></script>
+    <script src="~/lib/vue-router/vue-router.min.js" type="application/javascript"></script>
+
+    <script src="~/js/Portal/Message/Create.js"></script>
+    <script>
+        var _canRoleManagerAccessMessage;
+        var _canRoleManagerAccessMessageEmployee;
+
+        $(document).ready(function () {
+
+            _canRoleManagerAccessMessage = @canRoleManagerAccessMessage.ToString().ToLower();
+            _canRoleManagerAccessMessageEmployee =@canRoleManagerAccessMessageEmployee.ToString().ToLower();
+
+if (@role== "900") {
+            if (!_canRoleManagerAccessMessage) {
+                window.location.href = '/Error/PermissionDenied';
+            }
+        }
+      
+        if (@role == "100") {
+            if (!_canRoleManagerAccessMessageEmployee) {
+                window.location.href = '/Error/PermissionDenied';
+            }
+        }
+        })
+        $('.summernote').summernote({
+            placeholder: '',
+            tabsize: 4,
+            height: 100
+        });
+    </script>
+
+    
+}
+

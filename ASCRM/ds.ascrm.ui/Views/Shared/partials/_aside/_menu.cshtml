@@ -1,0 +1,565 @@
+<!-- begin:: Aside Menu -->
+@{
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+    var canViewSQLUpreade = (permissions == null) ? false : (bool)permissions["CFG_SQLUPGRADE"];
+    var canViewLead = (permissions == null) ? false : (bool)permissions["MD_LEAD_VIEW"];
+    var canViewUserProfile = (permissions == null) ? false : (bool)permissions["MD_USER_PROFILE_VIEW"];
+    var canViewDiary = (permissions == null) ? false : (bool)permissions["DIARY_VIEW"];
+    var canViewRole = (permissions == null) ? false : (bool)permissions["MD_ROLE_VIEW"];
+    var canViewUserAdmin = (permissions == null) ? false : (bool)permissions["MD_USER_VIEW"];
+    var canViewList = (permissions == null) ? false : (bool)permissions["MD_LIST_VIEW"];
+    var canViewConfiguration = (permissions == null) ? false : (bool)permissions["CFG_VIEW"];
+    var canViewDocument = (permissions == null) ? false : (bool)permissions["MD_DOCUMENT_VIEW"];
+    var canViewEmailTemplate = (permissions == null) ? false : (bool)permissions["TEMPLATE_VIEW"];
+
+    var canViewMyTask = (permissions == null) ? false : (bool)permissions["LEAD_TASK_VIEW"];
+
+    var canFileUpload = (permissions == null) ? false : (bool)permissions["MD_LEAD_BULK_UPLOAD"];
+    var canReportView = (permissions == null) ? false : (bool)permissions["RPT_VIEW"];
+    var canViewCalendar = (permissions == null) ? true : (bool)permissions["CALENDAR_VIEW"];
+    var canCompanyView = (permissions == null) ? false : (bool)permissions["COMPANY_VIEW"];
+
+    var canViewAppInvite = (permissions == null) ? false : (bool)permissions["APPINVITE_VIEW"];
+    var canViewApplications = (permissions == null) ? false : (bool)permissions["APPLIC_VIEW"];
+    var canRoleManagerViewApplictionOption = (permissions == null) ? false : (bool)permissions["VE_APP_OP"];
+
+
+    var canRoleManagerViewAppliction = (permissions == null) ? false : (bool)permissions["VE_APP"];
+    var canRoleManagerDeleteAppliction = (permissions == null) ? false : (bool)permissions["APP_DEL"];
+    var canRoleManagerCreateAppliction = (permissions == null) ? false : (bool)permissions["APP_CREATE"];
+    var canRoleManagerRejAppliction = (permissions == null) ? false : (bool)permissions["APP_REJ"];
+    var canRoleManagerENRAppliction = (permissions == null) ? false : (bool)permissions["APP_ENR"];
+
+    var canRoleManagerMQAppliction = (permissions == null) ? false : (bool)permissions["APP_MQ"];
+    var canRoleManagerMCLAppliction = (permissions == null) ? false : (bool)permissions["APP_MCL"];
+    var canRoleManagerMVAppliction = (permissions == null) ? false : (bool)permissions["APP_MV"];
+
+
+    var canAdminBulkToolNote = (permissions == null) ? false : (bool)permissions["ADM_TOOL_BULK_NOTE"];
+    var canAdminBulkToolStatus = (permissions == null) ? false : (bool)permissions["ADM_TOOL_BULK_STATUS"];
+    var canAdminBulkToolLastResult = (permissions == null) ? false : (bool)permissions["ADM_TOOL_BULK_Result"];
+    var canAdminBulkToolImportLead = (permissions == null) ? false : (bool)permissions["ADM_TOOL_BULK_LEAD"];
+
+    var canRoleManagerWorkSubmitted = (permissions == null) ? false : (bool)permissions["ACE_WSM"];
+    var canRoleManagerAccessContent = (permissions == null) ? false : (bool)permissions["ACE_CCM"];
+    var canRoleManagerAccessManageUser = (permissions == null) ? false : (bool)permissions["ACE_UM"];
+
+    var canRoleManagerAccessMessage = (permissions == null) ? false : (bool)permissions["ACE_MG"];
+
+
+
+
+
+
+
+    }
+
+
+<div class="kt-aside-menu-wrapper kt-grid__item kt-grid__item--fluid" id="kt_aside_menu_wrapper">
+    <div id="kt_aside_menu" class="kt-aside-menu  kt-aside-menu--dropdown " data-ktmenu-vertical="1" data-ktmenu-dropdown="1" data-ktmenu-scroll="0">
+        <ul class="kt-menu__nav ">
+
+            <li class="kt-menu__item  kt-menu__item--submenu kt-menu__item--submenu-fullheight kt-menu__item--open kt-menu__item--here" aria-haspopup="true" data-ktmenu-submenu-toggle="click" data-ktmenu-dropdown-toggle-class="kt-aside-menu-overlay--on">
+                <a title="Dashboard" href="~/Home/Index" class="kt-menu__link"><i class="kt-menu__link-icon flaticon-home"></i><span class="kt-menu__link-text">Dashboard</span><i class="kt-menu__ver-arrow la la-angle-right"></i></a>
+            </li>
+            @if (canViewLead == true)
+            {
+        <li class="kt-menu__item  kt-menu__item--submenu kt-menu__item--submenu-fullheight kt-menu__item--open kt-menu__item--here" aria-haspopup="true" data-ktmenu-submenu-toggle="click" data-ktmenu-dropdown-toggle-class="kt-aside-menu-overlay--on">
+            <a title="My Leads" href="~/Lead/Manage" class="kt-menu__link"><i class="kt-menu__link-icon flaticon-folder-1"></i><span class="kt-menu__link-text">My Leads</span><i class="kt-menu__ver-arrow la la-angle-right"></i></a>
+        </li>}
+
+            @if (canViewCalendar)
+            {
+        <li class="kt-menu__item  kt-menu__item--submenu kt-menu__item--submenu-fullheight kt-menu__item--open kt-menu__item--here" aria-haspopup="true" data-ktmenu-submenu-toggle="click" data-ktmenu-dropdown-toggle-class="kt-aside-menu-overlay--on">
+            <a title="Calendar" href="~/Calendar" class="kt-menu__link"><i class="kt-menu__link-icon flaticon-calendar-2"></i><span class="kt-menu__link-text">Calendar</span><i class="kt-menu__ver-arrow la la-angle-right"></i></a>
+        </li>
+}
+
+            @if (canViewDiary == true)
+            {
+        <li class="kt-menu__item  kt-menu__item--submenu kt-menu__item--submenu-fullheight kt-menu__item--open kt-menu__item--here" aria-haspopup="true" data-ktmenu-submenu-toggle="click" data-ktmenu-dropdown-toggle-class="kt-aside-menu-overlay--on">
+            <a title="Diary" href="~/MyDiary" class="kt-menu__link"><i class="kt-menu__link-icon flaticon-calendar-1"></i><span class="kt-menu__link-text">Task List</span><i class="kt-menu__ver-arrow la la-angle-right"></i></a>
+        </li>}
+
+            @if (canViewMyTask == true)
+            {@*<li class="kt-menu__item  kt-menu__item--submenu kt-menu__item--submenu-fullheight kt-menu__item--open kt-menu__item--here" aria-haspopup="true" data-ktmenu-submenu-toggle="click" data-ktmenu-dropdown-toggle-class="kt-aside-menu-overlay--on">
+                <a title="My Tasks" href="~/Task" class="kt-menu__link"><i class="kt-menu__link-icon flaticon-list"></i><span class="kt-menu__link-text">My Tasks</span><i class="kt-menu__ver-arrow la la-angle-right"></i></a>
+            </li>   TODO *@
+                            <li class="kt-menu__item  kt-menu__item--submenu kt-menu__item--submenu-fullheight kt-menu__item--open kt-menu__item--here" aria-haspopup="true" data-ktmenu-submenu-toggle="click" data-ktmenu-dropdown-toggle-class="kt-aside-menu-overlay--on">
+                                <a title="My Tasks" href="~/MyTask" class="kt-menu__link"><i class="kt-menu__link-icon flaticon-list"></i><span class="kt-menu__link-text">My Tasks</span><i class="kt-menu__ver-arrow la la-angle-right"></i></a>
+                            </li>}
+
+            @if (canViewUserProfile == true)
+            {
+        <li class="kt-menu__item  kt-menu__item--submenu kt-menu__item--submenu-fullheight kt-menu__item--open kt-menu__item--here" aria-haspopup="true" data-ktmenu-submenu-toggle="click" data-ktmenu-dropdown-toggle-class="kt-aside-menu-overlay--on">
+            <a title="My Profile" href="~/UserProfile" class="kt-menu__link"><i class="kt-menu__link-icon flaticon-user"></i><span class="kt-menu__link-text">My Profile</span><i class="kt-menu__ver-arrow la la-angle-right"></i></a>
+        </li>}
+
+
+            @if (canCompanyView == true)
+            {
+
+        <li class="kt-menu__item  kt-menu__item--submenu " aria-haspopup="true" data-ktmenu-submenu-toggle="click">
+            <a href="javascript:;" class="kt-menu__link kt-menu__toggle">
+                <i class="kt-menu__link-icon flaticon-buildings" style="color: #22b9ff;"></i>
+                <span class="kt-menu__link-text">Companies A-Z</span>
+                <i class="kt-menu__ver-arrow la la-angle-right"></i>
+            </a>
+            <div class="kt-menu__submenu kt-menu__submenu--up">
+                <span class="kt-menu__arrow"></span>
+                <ul class="kt-menu__subnav">
+                    @*<li class="kt-menu__item  kt-menu__item--parent kt-menu__item--bottom-2" aria-haspopup="true">
+                    <span class="kt-menu__link">
+                        <span class="kt-menu__link-text">Company A-Z</span>
+                    </span>
+                </li>*@
+
+                    <li class="kt-menu__item " aria-haspopup="true">
+                        <a href="~/Company/Manage" class="kt-menu__link ">
+                            <span class="kt-menu__link-text">All Companies </span>
+                        </a>
+                    </li>
+
+                    <li class="kt-menu__item " aria-haspopup="true">
+                        <span onclick="companySearch()" class="kt-menu__link ">
+                            <span class="kt-menu__link-text">Search Company</span>
+                        </span>
+                    </li>
+                    <li class="kt-menu__item " aria-haspopup="true">
+                        <span style="margin-left: 9px; margin-right: 9px;">
+                            @*<div class="kt-quick-search kt-quick-search--inline kt-quick-search--result-compact" id="kt_quick_search_inline">
+                            <form method="get" class="kt-quick-search__form">
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i class="flaticon2-search-1"></i></span></div>
+                                    <input type="text" class="form-control kt-quick-search__input" placeholder="Search...">
+                                    <div class="input-group-append"><span class="input-group-text"><i class="la la-close kt-quick-search__close" style="display: none;"></i></span></div>
+                                </div>
+                            </form>
+                            <div id="kt_quick_search_toggle" data-toggle="dropdown" data-offset="0px,10px"></div>
+                            <div class="dropdown-menu dropdown-menu-fit dropdown-menu-right dropdown-menu-anim dropdown-menu-lg">
+                                <div class="kt-quick-search__wrapper kt-scroll" data-scroll="true" data-height="300" data-mobile-height="200">
+                                </div>
+                            </div>
+                        </div>*@
+                            @*<input class="form-control kt-quick-search__input" placeholder="Search..." id="txtcompanysearch" />*@
+                        </span>
+                    </li>
+
+                </ul>
+            </div>
+        </li>
+}
+
+            @if (canAdminBulkToolImportLead == true || canAdminBulkToolNote == true || canAdminBulkToolStatus == true || canAdminBulkToolLastResult == true)
+            {
+
+        <li class="kt-menu__item  kt-menu__item--submenu " aria-haspopup="true" data-ktmenu-submenu-toggle="click">
+            <a href="javascript:;" class="kt-menu__link kt-menu__toggle">
+                <i class="kt-menu__link-icon flaticon-upload-1" style="color: #22b9ff;"></i>
+                <span class="kt-menu__link-text">Admin Tools</span>
+                <i class="kt-menu__ver-arrow la la-angle-right"></i>
+            </a>
+            <div class="kt-menu__submenu kt-menu__submenu--up">
+                <span class="kt-menu__arrow"></span>
+
+                <ul class="kt-menu__subnav">
+                    <li class="kt-menu__item  kt-menu__item--parent kt-menu__item--bottom-2" aria-haspopup="true">
+                        <span class="kt-menu__link">
+                            <span class="kt-menu__link-text">Admin Tools</span>
+                        </span>
+                    </li>
+                    @if (canAdminBulkToolImportLead == true)
+                    {
+        <li class="kt-menu__item " aria-haspopup="true">
+            <a href="~/LeadFileUpload/Index" class="kt-menu__link ">
+                <span class="kt-menu__link-text">
+                    Bulk upload Leads
+                </span>
+            </a>
+        </li>
+}
+                    @if (canAdminBulkToolNote == true)
+                    {
+        <li class="kt-menu__item " aria-haspopup="true">
+            <a href="~/BulkTools/ImportNote" class="kt-menu__link ">
+                <span class="kt-menu__link-text">Bulk upload Notes</span>
+            </a>
+        </li>
+}
+                    @if (canAdminBulkToolStatus == true)
+                    {
+        <li class="kt-menu__item " aria-haspopup="true">
+            <a href="~/BulkTools/ImportStatus" class="kt-menu__link ">
+                <span class="kt-menu__link-text">Bulk upload Status</span>
+            </a>
+        </li>
+}
+                    @if (canAdminBulkToolLastResult == true)
+                    {
+        <li class="kt-menu__item " aria-haspopup="true">
+            <a href="~/BulkTools/ImportLastResult" class="kt-menu__link ">
+                <span class="kt-menu__link-text">Bulk upload Last Results </span>
+            </a>
+        </li>
+}
+
+
+                </ul>
+            </div>
+        </li>
+}
+
+            @if (canReportView == true)
+            {
+        <li class="kt-menu__item  kt-menu__item--submenu kt-menu__item--submenu-fullheight kt-menu__item--open kt-menu__item--here" aria-haspopup="true" data-ktmenu-submenu-toggle="click" data-ktmenu-dropdown-toggle-class="kt-aside-menu-overlay--on">
+            <a title="Reports" href="~/Report/ContactReport" class="kt-menu__link"><i class="kt-menu__link-icon flaticon-file-2"></i><span class="kt-menu__link-text">Reports</span><i class="kt-menu__ver-arrow la la-angle-right"></i></a>
+        </li>
+}
+
+
+            @if (canViewAppInvite == true)
+            {
+        <li class="kt-menu__item  kt-menu__item--submenu kt-menu__item--submenu-fullheight kt-menu__item--open kt-menu__item--here" aria-haspopup="true" data-ktmenu-submenu-toggle="click" data-ktmenu-dropdown-toggle-class="kt-aside-menu-overlay--on">
+            <a title="Reports" href="~/AppInvites/ManageInvites" class="kt-menu__link"><i class="kt-menu__link-icon flaticon-paper-plane"></i><span class="kt-menu__link-text">Manage App Invites</span><i class="kt-menu__ver-arrow la la-angle-right"></i></a>
+        </li>}
+            @if (canViewApplications == true)
+            {
+        <li class="kt-menu__item  kt-menu__item--submenu kt-menu__item--submenu-fullheight kt-menu__item--open kt-menu__item--here" aria-haspopup="true" data-ktmenu-submenu-toggle="click" data-ktmenu-dropdown-toggle-class="kt-aside-menu-overlay--on">
+            <a title="Manage Application" href="~/Application/ManageApplication" class="kt-menu__link"><i class="kt-menu__link-icon flaticon-folder-1"></i><span class="kt-menu__link-text">Manage Applications</span><i class="kt-menu__ver-arrow la la-angle-right"></i></a>
+        </li> } @*@if (canRoleManagerViewAppliction == true)
+                {*@
+            <li class="kt-menu__item  kt-menu__item--submenu " aria-haspopup="true" data-ktmenu-submenu-toggle="click">
+                <a href="javascript:;" class="kt-menu__link kt-menu__toggle">
+                    <i class="kt-menu__link-icon flaticon-file-2"></i>
+                    <span class="kt-menu__link-text">Applications</span>
+                    <i class="kt-menu__ver-arrow la la-angle-right"></i>
+                </a>
+                <div class="kt-menu__submenu kt-menu__submenu--up">
+                    <span class="kt-menu__arrow"></span>
+                    <ul class="kt-menu__subnav">
+                        <li class="kt-menu__item  kt-menu__item--parent kt-menu__item--bottom-2" aria-haspopup="true">
+                            <span class="kt-menu__link">
+                                <span class="kt-menu__link-text">Applications</span>
+                            </span>
+                        </li>
+                        @if (canRoleManagerViewAppliction == true)
+                        {
+            <li class="kt-menu__item " aria-haspopup="true">
+                <a href="~/Application/ManageApplication" class="kt-menu__link ">
+                    <i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i>
+                    <span class="kt-menu__link-text">Manage Applications </span>
+                </a>
+            </li>}
+                        @if (canRoleManagerMQAppliction == true)
+                        {
+            <li class="kt-menu__item " aria-haspopup="true">
+                <a href="~/ApplicationQuestions/Manage" class="kt-menu__link ">
+                    <i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i>
+                    <span class="kt-menu__link-text">Manage Questions </span>
+                </a>
+            </li>}
+                        @if (canRoleManagerMQAppliction == true)
+                        {
+            <li class="kt-menu__item " aria-haspopup="true">
+                <a href="~/ApplicationQuestions/Create" class="kt-menu__link ">
+                    <i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i>
+                    <span class="kt-menu__link-text">Create Question </span>
+                </a>
+            </li>}
+                        @if (canRoleManagerMCLAppliction == true)
+                        {
+            <li class="kt-menu__item " aria-haspopup="true">
+                <a href="~/Application/CourseLevel" class="kt-menu__link ">
+                    <i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i>
+                    <span class="kt-menu__link-text">Manage Course Level </span>
+                </a>
+            </li>}
+                        @if (canRoleManagerMVAppliction == true)
+                        {
+            <li class="kt-menu__item " aria-haspopup="true">
+                <a href="~/QuestionValidation/Manage" class="kt-menu__link ">
+                    <i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i>
+                    <span class="kt-menu__link-text">Manage Validations </span>
+                </a>
+            </li>}
+                        @if (canViewAppInvite == true)
+                        {
+            <li class="kt-menu__item " aria-haspopup="true">
+                <a href="~/AppInvites/ManageInvites" class="kt-menu__link ">
+                    <i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i>
+                    <span class="kt-menu__link-text">Manage App Invites </span>
+                </a>
+            </li>}
+                        @if (canRoleManagerViewApplictionOption == true)
+                        {
+            <li class="kt-menu__item " aria-haspopup="true">
+                <a href="~/Application/Options" class="kt-menu__link ">
+                    <i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i>
+                    <span class="kt-menu__link-text">Manage Application Options</span>
+                </a>
+            </li>
+}
+                    </ul>
+                </div>
+            </li>
+            @*}*@
+
+            <li class="kt-menu__item  kt-menu__item--submenu " aria-haspopup="true" data-ktmenu-submenu-toggle="click">
+                <a href="javascript:;" class="kt-menu__link kt-menu__toggle">
+                    <i class="kt-menu__link-icon flaticon-file-2"></i>
+                    <span class="kt-menu__link-text">Portal</span>
+                    <i class="kt-menu__ver-arrow la la-angle-right"></i>
+                </a>
+                <div class="kt-menu__submenu kt-menu__submenu--up">
+                    <span class="kt-menu__arrow"></span>
+                    <ul class="kt-menu__subnav">
+                        <li class="kt-menu__item  kt-menu__item--parent kt-menu__item--bottom-2" aria-haspopup="true">
+                            <span class="kt-menu__link">
+                                <span class="kt-menu__link-text">Portal Area</span>
+                            </span>
+                        </li>
+                        @if (canRoleManagerWorkSubmitted == true)
+                        {
+            <li class="kt-menu__item " aria-haspopup="true">
+                <a href="~/Home/LearnerWork" class="kt-menu__link ">
+                    <i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i>
+                    <span class="kt-menu__link-text">Work Submitted </span>
+                </a>
+            </li>}
+                        @if (canRoleManagerAccessManageUser == true)
+                        {
+            <li class="kt-menu__item " aria-haspopup="true">
+                <a href="~/Portal/ManageUser" class="kt-menu__link ">
+                    <i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i>
+                    <span class="kt-menu__link-text">Manage User </span>
+                </a>
+            </li>}
+                        @if (canRoleManagerAccessContent == true)
+                        {
+            <li class="kt-menu__item " aria-haspopup="true">
+                <a href="~/Portal/CourseContents" class="kt-menu__link ">
+                    <i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i>
+                    <span class="kt-menu__link-text">Course Content </span>
+                </a>
+            </li>}
+                        @if (canRoleManagerAccessContent == true)
+                        {
+            <li class="kt-menu__item " aria-haspopup="true">
+                <a href="~/Portal/ManageResources" class="kt-menu__link ">
+                    <i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i>
+                    <span class="kt-menu__link-text">Manage Resources </span>
+                </a>
+            </li>}
+
+                        @if (canRoleManagerAccessMessage)
+                        {
+            <li class="kt-menu__item " aria-haspopup="true">
+                <a href="~/Portal/ManageMessages" class="kt-menu__link ">
+                    <i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i>
+                    <span class="kt-menu__link-text">Messages </span>
+                </a>
+            </li>
+}
+                        @if (canRoleManagerAccessMessage)
+                        {
+            <li class="kt-menu__item " aria-haspopup="true">
+                <a href="~/Portal/AssignLearner" class="kt-menu__link ">
+                    <i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i>
+                    <span class="kt-menu__link-text">Assign Learner </span>
+                </a>
+            </li>
+}
+                        @if (canRoleManagerAccessMessage)
+                        {
+            <li class="kt-menu__item " aria-haspopup="true">
+                <a href="~/Portal/UpdateEmployer" class="kt-menu__link ">
+                    <i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i>
+                    <span class="kt-menu__link-text">Update Employer </span>
+                </a>
+            </li>
+}
+                    </ul>
+                </div>
+            </li>
+
+            <li class="kt-menu__item  kt-menu__item--submenu " aria-haspopup="true" data-ktmenu-submenu-toggle="click">
+                <a href="javascript:;" class="kt-menu__link kt-menu__toggle">
+                    <i class="kt-menu__link-icon flaticon-file-2"></i>
+                    <span class="kt-menu__link-text">Portal</span>
+                    <i class="kt-menu__ver-arrow la la-angle-right"></i>
+                </a>
+                <div class="kt-menu__submenu kt-menu__submenu--up">
+                    <span class="kt-menu__arrow"></span>
+                    <ul class="kt-menu__subnav">
+                        <li class="kt-menu__item  kt-menu__item--parent kt-menu__item--bottom-2" aria-haspopup="true">
+                            <span class="kt-menu__link">
+                                <span class="kt-menu__link-text">Osca Area</span>
+                            </span>
+                        </li>
+                        @if (canRoleManagerWorkSubmitted == true)
+                        {
+            <li class="kt-menu__item " aria-haspopup="true">
+                <a href="~/Learners/Manage" class="kt-menu__link ">
+                    <i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i>
+                    <span class="kt-menu__link-text">Learners </span>
+                </a>
+            </li>
+                        }
+                    
+                    </ul>
+                </div>
+            </li>
+
+
+            <li class="kt-menu__item  kt-menu__item--submenu kt-menu__item--submenu-fullheight kt-menu__item--open kt-menu__item--here" aria-haspopup="true" data-ktmenu-submenu-toggle="click" data-ktmenu-dropdown-toggle-class="kt-aside-menu-overlay--on">
+                <a href="javascript:;" class="kt-menu__link kt-menu__toggle"><i class="kt-menu__link-icon flaticon-apps"></i><span class="kt-menu__link-text">Applications</span><i class="kt-menu__ver-arrow la la-angle-right"></i></a>
+                <div class="kt-menu__submenu ">
+                    <span class="kt-menu__arrow"></span>
+                    <div class="kt-menu__wrapper">
+                        <ul class="kt-menu__subnav">
+                            @if (canViewLead == true)
+                            {
+                <li class="kt-menu__item  kt-menu__item--submenu kt-menu__item--here" aria-haspopup="true" data-ktmenu-submenu-toggle="click" data-ktmenu-submenu-mode="accordion">
+                    <a href="javascript:;" class="kt-menu__link kt-menu__toggle"><span class="kt-menu__link-text">My Leads</span><i class="kt-menu__ver-arrow la la-angle-right"></i></a>
+                    <div class="kt-menu__submenu ">
+                        <span class="kt-menu__arrow"></span>
+                        <ul class="kt-menu__subnav">
+                            <li class="kt-menu__item" aria-haspopup="true"><a href="~/Lead/Create" class="kt-menu__link "><span class="kt-menu__link-text">Create Lead</span></a></li>
+                            <li class="kt-menu__item" aria-haspopup="true"><a href="~/Lead/Manage" class="kt-menu__link "><span class="kt-menu__link-text">Manage Leads</span></a></li>
+                            @if (canFileUpload == true)
+                            {
+            <li class="kt-menu__item" aria-haspopup="true"><a href="~/LeadFileUpload/Index" class="kt-menu__link "><span class="kt-menu__link-text">Import Leads</span></a></li>
+}
+                        </ul>
+                    </div>
+                </li>
+}
+
+                            @if (canViewDiary == true)
+                            {
+                <li class="kt-menu__item " aria-haspopup="true"><a href="~/MyDiary" class="kt-menu__link "><span class="kt-menu__link-text">My Diary</span></a></li>
+}
+                            @if (canViewCalendar == true)
+                            {
+                <li class="kt-menu__item " aria-haspopup="true"><a href="~/Calendar" class="kt-menu__link "><span class="kt-menu__link-text">My Calendar</span></a></li>
+}
+                            @if (canViewMyTask == true)
+                            {@*<li class="kt-menu__item " aria-haspopup="true"><a href="~/MyDiary" class="kt-menu__link "><span class="kt-menu__link-text">My Tasks</span></a></li>*@
+                                            <li class="kt-menu__item " aria-haspopup="true"><a href="~/MyTask" class="kt-menu__link "><span class="kt-menu__link-text">My Tasks</span></a></li>
+}
+                            @if (canViewUserProfile == true)
+                            {
+                <li class="kt-menu__item " aria-haspopup="true"><a href="~/UserProfile" class="kt-menu__link "><span class="kt-menu__link-text">My Profile</span></a></li>
+}
+                            @if (canViewRole == true)
+                            {
+                <li class="kt-menu__item  kt-menu__item--submenu kt-menu__item--here" aria-haspopup="true" data-ktmenu-submenu-toggle="click" data-ktmenu-submenu-mode="accordion">
+                    <a href="javascript:;" class="kt-menu__link kt-menu__toggle"><span class="kt-menu__link-text">Manage Roles</span><i class="kt-menu__ver-arrow la la-angle-right"></i></a>
+                    <div class="kt-menu__submenu ">
+                        <span class="kt-menu__arrow"></span>
+                        <ul class="kt-menu__subnav">
+                            <li class="kt-menu__item" aria-haspopup="true"><a href="~/RoleAdmin/Index" class="kt-menu__link "><span class="kt-menu__link-text">Roles</span></a></li>
+                            <li class="kt-menu__item" aria-haspopup="true"><a href="~/RoleAdmin/CreateRole" class="kt-menu__link "><span class="kt-menu__link-text">Create Role</span></a></li>
+                        </ul>
+                    </div>
+                </li>
+}
+                            @if (canViewUserAdmin == true)
+                            {
+                <li class="kt-menu__item  kt-menu__item--submenu kt-menu__item--here" aria-haspopup="true" data-ktmenu-submenu-toggle="click" data-ktmenu-submenu-mode="accordion">
+                    <a href="javascript:;" class="kt-menu__link kt-menu__toggle"><span class="kt-menu__link-text">Manage Users</span><i class="kt-menu__ver-arrow la la-angle-right"></i></a>
+                    <div class="kt-menu__submenu ">
+                        <span class="kt-menu__arrow"></span>
+                        <ul class="kt-menu__subnav">
+                            <li class="kt-menu__item" aria-haspopup="true"><a href="~/UserAdmin/Manage" class="kt-menu__link "><span class="kt-menu__link-text">Users</span></a></li>
+                            <li class="kt-menu__item" aria-haspopup="true"><a href="~/UserAdmin/Create" class="kt-menu__link "><span class="kt-menu__link-text">Create User</span></a></li>
+                        </ul>
+                    </div>
+                </li>
+}
+                            @if (canViewList == true)
+                            {
+                <li class="kt-menu__item " aria-haspopup="true"><a href="~/List/Index" class="kt-menu__link "><span class="kt-menu__link-text">Manage List Options</span></a></li>
+}
+
+
+                            @if (canViewDocument == true)
+                            {
+                <li class="kt-menu__item " aria-haspopup="true"><a href="~/Document/Index" class="kt-menu__link "><span class="kt-menu__link-text">Manage Documents</span></a></li>
+}
+                            @if (canViewEmailTemplate == true)
+                            {
+                <li class="kt-menu__item " aria-haspopup="true"><a href="~/EmailTemplate/Manage" class="kt-menu__link "><span class="kt-menu__link-text">Manage Email Templates</span></a></li>
+}
+
+
+                            @if (canViewLead == true)
+                            {
+                <li class="kt-menu__item  kt-menu__item--submenu kt-menu__item--here" aria-haspopup="true" data-ktmenu-submenu-toggle="click" data-ktmenu-submenu-mode="accordion">
+                    <a href="javascript:;" class="kt-menu__link kt-menu__toggle"><span class="kt-menu__link-text">Company</span><i class="kt-menu__ver-arrow la la-angle-right"></i></a>
+                    <div class="kt-menu__submenu ">
+                        <span class="kt-menu__arrow"></span>
+                        <ul class="kt-menu__subnav">
+                            <li class="kt-menu__item" aria-haspopup="true"><a href="~/Company/Create" class="kt-menu__link "><span class="kt-menu__link-text">Create Company</span></a></li>
+                            <li class="kt-menu__item" aria-haspopup="true"><a href="~/Company/Manage" class="kt-menu__link "><span class="kt-menu__link-text">Manage Company</span></a></li>
+                            @if (canFileUpload == true)
+                            {
+            <li class="kt-menu__item" aria-haspopup="true"><a href="~/CompanyFileUpload/Index" class="kt-menu__link "><span class="kt-menu__link-text">Import Company</span></a></li>
+}
+                        </ul>
+                    </div>
+                </li>
+}
+
+                        </ul>
+                    </div>
+                </div>
+            </li>
+
+            @if (canViewConfiguration == true || canViewSQLUpreade == true)
+            {
+        <li class="kt-menu__item  kt-menu__item--submenu kt-menu__item--bottom-1" aria-haspopup="true" data-ktmenu-submenu-toggle="click">
+            <a href="javascript:;" class="kt-menu__link kt-menu__toggle">
+                <i class="kt-menu__link-icon flaticon2-gear"></i>
+                <span class="kt-menu__link-text">Settings</span>
+                <i class="kt-menu__ver-arrow la la-angle-right"></i>
+            </a>
+            <div class="kt-menu__submenu kt-menu__submenu--up">
+                <span class="kt-menu__arrow"></span>
+                <ul class="kt-menu__subnav">
+                    <li class="kt-menu__item  kt-menu__item--parent kt-menu__item--bottom-2" aria-haspopup="true">
+                        <span class="kt-menu__link">
+                            <span class="kt-menu__link-text">Settings</span>
+                        </span>
+                    </li>
+                    @if (canViewConfiguration == true)
+                    {
+        <li class="kt-menu__item " aria-haspopup="true">
+            <a href="~/CoreConfiguration/Index" class="kt-menu__link ">
+                <i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i>
+                <span class="kt-menu__link-text">Configuration Keys </span>
+            </a>
+        </li>}
+                    @if (canViewSQLUpreade == true)
+                    {
+        <li class="kt-menu__item " aria-haspopup="true">
+            <a href="~/Admin/Upgrade" class="kt-menu__link ">
+                <i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i>
+                <span class="kt-menu__link-text">Upgrade SQL </span>
+            </a>
+        </li> } @*<li class="kt-menu__item " aria-haspopup="true"><a href="/metronic/preview/demo7/#.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i><span class="kt-menu__link-text">Help</span></a></li>
+                    <li class="kt-menu__item " aria-haspopup="true"><a href="/metronic/preview/demo7/#.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i><span class="kt-menu__link-text">Notifications</span></a></li>*@
+                </ul>
+            </div>
+        </li>}
+        </ul>
+    </div>
+</div>
+@*<script src="~/Theme/assets/js/scripts.bundle.js"></script>*@
+
+<!-- end:: Aside Menu -->
+@*<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">*@
+<link href="~/js/autocomplete.css" rel="stylesheet" />
+@*<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>*@
+@*<script src="~/js/autocomplete.js"></script>*@
+<script></script>

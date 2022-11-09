@@ -1,0 +1,58 @@
+﻿  <!--begin::Form-->
+<div class="kt-form kt-form--fit kt-form--label-right">
+    <div class="portlet__foot">
+        <div class="form-group">
+            <div class="col-lg-12">
+                @(Html.Kendo().Grid<ds.portal.leads.Models.CommunicationSummaryLogViewModel>()
+                                .Name("CSLGrid")
+                                .Columns(columns =>
+                                {
+                                    //columns.Template("<div class='gridactionbuttonscontainer'>" +
+                                    //        "<a class='kt-font-brand' style='cursor:pointer;' onclick=PerformCSLEdit('#:CSL_Id#') title='Edit'><span style = 'text-align:center;' class='fa fa-eye'></span></a>" +
+                                    //        "&nbsp;&nbsp;<a class='kt-font-danger' style='cursor:pointer;'onclick=PerformCSLDelete('#:CSL_Id#') title='Delete'> <span style='text-align:center;' class='fa fa-trash-alt'></span></a></div>").Width(60).ClientHeaderTemplate(" ");
+                                    columns.Template("<div class='gridactionbuttonscontainer'>" +
+                                            "<a class='kt-font-danger' style='cursor:pointer;'onclick=PerformCSLDelete('#:CSL_Id#') title='Delete'> <span style='text-align:center;' class='fa fa-trash-alt'></span></a></div>").Width(30).ClientHeaderTemplate(" ");
+
+                                    columns.Bound(p => p.CSL_Outcome).Title("Outcome");
+                                    columns.Bound(p => p.CSL_Date).Format("{0:dd/MM/yyyy HH:mm}").Title("Date").Width("180px");
+                                    columns.Bound(p => p.CSL_CreatedByUserName).Title("By");
+
+                                    //columns.Bound(p => p.CSL_Date_str).Title("Date2").Width("180px");
+                                    // columns.Bound(p => p.CSL_Note).Title("Notes");
+                                    // columns.Bound(p => p.CSL_Id_SalesAdvisor).Title("By").Width("200px");
+                                    // columns.Bound(p => p.CSL_Created).Title("By").Width("200px");
+
+                                })
+                                .HtmlAttributes(new { style = "height: 100%;" })
+                                .Scrollable(scr => scr.Height(300))
+                                    .Resizable(resize => resize.Columns(true))
+                                .Reorderable(x => x.Columns(true))
+                                .ColumnMenu(c => c.Columns(true))
+                                .NoRecords()
+                                .Sortable()
+                                .Pageable()
+                                .Filterable()
+                                .Pageable(pageable => pageable
+                                .Refresh(true)
+                                .PageSizes(true)
+                                .ButtonCount(5))
+                                .DataSource(dataSource =>
+                                dataSource
+                                .WebApi()
+                                .Model(model =>
+                                {
+                                    model.Id(p => p.CSL_Id);
+                                })
+                                .Events(events => events.Error("error_handler"))
+                                .Read(read => read.Action("GetAllLeadCSL", "LeadApi", new { lead_Id = ViewBag.Lead_Id }))
+                                .PageSize(20)
+                                )
+                )
+
+
+
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::Form-->

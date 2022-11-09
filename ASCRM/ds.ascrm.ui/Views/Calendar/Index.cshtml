@@ -1,0 +1,296 @@
+﻿@model ds.portal.calendar.Models.CalendarIndexViewModel
+
+@{
+    ViewData["Title"] = "Calendar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+    var canViewCalendar = (permissions == null) ? true : (bool)permissions["CALENDAR_VIEW"];
+    var canCreateCalendar = (permissions == null) ? true : (bool)permissions["CALENDAR_CREATE"];
+    var canEditCalendar = (permissions == null) ? true : (bool)permissions["CALENDAR_EDIT"];
+    var canDeleteCalendar = (permissions == null) ? true : (bool)permissions["CALENDAR_DEL"];
+}
+
+@(Html.Kendo().Window()
+    .Name("AddEditWindow")
+    .Position(b => b.Top(100).Left(600))
+    .Modal(true)
+    .Title("Event")
+    .MinWidth(600)
+    .Content("Loading...")
+    .Visible(false)
+    .Draggable(true)
+    .Resizable()
+)
+
+<div id="calendar" class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" style="margin-top: 28px;">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="kt-portlet" id="kt_portlet">
+                <div class="kt-portlet__head">
+                    <div class="kt-portlet__head-label">
+                        <span class="kt-portlet__head-icon">
+                            <i class="kt-menu__link-icon fa fa-calendar-alt"></i>
+                        </span>
+                        <h3 class="kt-portlet__head-title">
+                            Calendar
+                        </h3>
+                    </div>
+                </div>
+                <div class="kt-portlet__body">
+                    @(Html.Kendo().MultiSelect()
+                          .Name("Users")
+                          .DataTextField("DisplayName")
+                          .DataValueField("UserId")
+                          .TagTemplate("<span style= \"background: #: data.Color #\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span>&nbsp; #: data.DisplayName #</span>")
+                          .ItemTemplate("<span style= \"background: #: data.Color #\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span>&nbsp; #: data.DisplayName #</span>")
+                          .Placeholder("Select calendars...")
+                          .BindTo(Model.CalendarUsers)
+                          .ClearButton(false)
+                          .Value(Model.CalendarUsers.Select(x => x.UserId))
+                          .HtmlAttributes(new { style = "width: 100%" })
+                    )
+
+                    <br />
+
+                    @(Html.Kendo().Scheduler<ds.portal.calendar.CalendarEventViewModel>()
+                        .Name("Scheduler")
+                        .Date(Model.CalendarDate.Date)
+                        .StartTime(Model.CalendarStartTime)
+                        .AllDaySlot(false)
+                        .Height(650)
+                        .Selectable(true)
+                        .EventTemplateId("event-template")
+                        .Pdf(pdf => pdf
+                            .FileName("Calendar Export.pdf")
+                            .ProxyURL(Url.Action("Pdf_Export_Save", "Grid"))
+                        )
+                        .Toolbar(t => t.Pdf())
+                        .Views(views =>
+                        {
+                            views.DayView(day => day.DateHeaderTemplate("<span class='k-link k-nav-day'>#=kendo.toString(date, 'ddd dd/MM')#</span>"));
+                            views.WorkWeekView(week =>
+                            {
+                                week.Selected(true);
+                                week.DateHeaderTemplate("<span class='k-link k-nav-day'>#=kendo.toString(date, 'ddd dd/MM')#</span>");
+                            });
+                            views.MonthView();
+                            views.AgendaView(agenda =>
+                            {
+                                agenda.EventTemplateId("agenda-template");
+                            });
+                        })
+                        .Resources(resource =>
+                        {
+                            resource.Add(m => m.UserId)
+                                .Title("User")
+                                .DataTextField("DisplayName")
+                                .DataValueField("UserId")
+                                .DataColorField("Color")
+                                .BindTo(Model.CalendarUsers);
+
+                        })
+                        .Events(events => events
+                            .Add("scheduler_add")
+                            .Edit("scheduler_edit")
+                            .Save("scheduler_save")
+                            .Resize("scheduler_resize")
+                            .ResizeEnd("scheduler_resizeEnd")
+                            .Move("scheduler_move")
+                            .MoveEnd("scheduler_moveEnd")
+                            .Remove("scheduler_remove")
+                        )
+                        .ShowWorkHours(true)
+                        .DataSource(d => d
+                            .WebApi()
+                            .Model(m =>
+                            {
+                                m.Id(f => f.EventID);
+                            })
+                            .Events(e => e.Error("onError"))
+                            .Read(read => read.Action("Get", "CalendarApi"))
+                            .Create(create => create.Action("Post", "CalendarApi"))
+                            .Update(update => update.Action("Put", "CalendarApi", new { id = "{0}" }))
+                            .Destroy(destroy => destroy.Action("Delete", "CalendarApi", new { id = "{0}" }))
+                        )
+                    )
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+
+    function scheduler_resize(e) {
+        e.preventDefault();
+    }
+
+    function scheduler_resizeEnd(e) {
+        e.preventDefault();
+    }
+
+    function scheduler_move(e) {
+        e.preventDefault();
+    }
+
+    function scheduler_moveEnd(e) {
+        e.preventDefault();
+    }
+
+    function scheduler_remove(e) {
+        @if (!canDeleteCalendar) 
+        { 
+            <text>
+                e.preventDefault();
+                toastr.error('Sorry you do not have permission to delete events', 'Permission Error!');
+            </text>
+        }
+    }
+
+    function scheduler_add(e) {
+        e.preventDefault();
+        @if (canCreateCalendar)
+        {
+            <text>
+                var createWindow = $("#AddEditWindow").data("kendoWindow");
+                createWindow.title('Add Event');
+                createWindow.content("loading...");
+                createWindow.refresh({
+                    url: 'Calendar/Create',
+                    data: { start: new Date(e.event.start).toISOString() }
+                });
+                createWindow.open();
+            </text>
+        }
+        else
+        {
+            <text>
+                toastr.error('Sorry you do not have permission to add events', 'Permission Error!');
+            </text>
+        }
+    }
+
+    function scheduler_edit(e) {
+        e.preventDefault();
+        @if (canEditCalendar)
+        {
+            <text>
+                var createWindow = $("#AddEditWindow").data("kendoWindow");
+                createWindow.title('Edit Event');
+                createWindow.content("loading...");
+                createWindow.refresh({
+                    url: 'Calendar/Edit',
+                    data: { eventId: e.event.EventID }
+                });
+                createWindow.open();
+            </text>
+        }
+        else
+        {
+            <text>
+                toastr.error('Sorry you do not have permission to edit events', 'Permission Error!');
+            </text>
+        }
+    }
+
+    function scheduler_save(e) {
+        //e.preventDefault();
+    }
+
+    function onError(e) {
+        var errors = $.parseJSON(e.xhr.responseText);
+
+        if (errors) {
+            alert("Errors:\n" + errors.join("\n"));
+        }
+    }
+
+    $(document).ready(function () {
+        $("#Scheduler").kendoTooltip({
+            filter: ".k-event:not(.k-event-drag-hint)",
+            position: "top",
+            width: 250,
+            content: kendo.template($('#template').html()),
+        });
+
+        $("#Users").change(function (e) {
+            var users = $("#Users").data("kendoMultiSelect");
+
+            var filter = {
+                logic: "or",
+                filters: $.map(users.value(), function (value) {
+                    return {
+                        operator: "eq",
+                        field: "UserId",
+                        value: value
+                    };
+                })
+            };
+
+            var scheduler = $("#Scheduler").data("kendoScheduler");
+            scheduler.dataSource.filter(filter);
+        });
+
+    })
+</script>
+
+<script id="event-template" type="text/x-kendo-template">
+    #if(Reason == 'Booking') {#
+    <div class='event-template'>
+        <span>#: Reason #: #: Learner #  (#: Topic #)</span>
+    </div>
+    #} else {#
+    <div class='event-template'>
+        <span>#: Reason #: #: title #</span>
+    </div>
+    #}#
+</script>
+
+<script id="agenda-template" type="text/x-kendo-template">
+    #if(Reason == 'Booking') {#
+    <div class='event-template'>
+        <span>#: Reason #: #: Learner # (#: Topic #)</span>
+    </div>
+    #} else {#
+    <div class='event-template'>
+        <span>#: Reason #: #: title # </span>
+    </div>
+    #}#
+</script>
+
+<script id="template" type="text/x-kendo-template">
+    #var element = target;#
+    #var uid = element.attr("data-uid");#
+    #var scheduler = target.closest("[data-role=scheduler]").data("kendoScheduler");#
+    #var model = scheduler.occurrenceByUid(uid);#
+
+    #if(model) {#
+    <strong>Title:</strong> #=model.title#
+    <br />
+    <strong>Start:</strong> #=kendo.format('{0:dd/MM/yyyy HH:mm}',model.start)#
+    <br />
+    <strong>End:</strong> #=kendo.format('{0:dd/MM/yyyy HH:mm}',model.end)#
+    <br />
+    #} else {#
+    <strong>No event data is available</strong>
+    #}#
+</script>
+
+<style>
+    .event-template img {
+        float: left;
+        margin: 0 8px;
+    }
+
+    body, h1, h2, h3 {
+        margin: 0px;
+    }
+
+    @@media screen and (max-width: 1023px) {
+        div.k-window {
+            display: none !important;
+        }
+    }
+</style>

@@ -1,0 +1,274 @@
+﻿
+@{
+    ViewData["Title"] = ViewBag.Page;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+    var canCompanyView = (permissions == null) ? false : (bool)permissions["COMPANY_VIEW"];
+    var canCompanyEdit = (permissions == null) ? false : (bool)permissions["COMPANY_EDIT"];
+    var canCompanyCreate = (permissions == null) ? false : (bool)permissions["COMPANY_ADD"];
+    var canCompanyDel = (permissions == null) ? false : (bool)permissions["COMPANY_DEL"];
+    var hasAdminRole = (permissions == null) ? false : (bool)permissions["MD_LEAD_MSTR"];
+}
+
+
+<div class="content" >
+    <div class="kt-portlet" id="dv_Manage_Question">
+
+        <div class="kt-portlet__head">
+            <label id="lblUserHeader" style="font-size: large;font-weight:500;margin-left:-10px;margin-top:20px;">Manage Questions</label>
+
+            <div class="kt-portlet__head-toolbar">
+                <div class="form__actions kt-portlet__foot">
+                    <a class="btn btn-sm btn-bold btn-label-brand" v-on:click="PreviewApp">
+                        <i></i> Preview  Application
+                    </a>
+                </div>
+                <div class="form__actions kt-portlet__foot">
+                    <a class="btn btn-sm btn-bold btn-label-brand" v-on:click="AssignBulik">
+                        <i class="fa fa-plus"></i> Bulk Assign Question
+                    </a>
+                </div>
+
+                <div class="form__actions kt-portlet__foot">
+                    <a href="~/ApplicationQuestions/Create" class="btn btn-sm btn-bold btn-label-brand">
+                        <i class="fa fa-plus"></i> Create Question
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+        <section class="content">
+            <div class="kt-portlet__body">
+                <div class="row">
+                    <div class="col-lg-2">
+                        <label style="margin-top:7px;">Course Level</label>
+
+                    </div>
+                    <div class="col-lg-3">
+                        <select class="form-control" style="margin-left:-117px;" v-on:change="ChangeDropdown()" v-model="course_LevelId">
+                            <option v-for="level in CourseLevel" v-bind:value="level.CL_Id" v-text="level.CL_Title"></option>
+
+                        </select>
+                    </div>
+                    <div class="col-lg-2">
+                        <label style="margin-top:7px; margin-left:-50px;">Office Use</label>
+                    </div>
+                    <div class="col-lg-2">
+                        <select class="form-control" style="margin-left:-157px;" v-on:change="ChangeType()" v-model="question_type">
+                            <option value="0">No</option>
+                            <option value="1">Yes</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-3">
+
+
+                        <div>
+                            <input class="form-control" placeholder="Search " style="margin-bottom:10px;" id="search" type="text" autocomplete="off" />
+
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="box-header with-border">
+                    @(Html.Kendo().Grid<ds.portal.applications.Models.QuestionModel>()
+                        .Name("gridCompanies")
+                        .Columns(columns =>
+                        {
+                            columns.Template("<div class='gridactionbuttonscontainer'><a  class='kt-font-danger' style='cursor:pointer;'onclick=PerformQuestionDelete('#:id#') title='Soft Delete'> <span style='text-align:center;' class='fa fa-trash-alt'></span></a>" +
+                                          "&nbsp;&nbsp;<a class='' style='cursor:pointer; color:blue;'onclick=PerformQuestionHardDelete('#:id#') title='Hard Delete'> <span style='text-align:center;' class='fa fa-trash-alt'></span></a>" +
+                                          "&nbsp;&nbsp;<a class='kt-font-danger' style='cursor:pointer;'onclick=PerformQuestionRemove('#:id#') title='Remove'> <span style='text-align:center;' class='fa fa-trash-alt'></span></a>" +
+                                         "&nbsp;&nbsp;<a class='' style='cursor:pointer; color:blue;'onclick=PerformQuestionSingleBulk('#:id#') title='Single Assign'> <span style='text-align:center;' class='fa fa-clone'></span></a>" +
+                                          "&nbsp;&nbsp;<a class='' style='cursor:pointer;'onclick=PerformQuestionCopy('#:id#') title='Clone'> <span style='text-align:center;' class='fa fa-copy'></span></a>" +
+                                "</div>").Width(80).ClientHeaderTemplate(" ");
+
+                            columns.Bound(p => p.id).Title("Id").ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformQuestionEdit('#:encodedId#') title='#:id#'>#:id#</a>").Width(50);
+                            columns.Bound(p => p.title).ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformQuestionEdit('#:encodedId#') title='#:title#'>#:title#</a>").Title("Title").Width(250);
+
+                            columns.Bound(p => p.type).Title("Type").Width(90);
+                            //columns.Bound(p => p.step).Title("Step").Width(90);
+                            //columns.Bound(p => p.section).Title("Section").Width(90);
+                            columns.Bound(p => p.sortOrder).Title("Sort Order").Width(90);
+                            columns.Bound(p => p.optheader_title).Title("Answer").Width(170);
+                        })
+                        .Resizable(resize => resize.Columns(true))
+                        .Reorderable(x => x.Columns(true))
+                        .ColumnMenu(c => c.Columns(true))
+                        .Scrollable()
+                        .Sortable()
+                        .Sortable(sortable =>
+                        {
+                            sortable.SortMode(GridSortMode.SingleColumn);
+                        })
+                        .Pageable()
+                        .NoRecords()
+                        .Filterable()
+                        .Pageable(pageable => pageable
+                        .Refresh(true)
+                        .PageSizes(true)
+                        .ButtonCount(5))
+                        .DataSource(dataSource =>
+                        dataSource
+                        .WebApi()
+                        .Model(model =>
+                        {
+                            model.Id(p => p.id);
+                        })
+                        //.Events(events => events.Error("error_handler")) ---TODO
+                        .Read(read => read.Action("GetQuestionsList", "ApplicationQuestionsApi"))
+                        .PageSize(30)
+                        )
+                    )
+                </div>
+            </div>
+        </section>
+
+        <div class="modal fade" id="kt_modal_template_Single" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Single Assign Question</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="kt-form ">
+                            @*<div class="form-group row">
+
+                                <div class="col-sm-8">
+                                    <label>From Course Level:</label>
+                                    <select id="ddl_CourseLevelFrom" class="form-control" v-model="QuestionLevel.course_LevelFromId" v-bind:class="{ 'is-invalid': isSubmitted && $v.QuestionLevel.course_LevelFromId.$invalid }">
+                                        <option v-for="CourseLevel in CourseLevels1" v-bind:value="CourseLevel.CL_Id" v-text="CourseLevel.CL_Title"></option>
+                                    </select>
+                                    <span v-if="isSubmitted && $v.QuestionLevel.course_LevelFromId.$invalid" class="form-text text-danger">Course level is required</span>
+                                </div>
+                            </div>*@
+
+                            <div class="form-group row">
+
+                                <div class="col-sm-12">
+                                    <label>To Course Level:</label>
+                                    <select id="ddl_CourseLevelTo" class="form-control" v-model="QuestionLevel.course_LevelToId" v-bind:class="{ 'is-invalid': isSubmitted && $v.QuestionLevel.course_LevelToId.$invalid }">
+                                        <option v-for="CourseLevel in CourseLevels2" v-bind:value="CourseLevel.CL_Id" v-text="CourseLevel.CL_Title"></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" v-on:click="SingleBulkQuestion"><span>Submit</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="kt_modal_template" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Bulk Assign Questions</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="kt-form ">
+                            <div class="form-group row">
+
+                                <div class="col-sm-12">
+                                    <label>From Course Level:</label>
+                                    <select id="ddl_CourseLevelFrom" class="form-control" v-model="QuestionLevel.course_LevelFromId" v-bind:class="{ 'is-invalid': isSubmitted && $v.QuestionLevel.course_LevelFromId.$invalid }">
+                                        <option v-for="CourseLevel in CourseLevels1" v-bind:value="CourseLevel.CL_Id" v-text="CourseLevel.CL_Title"></option>
+                                    </select>
+                                    <span v-if="isSubmitted && $v.QuestionLevel.course_LevelFromId.$invalid" class="form-text text-danger">Course level is required</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+
+                                <div class="col-sm-12">
+                                    <label>To Course Level:</label>
+                                    <select id="ddl_CourseLevelTo" class="form-control" v-model="QuestionLevel.course_LevelToId" v-bind:class="{ 'is-invalid': isSubmitted && $v.QuestionLevel.course_LevelToId.$invalid }">
+                                        <option v-for="CourseLevel in CourseLevels2" v-bind:value="CourseLevel.CL_Id" v-text="CourseLevel.CL_Title"></option>
+                                    </select>
+                                    <span v-if="isSubmitted && $v.QuestionLevel.course_LevelToId.$invalid" class="form-text text-danger">Course level is required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" v-on:click="BulkQuestion"><span>Submit</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    <script src="~/js/Admin/Applications/Questions/Manage.js"></script>
+}
+<script>
+    var _canRoleManagerViewCompany;
+    var _canRoleManagerEditCompany;
+    var _canRoleManagerDeleteCompany;
+
+    $(document).ready(function () {
+        _canRoleManagerViewCompany = @canCompanyView.ToString().ToLower();
+        _canRoleManagerEditCompany = @canCompanyEdit.ToString().ToLower();
+        _canRoleManagerDeleteCompany = @canCompanyDel.ToString().ToLower();
+
+        //if (!_canRoleManagerViewCompany) {
+        //    window.location.href = '/Error/PermissionDenied';
+        //}
+
+        $("#search").keyup(function () {
+            $("#gridCompanies").data("kendoGrid").refresh();
+            debugger; // eslint-disable-line
+
+            var id = $(this).val();
+            if (id != "") {
+                $.ajax({
+                    url: "/api/ApplicationQuestionsApi/SearchInQuestion",
+                    data: { name: id },
+                    type: "GET",
+                    contentType: "application/json",
+                    dataType: "json",
+                    async: false
+                }).done(function (response) {
+                    $("#gridCompanies").data("kendoGrid").dataSource.data([]);
+
+
+                    let grid = $("#gridCompanies").data("kendoGrid");
+
+                    for (var i = 0; i < response.Data.length; i++) {
+
+                        grid.dataSource.add({
+                            encodedId: response.Data[i].encodedId, id: response.Data[i].id, title: response.Data[i].title, type: response.Data[i].type, step: response.Data[i].step
+                            , section: response.Data[i].section, sortOrder: response.Data[i].sortOrder, optheader_title: response.Data[i].optheader_title
+                        });
+
+                    }
+
+
+                });
+            }
+            else {
+                $("#gridCompanies").data("kendoGrid").dataSource.read();
+
+
+
+
+            }
+
+        });
+    });
+
+</script>
+

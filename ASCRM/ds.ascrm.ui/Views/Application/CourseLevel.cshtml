@@ -1,0 +1,88 @@
+﻿
+@{ ViewData["Title"] = ViewBag.Page;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+    var canCourseView = (permissions == null) ? false : (bool)permissions["COURSELEVEL_VIEW"];
+    var canCourseEdit = (permissions == null) ? false : (bool)permissions["COURSELEVEL_EDIT"];
+    var canCourseCreate = (permissions == null) ? false : (bool)permissions["COURSELEVEL_ADD"];
+    var canCourseDel = (permissions == null) ? false : (bool)permissions["COURSELEVEL_DEL"]; 
+    
+    }
+<div class="content">
+    <div class="kt-portlet" id="dv_Manage_CourseLevel">
+
+        <div class="kt-portlet__head">
+            <label id="lblUserHeader" style="font-size: large;font-weight:500;margin-left:-10px;margin-top:20px;">Manage Course Level</label>
+
+            <div class="kt-portlet__head-toolbar">
+
+
+                <div class="form__actions kt-portlet__foot">
+                    <a href="~/Application/AddCourseLevel" class="btn btn-sm btn-bold btn-label-brand">
+                        <i class="fa fa-plus"></i> Create Course Level
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+        <section class="content">
+            <div class="kt-portlet__body">
+                <div class="box-header with-border">
+                    @(Html.Kendo().Grid<ds.portal.applications.Models.CourseLevels>()
+                        .Name("gridCourseLevel")
+                        .Columns(columns =>
+                        {
+                            columns.Template("<div class='gridactionbuttonscontainer'><a  class='kt-font-danger' style='cursor:pointer;'onclick=PerformCourseLevelDelete('#:CL_Id#') title='Delete'> <span style='text-align:center;' class='fa fa-trash-alt'></span></a>" +
+                                             "</div>").Width(30).ClientHeaderTemplate(" ");
+                            columns.Bound(p => p.CL_Id).Title("Id").ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformCourseLevelEdit('#:encodedId#') title='#:CL_Id#'>#:CL_Id#</a>").Width(70);
+                            columns.Bound(p => p.CL_Title).ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformCourseLevelEdit('#:encodedId#') title='#:CL_Title#'>#:CL_Title#</a>").Title("Title").Width(180);
+
+                            columns.Bound(p => p.CL_Description).Title("Description").Width(160);
+                            columns.Bound(p => p.CL_Level).Title("Level").Width(160);
+                            columns.Bound(p => p.CL_SortOrder).Title("Sort Order").Width(160);
+                        })
+                        .Resizable(resize => resize.Columns(true))
+                        .Reorderable(x => x.Columns(true))
+                        .ColumnMenu(c => c.Columns(true))
+                        .Scrollable()
+                        .Sortable()
+                        .Sortable(sortable =>
+                        {
+                            sortable.SortMode(GridSortMode.SingleColumn);
+                        })
+                        .Pageable()
+                        .NoRecords()
+                        .Filterable()
+                        .Pageable(pageable => pageable
+                        .Refresh(true)
+                        .PageSizes(true)
+                        .ButtonCount(5))
+                        .DataSource(dataSource =>
+                        dataSource
+                        .WebApi()
+                        .Model(model =>
+                        {
+                            model.Id(p => p.CL_Title);
+                        })
+                        //.Events(events => events.Error("error_handler")) ---TODO
+                        .Read(read => read.Action("LoadCourseLevel", "ApplicationApi"))
+                        .PageSize(30)
+                        )
+                    )
+                </div>
+            </div>
+        </section>
+
+
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    <script src="~/js/Admin/Applications/ManageCourseLevel.js"></script>
+}
+

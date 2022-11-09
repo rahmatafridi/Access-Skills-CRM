@@ -1,0 +1,128 @@
+﻿.card .cover {
+    height: 105px;
+    overflow: hidden;
+    border-radius: 4px 4px 0 0;
+}
+.timeline {
+    list-style: none;
+    padding: 5px 0;
+    position: relative;
+    font-weight: 300;
+    margin-left:6px;
+}
+
+    .timeline:before {
+        top: 0;
+        bottom: 0;
+        position: absolute;
+        content: " ";
+        width: 2px;
+        background: #ffffff;
+        left: 100%;
+        margin-left: -1.5px;
+    }
+
+    .timeline > li {
+/*        margin-bottom: 10px;
+*/        position: relative;
+        width: 100%;
+        float: left;
+        clear: left;
+    }
+
+        .timeline > li:before, .timeline > li:after {
+            content: " ";
+            display: table;
+        }
+
+        .timeline > li:after {
+            clear: both;
+        }
+
+        .timeline > li:before, .timeline > li:after {
+            content: " ";
+            display: table;
+        }
+
+        .timeline > li:after {
+            clear: both;
+        }
+
+        .timeline > li > .timeline-panel {
+            width: calc(100% - 5px);
+            width: -moz-calc(100% - 5px);
+            width: -webkit-calc(100% - 5px);
+            float: left;
+            border: 1px solid #dcdcdc;
+            background: #ffffff;
+            position: relative;
+        }
+
+
+.timeline-title {
+    margin-top: 0;
+    color: inherit;
+}
+
+.timeline-heading h4 {
+    font-weight: 400;
+    padding: 0 5px;
+    color: #4679bd;
+}
+
+.timeline-body > p, .timeline-body > ul {
+    padding: 10px 5px;
+    margin-bottom: 0;
+}
+
+.timeline-footer {
+    padding: 5px 5px;
+    background-color: #f4f4f4;
+}
+
+    .timeline-footer p {
+        margin-bottom: 0;
+    }
+
+    .timeline-footer > a {
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+@media (max-width: 767px) {
+    ul.timeline:before {
+        left: 20px;
+    }
+
+    ul.timeline > li {
+        margin-bottom: 0px;
+        position: relative;
+        width: 100%;
+        float: left;
+        clear: left;
+    }
+
+        ul.timeline > li > .timeline-panel {
+            width: calc(100% - 5px);
+            width: -moz-calc(100% - 5px);
+            width: -webkit-calc(100% - 5px);
+        }
+
+        ul.timeline > li > .timeline-panel {
+            float: right;
+        }
+
+            ul.timeline > li > .timeline-panel:before {
+                border-left-width: 0;
+                border-right-width: 5px;
+                left: -15px;
+                right: auto;
+            }
+
+            ul.timeline > li > .timeline-panel:after {
+                border-left-width: 0;
+                border-right-width: 14px;
+                left: -14px;
+                right: auto;
+            }
+}

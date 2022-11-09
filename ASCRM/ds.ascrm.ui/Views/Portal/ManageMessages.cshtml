@@ -1,0 +1,184 @@
+﻿
+
+@{ ViewData["Title"] = "Message";
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+    var canRoleManagerAccessMessage = (permissions == null) ? false : (bool)permissions["AC_MSG"];
+    var canRoleManagerAccessMessageAssessor = (permissions == null) ? false : (bool)permissions["AC_MG"];
+    var canRoleManagerAccessMessageEmployee = (permissions == null) ? false : (bool)permissions["ACE_MG"];
+
+    var role = ViewBag.Role;
+    }
+<style>
+    .link-text:hover {
+        color: #22b9ff !important;
+    }
+
+    .kt-portlet .kt-portlet__foot {
+        padding: 10px 5px 10px 10px !important;
+    }
+
+    .k-grid-header .k-filterable, .k-grid-header .k-with-icon {
+        padding-right: calc(1px + .5rem + 1.5em + .5rem);
+    }
+    .pointer {
+        cursor: pointer;
+    }
+
+</style>
+
+<div class="content" id="dv_Portal_Massage">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <label id="lblUserHeader" style="font-size: large;font-weight:500;margin-left:-10px;margin-top:20px;">Messages  </label>
+            <div class="kt-portlet__head-toolbar">
+
+
+                <div class="kt-portlet__head-toolbar">
+
+
+                    <div class="form__actions kt-portlet__foot">
+
+                        <a  asp-controller="Portal" asp-action="CreateMessage" class="btn btn-sm btn-bold btn-label-brand">
+                            <i class="fa fa-plus"></i>New Message
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+        <section class="content">
+            <div class="kt-portlet__body">
+
+
+
+
+                <div class="card">
+                    <div class="card-body p-0">
+                        <!--begin::Table-->
+                        <div id="kt_inbox_listing_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-row-dashed fs-6 gy-5 my-0 dataTable no-footer" id="kt_inbox_listing">
+                                    <!--begin::Table head-->
+                                    <thead class="d-none">
+                                        <tr><th class="sorting" tabindex="0" aria-controls="kt_inbox_listing" rowspan="1" colspan="1" aria-label="Checkbox: activate to sort column ascending" style="width: 0px;">Checkbox</th><th class="sorting" tabindex="0" aria-controls="kt_inbox_listing" rowspan="1" colspan="1" aria-label="Actions: activate to sort column ascending" style="width: 0px;">Actions</th><th class="sorting" tabindex="0" aria-controls="kt_inbox_listing" rowspan="1" colspan="1" aria-label="Author: activate to sort column ascending" style="width: 0px;">Author</th><th class="sorting" tabindex="0" aria-controls="kt_inbox_listing" rowspan="1" colspan="1" aria-label="Title: activate to sort column ascending" style="width: 0px;">Title</th><th class="sorting" tabindex="0" aria-controls="kt_inbox_listing" rowspan="1" colspan="1" aria-label="Date: activate to sort column ascending" style="width: 0px;">Date</th></tr>
+                                    </thead>
+                                    <!--end::Table head-->
+                                    <!--begin::Table body-->
+                                    <tbody>
+                                      
+                                        <tr class="even" v-for="item in messageslist">
+
+                                       
+                                            <td class="min-w-80px" style="width:20px;">
+                                                <!--begin::Star-->
+                                                <a class="btn btn-icon btn-color-gray-400 btn-sm btn-active-color-primary" data-bs-toggle="tooltip" data-bs-placement="right" title="" data-bs-original-title="Star">
+                                                    <!--begin::Svg Icon | path: icons/duotune/general/gen029.svg-->
+                                                    <span class="svg-icon svg-icon-2">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                                            <path d="M11.1359 4.48359C11.5216 3.82132 12.4784 3.82132 12.8641 4.48359L15.011 8.16962C15.1523 8.41222 15.3891 8.58425 15.6635 8.64367L19.8326 9.54646C20.5816 9.70867 20.8773 10.6186 20.3666 11.1901L17.5244 14.371C17.3374 14.5803 17.2469 14.8587 17.2752 15.138L17.7049 19.382C17.7821 20.1445 17.0081 20.7069 16.3067 20.3978L12.4032 18.6777C12.1463 18.5645 11.8537 18.5645 11.5968 18.6777L7.69326 20.3978C6.99192 20.7069 6.21789 20.1445 6.2951 19.382L6.7248 15.138C6.75308 14.8587 6.66264 14.5803 6.47558 14.371L3.63339 11.1901C3.12273 10.6186 3.41838 9.70867 4.16744 9.54646L8.3365 8.64367C8.61089 8.58425 8.84767 8.41222 8.98897 8.16962L11.1359 4.48359Z" fill="black"></path>
+                                                        </svg>
+                                                    </span>
+                                                    <!--end::Svg Icon-->
+                                                </a>
+                                                <!--end::Star-->
+
+                                            </td>
+                                            <td class="w-100px text-end fs-7 pe-9" style="width:105px;">
+                                                <span class="fw-bold">{{formatDateEN(item.created_date)}}</span>
+                                            </td>
+                                            <td style="width:105px;">
+                                                <span class="fw-bold">{{getNumberOfDays(item.created_date)}}  Days</span>
+                                            </td>
+                                            <!--begin::Author-->
+                                            <td class="w-150px w-md-175px">
+                                                <a v-on:click="viewDataAdmin(item.encodedId)" class="d-flex align-items-center text-dark">
+                                                    <!--begin::Avatar-->
+                                                    @*<div class="symbol symbol-35px me-3">
+                    <span class="symbol-label" style="background-image:url(/metronic8/demo7/assets/media/avatars/300-1.jpg)"></span>
+                </div>*@
+                                                    <!--end::Avatar-->
+                                                    <!--begin::Name-->
+                                                    <span class="fw-bold pointer">{{item.user_name}}</span>
+                                                    <!--end::Name-->
+                                                </a>
+                                            </td>
+                                            <!--end::Author-->
+                                            <!--begin::Title-->
+                                            <td>
+                                                <div class="text-dark mb-1">
+                                                    <!--begin::Heading-->
+                                                    <a v-on:click="viewDataAdmin(item.encodedId)" class="text-dark">
+                                                        <span class="fw-bolder pointer">{{item.subject}}</span>
+
+                                                    </a>
+                                                    <!--end::Heading-->
+                                                </div>
+                                            </td>
+                                           <td>
+                                               <div>
+                                                   <span class="fw-bolder pointer"> {{item.topic}}</span>
+                                               </div>
+                                           </td>
+                                            <!--end::Title-->
+                                            <!--begin::Date-->
+                                            <!--end::Date-->
+                                        </tr>
+
+
+                                    </tbody>
+                                    <!--end::Table body-->
+                                </table>
+                            </div>
+
+                        </div>
+                        <!--end::Table-->
+                    </div>
+                </div>
+
+            
+            </div>
+        </section>
+    </div>
+
+
+
+</div>
+
+<script>
+    var _canRoleManagerAccessMessage;
+    var _canRoleManagerAccessMessageAssessor;
+    var _canRoleManagerAccessMessageEmployee;
+    $(document).ready(function () {
+        _canRoleManagerAccessMessage = @canRoleManagerAccessMessage.ToString().ToLower();
+         _canRoleManagerAccessMessageAssessor =@canRoleManagerAccessMessageAssessor.ToString().ToLower();
+        _canRoleManagerAccessMessageEmployee =@canRoleManagerAccessMessageEmployee.ToString().ToLower();
+        if (@role== "900") {
+            if (!_canRoleManagerAccessMessage) {
+                window.location.href = '/Error/PermissionDenied';
+            }
+        }
+        if (@role == "1000") {
+            if (!_canRoleManagerAccessMessageAssessor) {
+                window.location.href = '/Error/PermissionDenied';
+            }
+        }
+        if (@role == "100") {
+            if (!_canRoleManagerAccessMessageEmployee) {
+                window.location.href = '/Error/PermissionDenied';
+            }
+        }
+
+    })
+</script>
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    @*<script src="~/js/Portal/Index.js"></script>*@
+    <script src="~/js/Portal/Message/Manage.js"></script>
+}

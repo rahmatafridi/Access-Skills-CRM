@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- TemplateBeginEditable name="doctitle" -->
+<title>Untitled Document</title>
+<!-- TemplateEndEditable -->
+<!-- TemplateBeginEditable name="head" -->
+<!-- TemplateEndEditable -->
+<style type="text/css">
+<!--
+body {
+	font: 100% Verdana, Arial, Helvetica, sans-serif;
+	 margin: 0; /* it's good practice to zero the margin and padding of the body element to account for differing browser defaults */
+	padding: 0;
+	text-align: left; /* this centers the container in IE 5* browsers. The text is then set to the left aligned default in the #container selector */
+	color: #000000;
+	font-size:12px;
+}
+.oneColElsCtr #container {
+	width: 46em;
+	background: #FFFFFF;
+	margin: 0 auto; /* the auto margins (in conjunction with a width) center the page */
+	border: 1px solid #000000;
+	text-align: left; /* this overrides the text-align: center on the body element. */
+}
+.oneColElsCtr #mainContent {
+	padding: 0 20px; /* remember that padding is the space inside the div box and margin is the space outside the div box */
+}
+-->
+</style></head>
+
+<body class="oneColElsCtr">
+
+<div id="container">
+  <div id="mainContent">
+    <h4>Dear,</h4>
+    <p>&nbsp;</p>
+    <p>In reference to our recent conversation please find enclosed;</p>
+    <ul>
+      <li>1x C.V.’s </li>
+      <li>1x Offer letters.  Please print the text on your company’s letter headed paper and sign.</li>
+      <li>1x Employer agreements.    Please sign and date. </li>
+    </ul>
+    <p>Please fax one copy of each document back to me on:   0800 078 9276. Please also post another copy of each, as we require an original signature. </p>
+    
+    <p>Can you please forward the above documents to me at your earliest convenience which will speed up the process of the candidate's visa application, since they are essential documents for the file waiting to be submitted to the UK Embassy. </p>
+    
+    <p>Once the visa has been granted, the candidate's flight can be booked, but only after the accommodation of the candidate has been secured. We request that the employer is responsible for securing accommodation but we will be able to provide resources to assist - example, web page addresses.</p>
+    
+    
+    <p>We thank for your understanding and would highly appreciate any help from you as explained above in order to decrease as much as possible the time frame between the moment of accepting your candidate to the moment she/he starts working for you which is in our mutual interest. </p>
+    
+    <p>As stated before, there is no charge to you for the service of providing you with an overseas learner on our Sandwich Care Worker Scheme (SCWS).</p>
+    
+    <p>Hope this is useful to you and I look forward to your reply. If you do have any more queries or you are unsure of anything please do not hesitate to ask you can call me directly on 01384 399 647.</p>
+    
+    <p>Kindest Regards,</p>
+     
+    <h3>Bridgette</h3>
+    <!-- end #mainContent --></div>
+<!-- end #container --></div>
+</body>
+</html>

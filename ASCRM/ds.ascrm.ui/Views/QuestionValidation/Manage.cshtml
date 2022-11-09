@@ -1,0 +1,124 @@
+﻿
+@{
+    ViewData["Title"] = ViewBag.Page;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+    var canQVView = (permissions == null) ? false : (bool)permissions["QV_VIEW"];
+    var canQVEdit = (permissions == null) ? false : (bool)permissions["QV_EDIT"];
+    var canQVCreate = (permissions == null) ? false : (bool)permissions["QV_ADD"];
+    var canQVDel = (permissions == null) ? false : (bool)permissions["QV_DEL"];
+}
+
+
+<div class="content" id="dv_Manage_QuestionValidation">
+    <div class="kt-portlet">
+
+        <div class="kt-portlet__head">
+            <label id="lblUserHeader" style="font-size: large;font-weight:500;margin-left:-10px;margin-top:20px;">@ViewBag.Page</label>
+            <div class="kt-portlet__head-toolbar">
+
+
+                <div class="form__actions kt-portlet__foot">
+                    <a href="~/QuestionValidation/Create" class="btn btn-sm btn-bold btn-label-brand">
+                        <i class="fa fa-plus"></i> Create Validation
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+        <section class="content">
+            <div class="kt-portlet__body">
+
+                <div class="box-header with-border">
+                    <div class="row">
+                 
+
+                    @(Html.Kendo().Grid<ds.portal.applications.Models.QuestionValidationModel>()
+                        .Name("gridVQuestion")
+                        .Columns(columns =>
+                        {
+                            columns.Template("<div class='gridactionbuttonscontainer'><a  class='kt-font-danger' style='cursor:pointer;'onclick=PerformQVDelete('#:id#') title='Delete'> <span style='text-align:center;' class='fa fa-trash-alt'></span></a>" +
+                                             "</div>").Width(30).ClientHeaderTemplate(" ");
+                            columns.Bound(p => p.v_id).Title("Id").ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformQVEdit('#:encodedId#') title='#:v_id#'>#:v_id#</a>").Width(70);
+                            //columns.Bound(p => p.Lead_DateOfEnquiry_D).Format("{0:dd/MM/yyyy}").Title("Enquiry").Width(120);
+                            columns.Bound(p => p.q_type_name).Title("Name").ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformQVEdit('#:encodedId#') title='#:q_type_name#'>#:q_type_name#</a>").Title("Name").Width(180);
+                            columns.Bound(p => p.q_type_regex).Title("Format").Width(200);
+                            columns.Bound(p => p.q_max).Title("Max").Width(160);
+                            columns.Bound(p => p.q_min).Title("Min").Width(160);
+                            //columns.Bound(p => p.LeadID).Title("Lead(s)").Width(150);
+                            //if (hasAdminRole)
+                            //{
+                            //    columns.Bound(p => p.Users_Username).ClientTemplate("<a style='cursor:pointer' onclick='return openSalesAdvisor(#= Lead_Id_SalesAdvisor#,#=Lead_Id#)'> #= Users_Username # <a/>").Title("Assigned to").HtmlAttributes(new { style = "text-align:center" }).Width(180);
+                            //    columns.Bound(p => p.Lead_IsDuplicate).ClientTemplate("<a style='cursor:pointer' onclick='return duplicateOnclick(#= Lead_IsDuplicate#,#=Lead_Id#)'> #= Lead_IsDuplicate == 1 ? 'Yes' :'No' # <a/>").Title("Duplicated").HtmlAttributes(new { style = "text-align:center" }).Width(120);
+                            //}
+                        })
+                        .Resizable(resize => resize.Columns(true))
+                        .Reorderable(x => x.Columns(true))
+                        .ColumnMenu(c => c.Columns(true))
+                        .Scrollable()
+                        .Sortable()
+                        .Filterable(f => f.Messages(m => m.IsFalse("No")).Messages(m => m.IsTrue("Yes")))
+                        .Sortable(sortable =>
+                        {
+                            sortable.SortMode(GridSortMode.SingleColumn);
+                        })
+                        .Pageable()
+                        .NoRecords()
+                        .Filterable()
+                        .Pageable(pageable => pageable
+                        .Refresh(true)
+                        .PageSizes(true)
+                        .ButtonCount(5))
+                        .DataSource(dataSource =>
+                        dataSource
+                        .WebApi()
+                        .Model(model =>
+                        {
+                            model.Id(p => p.v_id);
+                        })
+                        //.Events(events => events.Error("error_handler")) ---TODO
+                       .Read(read => read.Action("GetQustionValidation", "QuestionValidationApi"))
+                        .PageSize(30)
+                        )
+                    )
+                </div>
+            </div>
+                </div>
+        </section>
+
+
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    <script src="~/js/Admin/QuestionValidation/Manage.js"></script>
+}
+<script>
+
+    var _canManagerViewQV;
+    var _canManagerEditQV;
+    var _canManagerDeleteQV;
+    var _canManageCreateQV;
+    $(document).ready(function () {
+        
+        _canManagerViewQV = @canQVView.ToString().ToLower();
+        _canManagerEditQV = @canQVEdit.ToString().ToLower();
+        _canManagerDeleteQV = @canQVDel.ToString().ToLower();
+        _canManageCreateQV = @canQVCreate.ToString().ToLower();
+
+        if (!_canManagerViewQV) {
+            window.location.href = '/Error/PermissionDenied';
+        }
+
+   
+
+        
+    });
+
+</script>
+

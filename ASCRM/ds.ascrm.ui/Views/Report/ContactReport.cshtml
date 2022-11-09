@@ -1,0 +1,161 @@
+﻿
+@{ ViewData["Title"] = "Contact Report";
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+    var canRoleManagerViewLeads = (permissions == null) ? false : (bool)permissions["MD_LEAD_VIEW"]; }
+<style>
+    .link-text:hover {
+        color: #22b9ff !important;
+    }
+
+    .k-grid-header .k-filterable, .k-grid-header .k-with-icon {
+        padding-right: calc(1px + .5rem + 1.5em + .5rem);
+    }
+</style>
+<div class="content">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <label id="lblUserHeader" style="font-size: large;font-weight:500;margin-left:-10px;margin-top:20px;">Contact Report</label>
+        </div>
+        <section class="content">
+            <div class="kt-portlet__body">
+                <div class="box-header with-border">
+                    <div class="form-group row">
+                        <div class="col-lg-6 col-md-6 col-sm-6">
+                            <label class="">Date of Enquiry From:</label>
+                            <div class="input-group date">
+                                <input type="text" class="form-control" id="txtDateEnquiryFrom" readonly>
+                                <div class="input-group-append">
+                                    <span class="input-group-text">
+                                        <i class="la la-calendar"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6">
+                            <label class="">Date of Enquiry To:</label>
+                            <div class="input-group date">
+                                <input type="text" class="form-control" id="txtDateEnquiryTo" readonly>
+                                <div class="input-group-append">
+                                    <span class="input-group-text">
+                                        <i class="la la-calendar"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" onclick="getReport()" class="btn btn-sm btn-brand pull-right" style="margin-left: 7px;">Generate Report</button>
+                    <div style="display:none;margin-top: 70px;">
+                        @(Html.Kendo().Grid<ds.portal.report.Model.ContactReportModel>()
+                                .Name("contactReportGrid")
+                                .Columns(columns =>
+                                {
+                                    columns.Bound(p => p.Id).Title("Id").Width(50);
+                                    columns.Bound(p => p.SalesAdvisor).Title("Sales advisor").Width(150);
+                                    columns.Bound(p => p.DateOfEnquiry).Title("Date of enquiry").Width(150);
+                                    columns.Bound(p => p.SourceOfEnquiry).Title("Source of enquiry").Width(200);
+                                    columns.Bound(p => p.Company_Name).Title("Company name").Width(150);
+                                    columns.Bound(p => p.ContactName).Title("Contact").Width(180);
+                                    columns.Bound(p => p.Phone).Title("Phone").Width(250);
+                                    columns.Bound(p => p.Mobile).Title("Mobile").Width(250);
+                                    columns.Bound(p => p.Email).Title("E-mail").Width(200);
+                                    columns.Bound(p => p.JobTitle).Title("Job title").Width(150);
+                                    columns.Bound(p => p.Department).Title("Department").Width(150);
+                                    columns.Bound(p => p.Pathway).Title("Pathway").Width(250);
+                                    columns.Bound(p => p.Registration).Title("Registration").Width(200);
+                                    columns.Bound(p => p.AgreedPaymentScheme).Title("Agreed payment scheme").Width(170);
+                                    columns.Bound(p => p.Learner_Enrolment_Date).Title("Enrolment date").Width(150);
+                                    columns.Bound(p => p.LearnerEnrolled).Title("Learner enrolled").Width(200);
+                                    columns.Bound(p => p.EnrolmentCancelledDate).Title("Enrolment cancellation date").Width(170);
+                                    columns.Bound(p => p.CourseLevel_Apply).Title("Course level to apply");
+                                    columns.Bound(p => p.CourseLevel_Enquiry).Title("Course level enquiry").Width(150);
+                                    columns.Bound(p => p.LastResults).Title("Last results").Width(170);
+                                    columns.Bound(p => p.Lead_Address1).Title("Address 1").Width(150);
+                                    columns.Bound(p => p.Lead_Address2).Title("Address 2").Width(150);
+                                    columns.Bound(p => p.Lead_TownCity).Title("Town/City").Width(150);
+                                    columns.Bound(p => p.Company_PostCode).Title("Employer postcode").Width(150);
+
+                                    // columns.Bound(p => p.Company_Name).Title("Enquiry Closed Date").Width(150);
+                                    columns.Bound(p => p.Notes).Title("Notes").Width(150);
+                                    columns.Bound(p => p.Desision_Maker).Title("Desision Maker").Width(150);
+                                    columns.Bound(p => p.Employer_Email).Title("Employer Email").Width(150);
+                                    columns.Bound(p => p.Lead_Contact_WebSubject).Title("Web Lead Postcode").Width(150);
+
+
+                                })
+                                .Sortable(sortable =>
+                                {
+                                    sortable.SortMode(GridSortMode.SingleColumn);
+                                })
+                                .Excel(excel => excel
+                                    .FileName("ContactReport.xlsx")
+                                    .Filterable(true)
+                                )
+                                .AutoBind(false)
+                                .DataSource(dataSource =>
+                                dataSource
+                                .Ajax()
+                                .ServerOperation(false)
+                                //.Model(model =>
+                                //{
+                                //    model.Id(p => p.Lead_Id);
+                                //})
+                                //.Read(read => read.Action("GetLeadFileUpload", "LeadFileUpload"))
+                                //.PageSize(20)
+                                )
+                        )
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+@section Scripts{
+
+    <script src="~/js/Admin/Companies/CompanySearch.js" type="application/javascript"></script>
+    }
+
+    <script>
+        $(document).ready(function () {
+            $('#txtDateEnquiryFrom').datepicker({
+                format: 'dd/mm/yyyy',
+                autoclose: true,
+                todayHighlight: true
+            });
+
+            $('#txtDateEnquiryTo').datepicker({
+                format: 'dd/mm/yyyy',
+                autoclose: true,
+                todayHighlight: true
+            });
+        });
+
+        function getReport() {
+            /*if ($('#txtDateEnquiryFrom').val() === "") {
+                toastr.error("Enquiry date 'From' is required.");
+                return;
+            }
+            if ($('#txtDateEnquiryTo').val() === "") {
+                toastr.error("Enquiry date 'To' is required.");
+                return;
+            }*/
+
+            $.ajax({
+                url: "/api/ReportApi/GetContacts",
+                type: "GET",
+                contentType: "application/json",
+                data:
+                {
+                    startDate: $('#txtDateEnquiryFrom').val(),
+                    endDate: $('#txtDateEnquiryTo').val()
+                },
+                dataType: "json",
+            }).done(function (response) {
+                $("#contactReportGrid").data("kendoGrid").dataSource.data(response);
+                $('#contactReportGrid').getKendoGrid().refresh();
+                $("#contactReportGrid").getKendoGrid().saveAsExcel();
+            }).fail(function (xhr) {
+                toastr.error(xhr.responseText, 'Error!');
+            });
+
+        }
+    </script>

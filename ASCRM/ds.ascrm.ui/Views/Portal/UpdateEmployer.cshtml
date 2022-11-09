@@ -1,0 +1,210 @@
+﻿@{
+    ViewData["Title"] = "Update Employer User";
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var role = ViewBag.Role;
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+    var canRoleManagerAccessContent = (permissions == null) ? false : (bool)permissions["AC_CCT"];
+  
+}
+
+<div class="kt-portlet" id="dv_Portal_updateEmployer">
+    <div class="kt-portlet__head">
+        <div class="form__actions kt-portlet__foot">
+            <label style="font-size: large;font-weight:500;margin-left:-10px;margin-top:10px;">Employer User</label>
+        </div>
+        <div class="kt-portlet__head-toolbar">
+
+        </div>
+    </div>
+    <div class="kt-portlet__body">
+        <div>
+            <div class="row">
+                <div class="col-lg-4">
+                    <select class="form-control" @@change="onChange()" v-model="userId">
+                        <option v-for="user in Users" v-bind:value="user.Users_Id" v-text="user.DisplayName"></option>
+                    </select>
+                </div>
+            </div>
+            <br />
+        </div>
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#kt_tabs_1_1" >
+                    <i class="fa fa-id-card"></i> Select Employer
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_2" >
+                    <i class="fa fa-address-card"></i> Show/Hide Learners
+                </a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="kt_tabs_1_1" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <label>Search</label>
+                        <input type="text"  autocomplete="off" placeholder="Search " class="form-control" v-model="search1" />
+                    </div>
+                    <div class="col-lg-3">
+
+                        @*<button class="btn btn-primary" style="float:right;margin-bottom:10px;" v-on:click="addnewcat">Add New</button>*@
+                    </div>
+                </div>
+                <br />
+                @(Html.Kendo().Grid<crm.portal.OscaModel.Employer>()
+                            .Name("grid_employer")
+                            .Columns(columns =>
+                            {
+                                columns.Bound(x => x.Employer_Id).Title("Id");
+                                columns.Bound(p => p.Employer_Name).Title("Name");
+                                columns.Bound(p => p.TotalAssigned).Title("Learners");
+                                columns.Bound(p => p.IsAssigned).Title("IsAssigned");
+
+                                columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-danger' style='cursor:pointer;'onclick=PerfromUpdate('#:Employer_Id#') title='Update'> <span style='text-align:center;' class='fa fa-pen-alt'></span></a></div>").Width(30).ClientHeaderTemplate(" ");
+                            })
+                            .Resizable(resize => resize.Columns(true))
+                            .Reorderable(x => x.Columns(true))
+                            .ColumnMenu(c => c.Columns(true))
+                            .Sortable()
+                            .Pageable()
+                            .Filterable()
+                            .NoRecords()
+                            .Pageable(pageable => pageable
+                            .Refresh(true)
+                            .PageSizes(true)
+                            .ButtonCount(5))
+                            .DataSource(dataSource =>
+                            dataSource
+                            .WebApi()
+                            .Model(model =>
+                            {
+                                model.Id(p => p.Employer_Id);
+                            })
+                            //.Read(read => read.Action("GetDocCategory", "PortalApi"))
+                            .PageSize(20)
+                            )
+                        )
+            </div>
+            <div class="tab-pane " id="kt_tabs_1_2" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <label>Search</label>
+                        <input type="text"  autocomplete="off" placeholder="Search " class="form-control" v-model="search12" />
+                    </div>
+                    <div class="col-lg-3">
+
+                    </div>
+                </div>     
+                <br />
+                @(Html.Kendo().Grid<crm.portal.OscaModel.Learner>()
+                            .Name("grid_Learner")
+                            .Columns(columns =>
+                            {
+                                columns.Bound(p => p.Learner_ID).ClientTemplate("<a style='cursor:pointer;' class='link-text' title='#:Learner_ID#'>#:Learner_ID#</a>").Width(70).Title("Learner Id");
+                                columns.Bound(p => p.Learner_FirstName).ClientTemplate("<a style='cursor:pointer;' class='link-text'  title='#:Learner_FirstName#'>#:Learner_FirstName#</a>").Title("First Name").Width(160);
+                                columns.Bound(p => p.Learner_Surname).Title("Last Name").ClientTemplate("<a style='cursor:pointer;' class='link-text'  title='#:Learner_Surname#'>#:Learner_Surname#</a>").Width(160);
+                                columns.Bound(p => p.Learner_Class).Title("Course").Width(100);
+                                columns.Bound(p => p.CandidateStatus).Title("Status").Width(100);
+                                columns.Bound(p => p.Percentage).Title("Progress (%)").Width(100);
+                                columns.Bound(p => p.IsHidden).Title("IsHidden").Width(100);
+                                columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-danger' style='cursor:pointer;'onclick=PerfromHide('#:Learner_ID#','#:IsHidden#') title='Hide'> <span style='text-align:center;' class='fa fa-eye'></span></a></div>").Width(30).ClientHeaderTemplate("Hide?");
+
+                                //columns.Bound(p => p.IsAssigned).Title("Assigned").ClientTemplate("# if(IsAssigned==1) {# Yes #} else {# No #}#").Width(70);
+
+
+
+                            })
+                            .Resizable(resize => resize.Columns(true))
+                            .Reorderable(x => x.Columns(true))
+                            .ColumnMenu(c => c.Columns(true))
+                            .Sortable()
+                            .Pageable()
+                            .Filterable()
+                            .NoRecords()
+                            .Pageable(pageable => pageable
+                            .Refresh(true)
+                            .PageSizes(true)
+                            .ButtonCount(5))
+                            .DataSource(dataSource =>
+                            dataSource
+                            .WebApi()
+                            .Model(model =>
+                            {
+                                model.Id(p => p.Learner_ID);
+                            })
+                            //.Read(read => read.Action("GetDocFiles", "PortalApi"))
+                            .PageSize(20)
+                            )
+                        )
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+@section Scripts{
+<script src="~/lib/vue/vue.js"></script>
+<script src="~/lib/vue/vuelidate.min.js"></script>
+<script src="~/lib/vue/validators.min.js"></script>
+<script src="~/js/Portal/User/UpdateEmployer.js"></script>
+}
+
+<script type="text/javascript">
+    var _canRoleManagerAccessContent;
+
+    var _acceptDocumentTypes;
+    var _allowedExtensions = [];
+    var _isMultipleDocumentUpload;
+    var _maxDocumentUpload;
+    var _maxDocumentFileSize;
+
+
+    //function PerformUserEdit(user_Id) {
+    //    if (!_canRoleManagerAccessUser) {
+    //        toastr.warning('You cannot edit user please contact administrator.', 'Permission denied!');
+    //    }
+    //    else {
+    //        window.location.href = 'Portal/EditUser?id=' + user_Id;
+    //    }
+    //}
+
+ 
+
+
+
+
+    var _canRoleManagerViewRoles;
+    var _canRoleManagerCreateRole;
+    var _canRoleManagerEditRole;
+    var _canRoleManagerDeleteRole;
+    var _canRoleManagerEditPermissions;
+    var _canRoleManagerViewPermissions;
+
+   
+
+</script>
+
+<script>
+    $(document).ready(function () {
+        app.LoadUserEmployer();
+        app.GetUsers();
+       
+    });
+    function CategoryGrid() {
+        $('#grid_categroy').data('kendoGrid').dataSource.read();
+        $('#grid_categroy').data('kendoGrid').refresh();
+    }
+    function FilesGrid() {
+        $('#grid_docfiles').data('kendoGrid').dataSource.read();
+        $('#grid_docfiles').data('kendoGrid').refresh();
+    }
+ 
+
+
+</script>

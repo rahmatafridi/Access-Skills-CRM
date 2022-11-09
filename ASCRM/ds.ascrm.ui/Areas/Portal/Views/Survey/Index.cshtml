@@ -1,0 +1,101 @@
+﻿@using Kendo.Mvc.UI
+@{ ViewData["Title"] = "Survey";
+
+    Layout = "~/Views/Shared/_Layout_Portal.cshtml";
+
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+    var canRoleManagerAccessSurvey = (permissions == null) ? false : (bool)permissions["AC_SURY"];
+}
+<style>
+    .link-text:hover {
+        color: #22b9ff !important;
+    }
+
+    .kt-portlet .kt-portlet__foot {
+        padding: 10px 5px 10px 10px !important;
+    }
+
+    .k-grid-header .k-filterable, .k-grid-header .k-with-icon {
+        padding-right: calc(1px + .5rem + 1.5em + .5rem);
+    }
+</style>
+
+<div class="content" id="dv_Portal_Survey">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <label id="lblUserHeader" style="font-size: large;font-weight:500;margin-left:-10px;margin-top:20px;">
+               Survey
+            </label>
+            <div class="kt-portlet__head-toolbar">
+            </div>
+        </div>
+        <section class="content">
+            <div class="kt-portlet__body" style="margin-left:30px;">
+
+                <div class="box-header with-border" v-if="IsSurveyList">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div v-for="item in documents">
+                                <button class="btn btn-primary" v-on:click="surveyDetail(item.SurveyId)"> {{item.Title}}</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div id="IsSurveyDetail">
+                    <div class="box-header with-border">
+                        <div v-for="q in survayQuestions">
+                            <h6>{{q.QuestionText}}</h6>
+                            <div v-if="q.QuestionType =='radio'">
+                                <div v-for="o in questionOptions">
+                                    <input type="radio"  v-on:blur="handleBlur"  :name="q.QuestionId"  :value="q.QuestionId" :id="o.AnswerId" /> {{o.AnswerOption}}
+                                </div>
+                            </div>
+                            <div v-if="q.QuestionType =='text'">
+                                <input type="text" class="form-control col-lg-6" v-on:blur="handleBlur" :id="q.QuestionId" v-model="q.QuestonId" />
+                            </div>
+                            <div v-if="q.QuestionType =='TrueFalse'">
+                                <select class="form-control col-lg-6" v-on:blur="handleBlur" :id="q.QuestionId"  v-model="q.QuestonId">
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" v-if="IsSurveyDetail" style="margin-top:20px;" v-on:click="SaveSurvey">Submit</button>
+
+                </div>
+            </div>
+        </section>
+    </div>
+
+
+</div>
+
+<style type="text/css">
+   
+</style>
+
+<script>
+    var _canRoleManagerAccessSurvey;
+
+        $(document).ready(function () {
+
+            _canRoleManagerAccessSurvey = @canRoleManagerAccessSurvey.ToString().ToLower();
+
+
+            if (!_canRoleManagerAccessSurvey) {
+                window.location.href = '/Error/PermissionDenied';
+            }
+        })
+
+</script>
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    @*<script src="~/js/Portal/Index.js"></script>*@
+    <script src="~/js/Portal/Survey/Manage.js"></script>
+}

@@ -1,0 +1,81 @@
+﻿ <!--begin::Form-->
+<div class="kt-form kt-form--fit kt-form--label-right">
+    <div class="portlet__foot">
+        <div class="form-group">
+            <div class="col-lg-12">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>Learner Id</th>
+                            <th>Learner Name</th>
+                            <th>Company Name</th>
+                            <th>Course Level</th>
+                            <th>Status</th>
+                            <th>Enrolment Date</th>
+                            <th>
+                                <span>Cancelled/ Withdrawn</span>
+                                <span>  or Completed Date</span> </th>
+                            <th>Whose Paying?</th>
+                            <th>View Learner </th>
+                        </tr>
+                    </thead>
+                    <tbody v-for="item in assignLearnnerList" :key="item.ID">
+                        <tr>
+                            <td>{{item.ID}}</td>
+                            <td>{{item.LearnerName}}</td>
+                            <td>{{companyNameForLearner}}</td>
+                            <td>{{item.CourseLevel}}</td>
+                            <td>{{item.CandidateStatus}}</td>
+                            <td v-if="item.EnrolmentDate=='01/01/1900'"></td>
+                            <td v-else>{{item.EnrolmentDate}}</td>
+                            <td>{{item.CompletionEnrolledCancelledDate}}</td>
+                            <td>{{item.WhosePaying}}</td>
+                            <td><a href="javascript:void(0)"  v-on:click="ViewLearner(item.ID)">View Learner</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+                @*@(Html.Kendo().Grid<ds.portal.companies.Models.CompanyAssignedLearnerModel>()
+                    .Name("assignedlearnerGrid")
+                    .Columns(columns =>
+                    {
+
+                        columns.Bound(p => p.id).Title("Id").Width("200px");
+                        columns.Bound(p => p.name).Title("Name").Width("200px");
+                        columns.Bound(p => p.is_active).Title("Status").Width("200px");
+                        //columns.Bound(p => p.address1).Title("Address 1").Width("200px");
+                        //columns.Bound(p => p.address2).Title("Address 2").Width("200px");
+                        //columns.Bound(p => p.post_code).Title("Postcode").Width("200px");
+                        columns.Bound(p => p.post_code).Title("Is Paying?").Width("200px");
+
+                    })
+                    .HtmlAttributes(new { style = "height: 100%;" })
+                    .Resizable(resize => resize.Columns(true))
+                    .Reorderable(x => x.Columns(true))
+                    .ColumnMenu(c => c.Columns(true))
+                    .Scrollable(scr => scr.Height(300))
+                    .Sortable()
+
+                    .Pageable()
+                    .NoRecords()
+                    .Filterable()
+                    .Pageable(pageable => pageable
+                    .Refresh(true)
+                    .PageSizes(true)
+                    .ButtonCount(5))
+                    .DataSource(dataSource =>
+                    dataSource
+                    .WebApi()
+                    .Model(model =>
+                    {
+                        model.Id(p => p.id);
+                    })
+                    .Events(events => events.Error("error_handler"))
+                    .Read(read => read.Action("GetAllAssignedLearner", "CompanyApi", new { company_Id = ViewBag.Company_Id }))
+                    .PageSize(20))
+                )*@
+            </div>
+        </div>
+         
+    </div>
+</div>
+<!--end::Form-->

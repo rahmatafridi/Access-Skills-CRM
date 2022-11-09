@@ -1,0 +1,42 @@
+﻿@{ Layout = string.Empty; }
+
+@model ds.portal.calendar.CalendarEventViewModel
+
+
+<form>
+    @await Html.PartialAsync("~/Views/Calendar/_CalendarEventForm.cshtml", Model)
+    <div class="form-group row">
+        <div class="col-sm-12">
+            <button class="btn btn-sm btn-bold btn-label-brand pull-right" id="edit_submit">Save</button>
+        </div>
+    </div>
+</form>
+
+
+<script>
+   
+    $(function () {
+        $('#edit_submit').on('click', function (evt) {
+            evt.preventDefault();
+
+            $.ajax({
+                url: 'api/CalendarApi',
+                type: 'PUT',
+                data: $('form').serialize(),
+                success: function (data) {
+                    $("#AddEditWindow").data("kendoWindow").close();
+                    $("#Scheduler").data("kendoScheduler").dataSource.read();
+                },
+                error: function (e) {
+                    if (e.status === 400) {
+                        $("#WarningWell").text(e.responseText);
+                    } else {
+                        $("#WarningWell").text("An error has been logged.");
+                    }
+                    $("#WarningWell").show();
+                }
+            });
+        });
+    });
+
+</script>

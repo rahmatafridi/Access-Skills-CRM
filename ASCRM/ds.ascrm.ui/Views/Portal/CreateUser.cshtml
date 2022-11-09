@@ -1,0 +1,247 @@
+﻿@{
+    ViewData["Title"] = "Create User";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var role = ViewBag.Role;
+    var userId = ViewBag.UserId; }
+<style>
+    .link-text:hover {
+        color: #22b9ff !important;
+    }
+
+    .kt-portlet .kt-portlet__foot {
+        padding: 10px 5px 10px 10px !important;
+    }
+
+    .k-grid-header .k-filterable, .k-grid-header .k-with-icon {
+        padding-right: calc(1px + .5rem + 1.5em + .5rem);
+    }
+</style>
+
+<div class="content" id="dv_Portal_UserManage">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <label id="lblUserHeader" style="font-size: large;font-weight:500;margin-left:-10px;margin-top:20px;">Add User </label>
+
+            <div class="kt-portlet__head-toolbar">
+                <a href="~/Portal/ManageUser" class="btn btn-clean kt-margin-r-10">
+                    <i class="la la-arrow-left"></i>
+                    <span class="kt-hidden-mobile">Cancel</span>
+                </a>
+                <div class="btn-group">
+                    &nbsp;
+
+                    <button type="button" class="btn btn-sm btn-brand" onclick="saveUserAdmin(0)">
+                        <i class="la la-check"></i>
+                        <span class="kt-hidden-mobile">Save</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-brand dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                    <div class="dropdown-menu dropdown-menu-right" style="">
+                        <ul class="kt-nav">
+                            <li class="kt-nav__item">
+                                <a onclick="return saveUserAdmin(0)" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon flaticon2-reload"></i>
+                                    <span class="kt-nav__link-text">Save &amp; Stay</span>
+                                </a>
+                            </li>
+                            <li class="kt-nav__item">
+                                <a onclick="return saveUserAdmin(1)" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon flaticon2-power"></i>
+                                    <span class="kt-nav__link-text">Save &amp; Go back</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="kt-portlet__body">
+            <div class="box-header with-border kt-form kt-form--label-right">
+                <div class="form-group row">
+                    <label class="col-lg-3 col-form-label">Username:</label>
+                    <div class="col-lg-6">
+                        <input type="text" v-model="user.Users_UserName" class="form-control" v-bind:class="{ 'is-invalid': isSubmitted && ($v.user.Users_UserName.$invalid || isExists)}">
+                        <span v-if="isSubmitted && !$v.user.Users_UserName.required" class="form-text text-danger">Username is required</span>
+                        @*<span v-else-if="isSubmitted && !$v.user.Users_UserName.email" class="form-text text-danger">Email is invalid</span>*@
+                        <span v-else-if="isSubmitted && isExists" class="form-text text-danger">Email already exists</span>
+                        <span class="form-text text-muted">Username to access the system. ie: firstname.surname (ideally an email)</span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-lg-3 col-form-label">Role:</label>
+                    <div class="col-lg-6">
+                        <select class="form-control" v-on:change="changeRole" v-model="user.Users_RoleId" v-bind:class="{ 'is-invalid': isSubmitted && $v.user.Users_RoleId.$invalid }">
+                            <option v-for="role in Roles" v-bind:value="role.security_role_id" v-text="role.name"></option>
+                        </select>
+                        <span v-if="isSubmitted && !$v.user.Users_RoleId.required" class="form-text text-danger">Role is required</span>
+                        <span class="form-text text-muted">Role access for this user</span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-lg-3 col-form-label">Display Name:</label>
+                    <div class="col-lg-6">
+                        <input type="text" v-model="user.Users_DisplayName" class="form-control" v-bind:class="{ 'is-invalid': isSubmitted && $v.user.Users_DisplayName.$invalid }">
+                        <span v-if="isSubmitted && $v.user.Users_DisplayName.$invalid" class="form-text text-danger">Display name is required</span>
+                        <span class="form-text text-muted">User friendly name</span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-lg-3 col-form-label">Email:</label>
+                    <div class="col-lg-6">
+                        <input type="text" v-model="user.Users_Email" class="form-control" v-bind:class="{ 'is-invalid': isSubmitted && $v.user.Users_Email.$invalid }">
+                        <span v-if="isSubmitted && !$v.user.Users_Email.required" class="form-text text-danger">Email is required</span>
+                        <span v-else-if="isSubmitted && !$v.user.Users_Email.email" class="form-text text-danger">Email is invalid</span>
+                        <span class="form-text text-muted">Valid email is required for passwords and notifications</span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-xl-3 col-lg-3 col-form-label">Is Active?</label>
+                    <div class="col-lg-9 col-xl-6">
+                        <span class="kt-switch">
+                            <label>
+                                <input type="checkbox" v-model="user.Users_IsActive" checked="checked" name="email_notification_1">
+                                <span></span>
+                            </label>
+                            <br />
+                            Give or revoke access to the system
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group row" id="accouttype">
+                    <label class="col-xl-3 col-lg-3 col-form-label">Account Type</label>
+                    <div class="col-lg-3 ">
+                        <input type="radio" name="accountype" @@change="onChange($event)" value="Training Provider" id="account"> <span style="font-size:18px;">Training Provider Account</span>
+                       <br />
+                        <input type="radio" name="accountype" @@change="onChange($event)" value="Awarding Body" id="account"> <span style="font-size:18px;">Awarding Body Account</span>
+
+                    </div>
+                    <div class="col-lg-3">
+
+                     
+                            <select class="form-control" id="traingingprovider" v-model="user.Users_Id_TrainingProvider">
+                                <option v-for="item in providers" v-bind:value="item.TrainingProvider_Id" v-text="item.TrainingProvider_Title"></option>
+                            </select>
+                            <select class="form-control" id="awardingbody" v-model="user.Users_Id_AwardingBody">
+                                <option v-for="role in awarding" v-bind:value="role.AwardingBodyLearner_Id" v-text="role.AwardingBodyLearner_Title"></option>
+                            </select>
+                       
+                       
+
+                    </div>
+                    <div class="col-lg-3 ">
+                        </div>
+                    </div>
+                    <div class="form-group row" id="employerid">
+                        <label class="col-lg-3 col-form-label">Employer Id (care Id)</label>
+                        <div class="col-lg-6">
+                            <input type="text" onkeypress='validate(event)' v-model="user.Users_Id_Care" class="form-control">
+                            @*<span v-if="isSubmitted && $v.user.Users_Id_Care.$invalid" class="form-text text-danger">Employer Id is required</span>*@
+                        </div>
+                    </div>
+                    <div class="form-group row" id="showlearner">
+                        <label class="col-lg-3 col-form-label">Show only learners from</label>
+                        <div class="col-lg-6">
+                            <input type="date"  v-model="user.Users_ShowLearnersFrom" autocomplete="off" class="form-control">
+                            @*<span v-if="isSubmitted && $v.user.Users_ShowLearnersFrom.$invalid" class="form-text text-danger">Show only learners from</span>*@
+                        </div>
+                    </div>
+                    <div class="form-group row" id="tickdcourse">
+                        <label class="col-xl-3 col-lg-3 col-form-label">Tick if you want to enable employer to see learner course summary documents</label>
+                        <div class="col-lg-9 col-xl-6">
+                            <span class="kt-switch">
+                                <label>
+                                    <input type="checkbox" v-model="user.Users_SeeLearnerCourceSummaryDocs" checked="checked">
+                                    <span></span>
+                                </label>
+                                <br />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label">Password:</label>
+                        <div class="col-lg-6">
+                            <input type="password" v-model="user.Users_Password" class="form-control" v-bind:class="{ 'is-invalid': isSubmitted && $v.user.Users_Password.$invalid }">
+                            <span v-if="isSubmitted && !$v.user.Users_Password.required" class="form-text text-danger">Password is required </span>
+                            <span v-else-if="isSubmitted && !$v.user.Users_Password.minLength" class="form-text text-danger">Password must be at least 6 characters </span>
+                            <span class="form-text text-muted">Please enter password</span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label">Confirm Password:</label>
+                        <div class="col-lg-6">
+                            <input type="password" v-model="user.Users_ConfirmPassword" class="form-control" v-bind:class="{ 'is-invalid': isSubmitted && $v.user.Users_ConfirmPassword.$invalid }">
+                            <span v-if="isSubmitted && !$v.user.Users_ConfirmPassword.required" class="form-text text-danger">Confirm password is required</span>
+                            <span v-else-if="isSubmitted && !$v.user.Users_ConfirmPassword.sameAsPassword" class="form-text text-danger">Passwords must match</span>
+                            <span class="form-text text-muted">Please enter confirm password</span>
+                        </div>
+                    </div>
+                </div>
+        </div>
+
+    </div>
+</div>
+<script>
+    function validate(evt) {
+        var theEvent = evt || window.event;
+
+        // Handle paste
+        if (theEvent.type === 'paste') {
+            key = event.clipboardData.getData('text/plain');
+        } else {
+            // Handle key press
+            var key = theEvent.keyCode || theEvent.which;
+            key = String.fromCharCode(key);
+        }
+        var regex = /[0-9]|\./;
+        if (!regex.test(key)) {
+            theEvent.returnValue = false;
+            if (theEvent.preventDefault) theEvent.preventDefault();
+        }
+    }
+    var _userId = 0;
+
+    $(document).ready(function () {
+        
+        _userId = @userId;
+        $("#tickdcourse").hide();
+        $("#employerid").hide();
+        $("#showlearner").hide();
+        $("#accouttype").hide();
+        $("#traingingprovider").hide();
+        $("#awardingbody").hide();
+
+        $('#completeDate').datepicker({
+            format: 'dd/mm/yyyy',
+            autoclose: true,
+            todayHighlight: true,
+
+        }).datepicker('setDate', new Date());
+        resizeGrid1();
+        app.mounted();
+
+    });
+    function resizeGrid1() {
+        var contentwrapper = $("#kt_aside").innerHeight();
+        var gridElement = $("#usersGrid"),
+            newHeight = gridElement.innerHeight(),
+            otherElements = gridElement.children().not(".k-grid-content"),
+            otherElementsHeight = 0;
+
+        otherElements.each(function () {
+            otherElementsHeight += $(this).outerHeight();
+        });
+        var newHeight = (contentwrapper - otherElementsHeight) - 330;
+        if (newHeight < 325) newHeight = 325;
+        gridElement.children(".k-grid-content").height(newHeight);
+    }
+</script>
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    <script src="~/lib/vue-router/vue-router.min.js"></script>
+
+    <script src="~/js/Portal/User/Create.js"></script>
+}

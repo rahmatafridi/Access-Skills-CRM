@@ -1,0 +1,135 @@
+﻿
+@{ Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+    var canQVView = (permissions == null) ? false : (bool)permissions["QV_VIEW"];
+    var canQVEdit = (permissions == null) ? false : (bool)permissions["QV_EDIT"];
+    var canQVCreate = (permissions == null) ? false : (bool)permissions["QV_ADD"];
+    var canQVDel = (permissions == null) ? false : (bool)permissions["QV_DEL"];
+    var validationId = ViewBag.Validation_Id;
+
+    var isOwner = ViewBag.Owner;
+    }
+
+<style>
+
+    .form-group {
+        margin-bottom: 1rem !important;
+    }
+
+    .link-text:hover {
+        color: #22b9ff !important;
+    }
+
+    .kt-portlet .kt-portlet__foot {
+        padding: 18px 10px 10px 0px !important;
+    }
+
+    .k-dropdown-wrap > .k-input, .k-dropdown .k-dropdown-wrap .k-select, .k-list, .k-reset {
+        background-color: white;
+    }
+</style>
+
+<input type="hidden" id="hfd_roleName" value="@ViewBag.RoleName" />
+<input type="hidden" id="hfd_userId" value="@ViewBag.UserId" />
+<input type="hidden" id="hfd_owner" value="@ViewBag.Owner" />
+
+<div class="content" id="dv_Create_QuestionValidation">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <div class="kt-form__actions kt-portlet__foot">
+                <label id="lblEditHeader" style="font-size: large;font-weight: 500;margin-right: 5px">Add Validation</label>
+            </div>
+            <div class="kt-portlet__head-toolbar">
+                <a href="/QuestionValidation/Manage" class="btn btn-clean kt-margin-r-10 btn-sm btn-outline-info">
+                    <i class="la la-arrow-left"></i>
+                    <span class="kt-hidden-mobile">Cancel</span>
+                </a>
+             
+                <div class="btn-group">
+
+                    &nbsp;
+                    <button type="button" v-on:click="submitted(0)" class="btn btn-sm btn-brand">
+                        <i class="la la-check"></i>
+                        <span class="kt-hidden-mobile">Save</span>
+                    </button>
+                   
+                </div>
+
+
+            </div>
+        </div>
+        <section class="content">
+            <div class="kt-portlet__body">
+                <div class="row form-group">
+                    <div class="col-lg-3">
+                        <label>Name</label>
+                        <input type="text" class="form-control" v-model="question.q_type_name">
+                    </div>
+                    <div class="col-lg-3">
+                        <label>Format</label>
+                        <input type="text" class="form-control" v-model="question.q_type_regex">
+                    </div>
+                    <div class="col-lg-3">
+                        <label>Max</label>
+                        <input type="text" class="form-control" @@keypress="isNumber($event)" v-model="question.q_max">
+                    </div>
+                    <div class="col-lg-3">
+                        <label>Min</label>
+                        <input type="text" class="form-control" @@keypress="isNumber($event)" v-model="question.q_min">
+                    </div>
+                </div>
+                <div class="row form-group">
+
+                    <div class="col-lg-6">
+                        <label>Massage</label>
+                        <input type="text" class="form-control" v-model="question.q_validation_massage">
+                    </div>
+                </div>
+                </div>
+</section>
+    </div>
+</div>
+
+@*<partial name="~/Views/Shared/partials/lead/history/_portlet_history.cshtml" />*@
+
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js" type="application/javascript"></script>
+    <script src="~/lib/vue/vuelidate.min.js" type="application/javascript"></script>
+    <script src="~/lib/vue/validators.min.js" type="application/javascript"></script>
+    <script src="~/lib/vue-router/vue-router.min.js" type="application/javascript"></script>
+    @*<script src="~/js/Admin/Companies/Create.js" type="application/javascript"></script>*@
+    <script src="~/js/Admin/QuestionValidation/Create.js"></script>
+
+    <script>
+
+        var _validationId;
+        var _acceptDocumentTypes;
+        var _allowedExtensions = [];
+        var _isMultipleDocumentUpload;
+        var _maxDocumentUpload;
+        var _maxDocumentFileSize;
+
+        var _canManagerViewQV;
+        var _canManagerEditQV;
+        var _canManagerDeleteQV;
+        var _canManageCreateQV;
+
+        $(document).ready(function () {
+
+            _canManagerViewQV = @canQVView.ToString().ToLower();
+            _canManagerEditQV = @canQVEdit.ToString().ToLower();
+            _canManagerDeleteQV = @canQVDel.ToString().ToLower();
+            _canManageCreateQV = @canQVCreate.ToString().ToLower();
+
+
+            if (@validationId)
+                _validationId = @validationId;
+            app.Populate();
+            app.mounted();
+        } )
+    </script>
+}
+

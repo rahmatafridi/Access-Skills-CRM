@@ -1,0 +1,164 @@
+﻿@using Kendo.Mvc.UI
+
+@{
+    ViewData["Title"] = "Learner";
+
+    Layout = "~/Views/Shared/_Layout_Portal.cshtml";
+
+    var role = ViewBag.Role;
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+    var canRoleManagerAccessContent = (permissions == null) ? false : (bool)permissions["AC_CCT"];
+
+}
+
+<div class="kt-portlet" id="dv_Resource">
+    <div class="kt-portlet__head">
+        <label id="lblUserHeader" style="font-size: large;font-weight:500;margin-left:-10px;margin-top:20px;"> Learners </label>
+        <div class="kt-portlet__head-toolbar">
+            @*<a href="~/Portal/ManageUser" class="btn btn-clean kt-margin-r-10">
+                    <i class="la la-arrow-left"></i>
+                    <span class="kt-hidden-mobile">Cancel</span>
+                </a>*@
+            <div class="btn-group">
+                &nbsp;
+
+                @*<button type="button" class="btn btn-sm btn-brand" onclick="saveUserAdmin(0)">
+                    <i class="la la-check"></i>
+                    <span class="kt-hidden-mobile">Save</span>
+                </button>*@
+
+            </div>
+        </div>
+
+    </div>
+    <div class="kt-portlet__body">
+        <div class="box-header with-border kt-form kt-form--label-right">
+            <div class="row">
+                <div class="col-lg-4">
+                    <label>Search</label>
+                    <input type="text" autocomplete="off" placeholder="Search Learner" class="form-control" id="search" />
+                </div>
+          
+            </div>
+            <br />
+            <div class="box-header with-border">
+                @(Html.Kendo().Grid<crm.portal.OscaModel.Learner>()
+                        .Name("LearnerGrid")
+                        .Columns(columns =>
+                        {
+                            columns.Bound(p => p.CandidateStatus_BackColor).Hidden();
+                            columns.Bound(p => p.Learner_ID).ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerfromView('#:encodedId#') title='#:Learner_ID#'>#:Learner_ID#</a>").Width(70).Title("Learner Id");
+                            columns.Bound(p => p.Learner_FirstName).ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerfromView('#:encodedId#') title='#:Learner_FirstName#'>#:Learner_FirstName#</a>").Title("First Name").Width(160);
+                            columns.Bound(p => p.Learner_Surname).Title("Last Name").ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerfromView('#:encodedId#') title='#:Learner_Surname#'>#:Learner_Surname#</a>").Width(160);
+                            columns.Bound(p => p.Learner_Class).Title("Course").Width(100);
+                            columns.Bound(p => p.CandidateStatus).Title("Status").Width(100);
+                            columns.Bound(p => p.Percentage).Title("Progress (%)").Width(100);
+                            //columns.Bound(p => p.IsAssigned).Title("Assigned").ClientTemplate("# if(IsAssigned==1) {# Yes #} else {# No #}#").Width(70);
+                            columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-danger' style='cursor:pointer;'onclick=PerfromView('#:encodedId#') title='View'> <span style='text-align:center;' class='fa fa-eye'></span></a></div>").Width(30).ClientHeaderTemplate(" ");
+
+                            // columns.Bound(p => p.CourseLevelsEnquiry).Title("Course Level Enquiry").Width(150);
+                        })
+                        .Resizable(resize => resize.Columns(true))
+                        .Reorderable(x => x.Columns(true))
+                        .ColumnMenu(c => c.Columns(true))
+                        .Scrollable()
+                        .Sortable()
+                        .Filterable(f => f.Messages(m => m.IsFalse("No")).Messages(m => m.IsTrue("Yes")))
+                        .Sortable(sortable =>
+                        {
+                            sortable.SortMode(GridSortMode.SingleColumn);
+                        })
+                        .Pageable()
+                        .NoRecords()
+                        .Filterable()
+                        .Pageable(pageable => pageable
+                        .Refresh(true)
+                        .PageSizes(true)
+                        .ButtonCount(5))
+                        .DataSource(dataSource =>
+                        dataSource
+                        .WebApi()
+                        .Model(model =>
+                        {
+                            model.Id(p => p.Id);
+                        })
+                        //.Events(events => events.Error("error_handler"))
+                        .Read(read => read.Action("LoadAssignLearnerForAccount", "UserAdminApi"))
+                        .PageSize(20)
+                        )
+                    )
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+}
+
+
+
+<script>
+    function PerfromView(id) {
+        window.location.href = "/Portal/Account/LearnerDetail?id=" + id;
+    }
+    $(document).ready(function () {
+        $("#search").keyup(function () {
+            $("#LearnerGrid").data("kendoGrid").refresh();
+            debugger; // eslint-disable-line
+
+            var id = $(this).val();
+            if (id != "") {
+                $.ajax({
+                    url: "/api/UserAdminApi/LoadAssignLearnerForAccountSearch",
+                    data: { name: id },
+                    type: "GET",
+                    contentType: "application/json",
+                    dataType: "json",
+                    async: false
+                }).done(function (response) {
+                    $("#LearnerGrid").data("kendoGrid").dataSource.data([]);
+
+
+                    let grid = $("#LearnerGrid").data("kendoGrid");
+
+                    for (var i = 0; i < response.length; i++) {
+
+                        grid.dataSource.add({
+                            encodedId: response[i].encodedId, CandidateStatus_BackColor: response[i].CandidateStatus_BackColor,
+                            Learner_ID: response[i].Learner_ID, Learner_FirstName: response[i].Learner_FirstName, Learner_Surname: response[i].Learner_Surname
+                            , Learner_Class: response[i].Learner_Class, CandidateStatus: response[i].CandidateStatus
+                            , Percentage: response[i].CandidatePercentageStatus
+                        });
+
+                    }
+
+
+                });
+            }
+            else {
+                $("#LearnerGrid").data("kendoGrid").dataSource.read();
+
+
+
+
+            }
+
+        });
+    });
+    function CategoryGrid() {
+        $('#grid_categroy').data('kendoGrid').dataSource.read();
+        $('#grid_categroy').data('kendoGrid').refresh();
+    }
+    function FilesGrid() {
+        $('#grid_docfiles').data('kendoGrid').dataSource.read();
+        $('#grid_docfiles').data('kendoGrid').refresh();
+    }
+
+
+
+</script>

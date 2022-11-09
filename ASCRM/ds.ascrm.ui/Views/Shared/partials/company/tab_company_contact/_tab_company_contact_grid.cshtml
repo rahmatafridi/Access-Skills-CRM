@@ -1,0 +1,51 @@
+﻿ <!--begin::Form-->
+<div class="kt-form kt-form--fit kt-form--label-right">
+    <div class="portlet__foot">
+        <div class="form-group">
+            <div class="col-lg-12">
+                @(Html.Kendo().Grid<ds.portal.companies.Models.CompanyContact>()
+                    .Name("companycontactGrid")
+                    .Columns(columns =>
+                    {
+                        columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-brand' style='cursor:pointer;'onclick=PerformCompanyContactEdit('#:contact_id#') title='Edit'><span style='text-align:center;' class='fa fa-pen'></span></a>" +
+                                                    "&nbsp;&nbsp;<a class='kt-font-danger' style='cursor:pointer;'onclick=PerformCompanyContactDelete('#:contact_id#') title='Delete'> <span style='text-align:center;' class='fa fa-trash-alt'></span></a></div>").Width(55).ClientHeaderTemplate(" ");
+                        columns.Bound(p => p.title).Title("Title").Width("200px");;
+                        columns.Bound(p => p.contact_name).Title("Contact Name").Width("200px");
+                        columns.Bound(p => p.job_title).Title("Job Title").Width("200px");
+                        columns.Bound(p => p.email1).Title("Email").Width("200px");
+
+                        columns.Bound(p => p.mobile1).Title("Number").Width("180px");
+                        //columns.Bound(p => p.website).Title("Website").Width("180px");
+
+                    })
+                    .HtmlAttributes(new { style = "height: 100%;" })
+                    .Resizable(resize => resize.Columns(true))
+                    .Reorderable(x => x.Columns(true))
+                    .ColumnMenu(c => c.Columns(true))
+                    .Scrollable(scr => scr.Height(300))
+                    .Sortable()
+
+                    .Pageable()
+                    .NoRecords()
+                    .Filterable()
+                    .Pageable(pageable => pageable
+                    .Refresh(true)
+                    .PageSizes(true)
+                    .ButtonCount(5))
+                    .DataSource(dataSource =>
+                    dataSource
+                    .WebApi()
+                    .Model(model =>
+                    {
+                        model.Id(p => p.contact_id);
+                    })
+                    .Events(events => events.Error("error_handler"))
+                    .Read(read => read.Action("GetAllCompanyContacts", "CompanyApi", new { company_Id = ViewBag.Company_Id }))
+                    .PageSize(20))
+                )
+            </div>
+        </div>
+         
+    </div>
+</div>
+<!--end::Form-->

@@ -1,0 +1,144 @@
+﻿@using Kendo.Mvc.UI
+@{ ViewData["Title"] = "View Matrix";
+
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+    var canRoleManagerAccessMatrix = (permissions == null) ? false : (bool)permissions["AC_MTX"];
+
+    Layout = "~/Views/Shared/_Layout_Portal.cshtml";
+    var acceptDocumentTypes = ViewBag.acceptDocumentTypes;
+    var isMultipleDocumentUpload = ViewBag.isMultipleDocumentUpload;
+    var maxDocumentUpload = ViewBag.maxDocumentUpload;
+    var maxDocumentFileSize = ViewBag.maxDocumentFileSize; }
+<style>
+    .link-text:hover {
+        color: #22b9ff !important;
+    }
+
+    .kt-portlet .kt-portlet__foot {
+        padding: 10px 5px 10px 10px !important;
+    }
+
+    .k-grid-header .k-filterable, .k-grid-header .k-with-icon {
+        padding-right: calc(1px + .5rem + 1.5em + .5rem);
+    }
+</style>
+
+<div class="content" id="dv_Portal_ViewMatrix">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <label id="lblUserHeader" style="font-size: large;font-weight:500;margin-left:-10px;margin-top:20px;">Matrix</label>
+            <div class="kt-portlet__head-toolbar">
+
+
+
+
+            </div>
+        </div>
+        <section class="content">
+            <div class="kt-portlet__body">
+
+                <div class="box-header with-border">
+                    <div class="row">
+                        <div class="col-lg-5">
+                            <label>Choose a matrix or use the buttons to generate full matrix report </label>
+                            <select class="form-control" v-model="matrixId" v-on:change="changeMatrixLable">
+                                <option v-for="item in MatrixLable" :value="item.SSMB_Id">
+                                    {{item.SSMB_Title}}
+                                </option>
+                            </select>
+                        </div>
+                        </div>
+                    <div>
+                        <div id="matrixdata">
+
+
+                            <div class="col-lg-12">
+                                <label style="background-color:aquamarine;margin-top:7px;" v-if="IsSummary">Summary</label>
+                                @*<div class="col-lg-1">*@
+                                <div>
+                                    <table>
+                                        <tr>
+                                            <td v-for="item in Summary">
+                                                <label class="checkbox-inline">
+
+                                                    <input type="checkbox" disabled v-model="item.SSML_IsCompleted"><span style="margin-left:3px;margin-right:3px;">{{item.SSML_Id_LevelKey}}{{"."}}{{item.SSML_Id_LevelValue}}</span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <div>
+
+                                    </div>
+
+                                </div>
+                                @*</div>*@
+                            </div>
+
+                            <div class="col-lg-12">
+                                <label style="background-color:powderblue" v-if="IsSummary">{{SSM_Name}}</label>
+                                @*<div class="col-lg-1">*@
+                                <div>
+                                    <table>
+                                        <tr>
+                                            <td v-for="item in FullSummary">
+                                                <input type="checkbox" disabled v-model="item.SSML_IsCompleted"><span style="margin-left: 3px; margin-right: 3px;"> {{item.SSML_Id_LevelKey}}{{"."}}{{item.SSML_Id_LevelValue}}</span>
+
+                                            </td>
+                                        </tr>
+                                    </table>
+
+
+
+
+                                </div>
+                                @*</div>*@
+                            </div>
+                        </div>
+                        <div id="matrixview" style="margin-top:10px;">
+                            <span v-html="htmlContent"></span>
+                        </div>
+                    </div>
+
+                    <div class="" style="margin-top:20px;">
+                        <button class="btn btn-sm btn-primary" id="btndownload" v-on:click="DownlaodCompleteSummary()">Download Complete Summary</button>
+
+                        <button class="btn btn-sm btn-primary" id="btnview" v-on:click="ViewSummary()">View Complete Summary</button>
+                        <button class="btn btn-sm btn-defult" id="btncancel" v-on:click="ViewCancel()">Cancel</button>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+
+
+</div>
+
+<script>
+    var _canRoleManagerAccessMatrix;
+
+        $(document).ready(function () {
+            $("#matrixdata").hide();
+            
+            $("#btncancel").hide();
+
+            _canRoleManagerAccessMatrix = @canRoleManagerAccessMatrix.ToString().ToLower();
+
+
+            if (!_canRoleManagerAccessMatrix) {
+                window.location.href = '/Error/PermissionDenied';
+            }
+        })
+
+</script>
+@*<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script>*@
+<script src="~/lib/pdf.js"></script>
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    @*<script src="~/js/Portal/Index.js"></script>*@
+    <script src="~/js/Portal/Matrix/Manage.js"></script>
+}

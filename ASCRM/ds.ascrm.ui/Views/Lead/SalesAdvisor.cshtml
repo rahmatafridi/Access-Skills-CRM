@@ -1,0 +1,14 @@
+﻿@(
+        Html.Kendo().DropDownList()
+            .Name("Type")
+            .DataTextField("Users_UserName")
+            .DataValueField("Users_ID")
+            .OptionLabel("Select Type...")
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                        {
+                            read.Url("/api/LeadApi/GetAllSalesAdvisorUsers").Type(HttpVerbs.Get);
+                        });
+            })
+)

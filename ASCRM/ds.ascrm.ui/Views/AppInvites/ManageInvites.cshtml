@@ -1,0 +1,122 @@
+﻿
+@{
+    ViewData["Title"] = "Manage Invites";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+    var canRoleManagerViewAppInvite = (permissions == null) ? false : (bool)permissions["APPINVITE_VIEW"];
+    var canRoleManagerCreateAppInvite = (permissions == null) ? false : (bool)permissions["APPINVITE_CREATE"];
+    var canRoleManagerEditAppInvite = (permissions == null) ? false : (bool)permissions["APPINVITE_EDIT"];
+    var canRoleManagerDeleteAppInvite = (permissions == null) ? false : (bool)permissions["APPINVITE_DEL"];
+    var canRoleManagerResendAppInvite = (permissions == null) ? false : (bool)permissions["APPINVITE_RESEND"];
+}
+@*<style>
+    .kt-portlet .kt-portlet__foot {
+        padding: 10px 5px 10px 10px !important;
+    }
+</style>*@
+<div class="content" id="dv_Manage_AppInvites">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <div class="kt-form__actions kt-portlet__foot">
+                <label style="font-size: large;font-weight: 500;margin-top:10px;margin-left:-15px;">Application Invites</label>
+            </div>
+
+            <div class="kt-portlet__head-toolbar">
+                <button type="button" class="btn btn-sm btn-bold btn-label-brand" v-on:click="NewTemplate"><i class="fa fa-plus"></i> Add Invite</button>
+                &nbsp;
+                <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-brand">
+                        <i class="la la-check"></i>
+                        <span class="kt-hidden-mobile">Export Options</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-brand dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                    <div class="dropdown-menu dropdown-menu-right" style="">
+                        <ul class="kt-nav">
+                            <li class="kt-nav__item">
+                                <a onclick="return exportEmailPDF()" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon"></i>
+                                    <span class="kt-nav__link-text">PDF</span>
+                                </a>
+                            </li>
+                            <li class="kt-nav__item">
+                                <a onclick="return exportEmailExcel()" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon"></i>
+                                    <span class="kt-nav__link-text">Excel</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="kt-portlet__body">
+            <partial name="~/Views/Shared/partials/appinvites/_tab_grid_appinvites.cshtml" />
+        </div>
+               
+        <partial name="~/Views/Shared/partials/appinvites/_modal_form_create_invite.cshtml" />
+        <partial name="~/Views/Shared/partials/appinvites/_modal_form_view_invite.cshtml" />    
+        <partial name="~/Views/Shared/partials/appinvites/_modal_form_change_level.cshtml" /> 
+        
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    <script src="~/js/Admin/AppInvites/ManageInvites.js"></script>
+    <script>
+        $('#editor').summernote({
+            height: 250,                 // set editor height
+            minHeight: null,             // set minimum height of editor
+            maxHeight: null,             // set maximum height of editor
+        });
+    </script>
+    <script>
+    var _canRoleManagerViewAppInvite;
+    var _canRoleManagerCreateAppInvite;
+    var _canRoleManagerEditAppInvite;
+    var _canRoleManagerDeleteAppInvite;
+    var _canRoleManagerResendAppInvite;
+
+    $(document).ready(function () {
+        _canRoleManagerViewAppInvite = @canRoleManagerViewAppInvite.ToString().ToLower();
+        _canRoleManagerCreateAppInvite = @canRoleManagerCreateAppInvite.ToString().ToLower();
+        _canRoleManagerEditAppInvite = @canRoleManagerEditAppInvite.ToString().ToLower();
+        _canRoleManagerDeleteAppInvite = @canRoleManagerDeleteAppInvite.ToString().ToLower();
+        _canRoleManagerResendAppInvite = @canRoleManagerResendAppInvite.ToString().ToLower();
+
+        //if (!_canRoleManagerViewAppInvite) {
+        //    window.location.href = '/Error/PermissionDenied';
+        //}
+        resizeGrid1();
+       });
+        function resizeGrid1() {
+            var contentwrapper = $("#kt_aside").innerHeight();
+            var gridElement = $("#templateGrid"),
+                newHeight = gridElement.innerHeight(),
+                otherElements = gridElement.children().not(".k-grid-content"),
+                otherElementsHeight = 0;
+
+            otherElements.each(function () {
+                otherElementsHeight += $(this).outerHeight();
+            });
+                var newHeight = (contentwrapper - otherElementsHeight) - 330;
+                if (newHeight < 325) newHeight = 325;
+            gridElement.children(".k-grid-content").height(newHeight);
+        }
+
+        function exportEmailPDF() {
+            var grid = $("#templateGrid").data("kendoGrid");
+            grid.hideColumn(0);
+            $("#templateGrid").getKendoGrid().saveAsPDF();
+            grid.showColumn(0);
+        }
+
+        function exportEmailExcel() {
+            $("#templateGrid").getKendoGrid().saveAsExcel();
+        }
+    </script>
+}
+

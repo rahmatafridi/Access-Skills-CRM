@@ -1,0 +1,115 @@
+﻿@using Kendo.Mvc.UI
+@{ ViewData["Title"] = "Contact";
+
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+    var canRoleManagerAccessContact = (permissions == null) ? false : (bool)permissions["AC_CNT"];
+    var canRoleManagerAccessContactAssessor = (permissions == null) ? false : (bool)permissions["AC_CU"];
+
+    Layout = "~/Views/Shared/_Layout_Portal.cshtml";
+    var role = ViewBag.Role;
+    }
+<style>
+    .link-text:hover {
+        color: #22b9ff !important;
+    }
+
+    .kt-portlet .kt-portlet__foot {
+        padding: 10px 5px 10px 10px !important;
+    }
+
+    .k-grid-header .k-filterable, .k-grid-header .k-with-icon {
+        padding-right: calc(1px + .5rem + 1.5em + .5rem);
+    }
+</style>
+
+<div class="content" id="dv_Portal_Contact">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <label id="lblUserHeader" style="font-size: large;font-weight:500;margin-left:-10px;margin-top:20px;">Contact Us</label>
+            @*<label style="font-size: large;font-weight:500;margin-left:-10px;margin-top:20px;">   You want to contact student support?</label>*@
+            <div class="kt-portlet__head-toolbar">
+            
+
+
+            </div>
+        </div>
+        <section class="content">
+            <div class="kt-portlet__body">
+
+                <div class="box-header with-border">
+                    <div class="row">
+                        <div class="col-lg-9">
+
+                        </div>
+                        @*<div class="col-lg-3">
+                                <input class="form-control" placeholder="Search Company" style="margin-bottom:10px;" id="search" type="text" autocomplete="off" />
+                            </div>*@
+
+                    </div>
+
+                    <div class="" >
+                        <div class="kt-portlet kt-portlet--height-fluid">
+                      
+                           <div class="row" style="margin-left:20px;">
+                               <div class="col-lg-9">
+                                
+                                   <p>
+                                       A member of the support team will be in touch with you shortly once you have filled below form.
+                                   </p>
+                                   <div class="form-group">
+                                       <label>Subject</label>
+                                       <input type="text" v-model="subject" class="form-control" />
+                                   </div>
+                                   <div class="form-group">
+                                       <label>Message</label>
+                                       @*<input type="text" class="form-control" />*@
+                                       <textarea rows="4" v-model="massage" class="form-control"></textarea>
+                                   </div>
+                                   <button class="btn btn-primary" v-on:click="SubmitContact">Submit</button>
+                               </div>
+                           </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+
+   
+</div>
+
+
+<script>
+    var _canRoleManagerAccessContact;
+    var _canRoleManagerAccessContactAssessor;
+    $(document).ready(function () {
+
+        _canRoleManagerAccessContact = @canRoleManagerAccessContact.ToString().ToLower();
+        _canRoleManagerAccessContactAssessor =@canRoleManagerAccessContactAssessor.ToString().ToLower();
+
+         if (@role== "900") {
+             if (!_canRoleManagerAccessContact) {
+                window.location.href = '/Error/PermissionDenied';
+            }
+        }
+        if (@role == "1000") {
+            if (!_canRoleManagerAccessContactAssessor) {
+                window.location.href = '/Error/PermissionDenied';
+            }
+        }
+
+
+        
+    })
+
+</script>
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    @*<script src="~/js/Portal/Index.js"></script>*@
+<script src="~/js/Portal/Contact/Manage.js"></script>
+}

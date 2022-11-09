@@ -1,0 +1,54 @@
+﻿<div class="modal fade" id="kt_modal_companycontact" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog" role="note">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Contact</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-control-label">Title</label>
+                    <select class="form-control" v-model="companyContacts.title">
+                        <option v-for="title in Titles" v-bind:value="title.id" v-text="title.description"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label">Contact Name</label>
+                    <input type="text" class="form-control" v-model="companyContacts.contact_name">
+
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label">Job Title</label>
+
+                    @*<v-select v-model="companyContacts.job_title" :options="JobTitles"></v-select>*@
+
+                    <select class="form-control select2"  id="jobTitle" v-model="companyContacts.job_title">
+                        <option v-for="notesCat in JobTitles" v-bind:value="notesCat.id" v-text="notesCat.description"></option>
+                    </select>
+
+
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label">Email</label>
+                    <input type="text" class="form-control" v-model="companyContacts.email1">
+
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-control-label">Mobile</label>
+                    <input type="text" class="form-control" v-model="companyContacts.mobile1">
+
+                </div>
+                @*<div class="form-group">
+                    <label class="form-control-label">Website</label>
+                    <input type="text" class="form-control" v-model="companyContacts.website">
+
+                </div>*@
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="submit" v-on:click="submitCompanyContact" class="btn btn-success">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>

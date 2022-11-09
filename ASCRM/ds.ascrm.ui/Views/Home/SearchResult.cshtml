@@ -1,0 +1,531 @@
+﻿
+@{ ViewData["Title"] = "Search Result";
+                Layout = "~/Views/Shared/_Layout.cshtml";
+
+                var roleName = ViewBag.roleName; }
+
+
+<div class="content" id="dv_SearchResults">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <div class="form__actions kt-portlet__foot">
+                <label style="font-size:large;font-weight: 500;margin-top:10px;margin-left:-15px;">Search Results</label>
+            </div>
+        </div>
+        <div class="kt-portlet__body" style="padding: 10px!important;">
+            <div class="box-header with-border">
+                <div class="form-group row" style="margin-top:10px;">
+                    <div class="col-lg-3 col-md-3 col-sm-6">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Enter search query" v-model="search_query">
+                            <div class="input-group-append">
+                                <button class="btn btn-sm btn-brand" type="button" v-on:click="GetSearchResults">Search</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xl-12 col-lg-12 order-lg-1 order-xl-1">
+                        <div class="kt-portlet kt-portlet--height-fluid">
+                            <div class="kt-portlet__head">
+                                <div class="kt-portlet__head-label">
+                                    <h3 class="kt-portlet__head-title">
+                                        <span class="kt-widget20__number kt-font-brand">Leads</span>
+                                    </h3>
+                                </div>
+                            </div>
+                            <div class="kt-portlet__body" style="max-height:300px; overflow-y:auto;padding: 10px!important;">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>
+
+                                            </th>
+                                            <th>
+                                                Lead Id
+                                            </th>
+                                            <th>
+                                                Enquiry Date
+                                            </th>
+                                            <th>
+                                                Contact Name
+                                            </th>
+
+                                            <th>
+                                                Company Name
+                                            </th>
+                                            <th>
+                                                Mobile
+                                            </th>
+                                            <th>
+                                                Email
+                                            </th>
+                                            <th>
+                                                Assigned To
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody v-if="leads_result.length == 0">
+                                        <tr>
+                                            <td colspan="8">
+                                                <div class="alert alert-brand" role="alert"><span class="col-md-12 text-center">No matching records found</span></div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody v-for="lead in leads_result">
+                                        <tr v-if="lead.CanEdit == false" style="cursor:pointer;" v-on:click="GoToViewLead(lead.encodeLeadId)">
+                                            <td></td>
+                                            <td v-text="lead.Lead_Id"></td>
+                                            <td v-text="lead.EnquiryDate"></td>
+                                            <td v-text="lead.ContactName"></td>
+                                            @*<td v-text="lead.FirstName"></td>
+                                <td v-text="lead.LastName"></td>*@
+                                            <td v-text="lead.CompanyName"></td>
+                                            <td v-text="lead.MobileNumber"></td>
+                                            <td v-text="lead.Email"></td>
+                                            <td v-text="lead.AssignedTo"></td>
+                                        </tr>
+                                        <tr v-if="lead.CanEdit == true">
+                                            <td v-if="lead.CanDelete != true"></td>
+                                            <td v-if="lead.CanDelete == true"><a class='kt-font-danger' style='cursor:pointer;' v-on:click="PerformDeleteNow(lead.Lead_Id)" title="Delete this lead"> <span style='text-align:center;' class='fa fa-trash-alt'></span></a></td>
+                                            <td v-text="lead.Lead_Id" style="cursor:pointer;" v-on:click="GoToLead(lead.encodeLeadId)"></td>
+                                            <td v-text="lead.EnquiryDate" style="cursor:pointer;" v-on:click="GoToLead(lead.encodeLeadId)"></td>
+                                            <td v-text="lead.ContactName" style="cursor:pointer;" v-on:click="GoToLead(lead.encodeLeadId)"></td>
+                                            @*<td v-text="lead.FirstName"></td>
+                                <td v-text="lead.LastName"></td>*@
+                                            <td v-text="lead.CompanyName" style="cursor:pointer;" v-on:click="GoToLead(lead.encodeLeadId)"></td>
+                                            <td v-text="lead.MobileNumber" style="cursor:pointer;" v-on:click="GoToLead(lead.encodeLeadId)"></td>
+                                            <td v-text="lead.Email" style="cursor:pointer;" v-on:click="GoToLead(lead.encodeLeadId)"></td>
+                                            <td v-text="lead.AssignedTo" style="cursor:pointer;" v-on:click="GoToLead(lead.encodeLeadId)"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-12 col-lg-12 order-lg-1 order-xl-1">
+                        <div class="kt-portlet kt-portlet--height-fluid">
+                            <div class="kt-portlet__head">
+                                <div class="kt-portlet__head-label">
+                                    <h3 class="kt-portlet__head-title">
+
+                                        <span class="kt-widget20__number kt-font-brand">Notes</span>
+                                    </h3>
+                                </div>
+                            </div>
+                            <div class="kt-portlet__body" style="max-height:300px; overflow-y:auto;padding: 10px!important;">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                Lead Id
+                                            </th>
+                                            <th>
+                                                Contact Name
+                                            </th>
+                                            <th>
+                                                Category
+                                            </th>
+                                            <th>
+                                                Notes
+                                            </th>
+                                            <th>
+                                                Assigned To
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody v-if="notes_result.length == 0">
+                                        <tr>
+                                            <td colspan="5">
+                                                <div class="alert alert-brand" role="alert"><span class="col-md-12 text-center">No matching records found</span></div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody v-for="note in notes_result">
+                                        <tr v-if="note.CanEdit == false" style="cursor:pointer;" v-on:click="GoToViewLead(note.encodeNoteIdLead)">
+                                            <td v-text="note.Note_Id_Lead"></td>
+                                            <td v-text="note.ContactName"></td>
+                                            <td v-text="note.Note_Category"></td>
+                                            <td v-text="note.Note_Description"></td>
+                                            <td v-text="note.AssignedTo"></td>
+
+                                        </tr>
+                                        <tr v-if="note.CanEdit == true" style="cursor:pointer;" v-on:click="GoToLead(note.encodeNoteIdLead)">
+                                            <td v-text="note.Note_Id_Lead"></td>
+                                            <td v-text="note.ContactName"></td>
+                                            <td v-text="note.Note_Category"></td>
+                                            <td v-text="note.Note_Description"></td>
+                                            <td v-text="note.AssignedTo"></td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-12 col-lg-12 order-lg-1 order-xl-1" id="activity-tab">
+                        <div class="kt-portlet kt-portlet--height-fluid">
+                            <div class="kt-portlet__head">
+                                <div class="kt-portlet__head-label">
+                                    <h3 class="kt-portlet__head-title">
+
+                                        <span class="kt-widget20__number kt-font-brand">Activities</span>
+                                    </h3>
+                                </div>
+                            </div>
+                            <div class="kt-portlet__body" style="max-height:300px; overflow-y:auto;padding: 10px!important;">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                Lead Id
+                                            </th>
+                                            <th>
+                                                Contact Name
+                                            </th>
+                                            <th>
+                                                Type
+                                            </th>
+                                            <th>
+                                                Action
+                                            </th>
+                                            <th>
+                                                Notes
+                                            </th>
+                                            <th>
+                                                Assigned To
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody v-if="activities_result.length == 0">
+                                        <tr>
+                                            <td colspan="6">
+                                                <div class="alert alert-brand" role="alert"><span class="col-md-12 text-center">No matching records found</span></div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody v-for="activity in activities_result">
+                                        <tr v-if="activity.CanEdit == false" style="cursor:pointer;" v-on:click="GoToViewLead(activity.encodeActivityLeadId, true)">
+                                            <td v-text="activity.Activity_Id_Lead"></td>
+                                            <td v-text="activity.ContactName"></td>
+                                            <td v-text="activity.Activity_Type"></td>
+                                            <td>
+                                                <span v-if="activity.Activity_Id_Lead == 1" v-text="activity.Activity_PhoneActions"></span>
+                                                <span v-if="activity.Activity_Id_Lead == 2" v-text="activity.Activity_EmailActions"></span>
+                                                <span v-if="activity.Activity_Id_Lead == 3" v-text="activity.Activity_MeetingActions"></span>
+                                            </td>
+                                            <td v-text="activity.Activity_Note"></td>
+                                            <td v-text="activity.AssignedTo"></td>
+                                        </tr>
+                                        <tr v-if="activity.CanEdit == true" style="cursor:pointer;" v-on:click="GoToLead(activity.encodeActivityLeadId, true)">
+                                            <td v-text="activity.Activity_Id_Lead"></td>
+                                            <td v-text="activity.ContactName"></td>
+                                            <td v-text="activity.Activity_Type"></td>
+                                            <td>
+                                                <span v-if="activity.Activity_Id_Lead == 1" v-text="activity.Activity_PhoneActions"></span>
+                                                <span v-if="activity.Activity_Id_Lead == 2" v-text="activity.Activity_EmailActions"></span>
+                                                <span v-if="activity.Activity_Id_Lead == 3" v-text="activity.Activity_MeetingActions"></span>
+                                            </td>
+                                            <td v-text="activity.Activity_Note"></td>
+                                            <td v-text="activity.AssignedTo"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-12 col-lg-12 order-lg-1 order-xl-1">
+                        <div class="kt-portlet kt-portlet--height-fluid">
+                            <div class="kt-portlet__head">
+                                <div class="kt-portlet__head-label">
+                                    <h3 class="kt-portlet__head-title">
+                                        <span class="kt-widget20__number kt-font-brand">Company</span>
+                                    </h3>
+                                </div>
+                            </div>
+                            <div class="kt-portlet__body" style="max-height:300px; overflow-y:auto;padding: 10px!important;">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            @*<th>
+
+                                </th>*@
+                                            <th>
+                                                Company Id
+                                            </th>
+                                            <th>
+                                                Company Name
+                                            </th>
+                                            <th>
+                                                Decision Maker Name
+                                            </th>
+
+                                            <th>
+                                                Telephone Number
+                                            </th>
+
+                                            <th>
+                                                Email
+                                            </th>
+                                            <th>
+                                                Postcode
+                                            </th>
+                                            <th>
+                                                Sales Advisor
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody v-if="company_result.length == 0">
+                                        <tr>
+                                            <td colspan="9">
+                                                <div class="alert alert-brand" role="alert"><span class="col-md-12 text-center">No matching records found</span></div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody v-for="company in company_result">
+                                        <tr>
+
+                                            <td v-text="company.id" style="cursor:pointer;" v-on:click="GoToCompany(company.encodedId)"></td>
+                                            <td v-text="company.name" style="cursor:pointer;" v-on:click="GoToCompany(company.encodedId)"></td>
+
+                                            <td v-text="company.name_desision_maker"></td>
+
+                                            <td v-text="company.tel1"></td>
+                                            <td v-text="company.email1"></td>
+                                            <td v-text="company.postcode"></td>
+                                            <td v-text="company.sales_advisor"></td>
+
+                                        </tr>
+                                        <!--<tr v-if="lead.CanEdit == true">
+                        <td v-if="lead.CanDelete != true"></td>
+                        <td v-if="lead.CanDelete == true"><a class='kt-font-danger' style='cursor:pointer;' v-on:click="PerformDeleteNow(lead.Lead_Id)" title="Delete this lead"> <span style='text-align:center;' class='fa fa-trash-alt'></span></a></td>
+                        <td v-text="lead.Lead_Id" style="cursor:pointer;" v-on:click="GoToLead(lead.encodeLeadId)"></td>
+                        <td v-text="lead.EnquiryDate" style="cursor:pointer;" v-on:click="GoToLead(lead.encodeLeadId)"></td>
+                        <td v-text="lead.ContactName" style="cursor:pointer;" v-on:click="GoToLead(lead.encodeLeadId)"></td>-->
+                                        @*<td v-text="lead.FirstName"></td>
+                            <td v-text="lead.LastName"></td>*@
+                                        <!--<td v-text="lead.CompanyName" style="cursor:pointer;" v-on:click="GoToLead(lead.encodeLeadId)"></td>
+                            <td v-text="lead.MobileNumber" style="cursor:pointer;" v-on:click="GoToLead(lead.encodeLeadId)"></td>
+                            <td v-text="lead.Email" style="cursor:pointer;" v-on:click="GoToLead(lead.encodeLeadId)"></td>
+                            <td v-text="lead.AssignedTo" style="cursor:pointer;" v-on:click="GoToLead(lead.encodeLeadId)"></td>
+                        </tr>-->
+                                    </tbody>
+                                </table>
+
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-12 col-lg-12 order-lg-1 order-xl-1">
+                        <div class="kt-portlet kt-portlet--height-fluid">
+                            <div class="kt-portlet__head">
+                                <div class="kt-portlet__head-label">
+                                    <h3 class="kt-portlet__head-title">
+                                        <span class="kt-widget20__number kt-font-brand">Workplaces</span>
+                                    </h3>
+                                </div>
+                            </div>
+                            <div class="kt-portlet__body" style="max-height:300px; overflow-y:auto;padding: 10px!important;">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            @*<th>
+
+                                </th>*@
+                                            <th>
+                                                Id
+                                            </th>
+                                            <th>
+                                                Name
+                                            </th>
+
+
+                                            <th>
+                                                Manager Name
+                                            </th>
+
+                                            <th>
+                                                Email
+                                            </th>
+                                            <th>
+                                                Phone Number
+                                            </th>
+
+                                            <th>
+                                                Postcode
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody v-if="workPlace_result.length == 0">
+                                        <tr>
+                                            <td colspan="9">
+                                                <div class="alert alert-brand" role="alert"><span class="col-md-12 text-center">No matching records found</span></div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody v-for="workplace in workPlace_result">
+                                        <tr>
+
+                                            <td v-text="workplace.wp_id" style="cursor:pointer;" v-on:click="GoToCompany(workplace.encodedId)"></td>
+                                            <td v-text="workplace.company_name" style="cursor:pointer;" v-on:click="GoToCompany(workplace.encodedId)"></td>
+
+                                            <td v-text="workplace.wp_name"></td>
+
+                                            <td v-text="workplace.employee_email"></td>
+                                            <td v-text="workplace.phone_number"></td>
+                                            <td v-text="workplace.post_code"></td>
+
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-12 col-lg-12 order-lg-1 order-xl-1">
+                        <div class="kt-portlet kt-portlet--height-fluid">
+                            <div class="kt-portlet__head">
+                                <div class="kt-portlet__head-label">
+                                    <h3 class="kt-portlet__head-title">
+                                        <span class="kt-widget20__number kt-font-brand">
+                                             Company Contacts
+
+                                        </span>
+                                    </h3>
+                                </div>
+                            </div>
+                            <div class="kt-portlet__body" style="max-height:300px; overflow-y:auto;padding: 10px!important;">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            @*<th>
+
+                                </th>*@
+                                            <th>
+                                                Id
+                                            </th>
+                                            <th>
+                                                Name
+                                            </th>
+
+
+                                            <th>
+                                                Email
+                                            </th>
+                                            <th>
+                                                Mobile
+                                            </th>
+
+
+                                        </tr>
+                                    </thead>
+                                    <tbody v-if="companyContact_result.length == 0">
+                                        <tr>
+                                            <td colspan="9">
+                                                <div class="alert alert-brand" role="alert"><span class="col-md-12 text-center">No matching records found</span></div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody v-for="workplace in companyContact_result">
+                                        <tr>
+
+                                            <td v-text="workplace.contact_id" style="cursor:pointer;" v-on:click="GoToCompany(workplace.encodedId)"></td>
+                                            <td v-text="workplace.contact_name" style="cursor:pointer;" v-on:click="GoToCompany(workplace.encodedId)"></td>
+
+                                            <td v-text="workplace.email1"></td>
+
+                                            <td v-text="workplace.mobile1"></td>
+                                       
+
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-12 col-lg-12 order-lg-1 order-xl-1">
+                        <div class="kt-portlet kt-portlet--height-fluid">
+                            <div class="kt-portlet__head">
+                                <div class="kt-portlet__head-label">
+                                    <h3 class="kt-portlet__head-title">
+                                        <span class="kt-widget20__number kt-font-brand">
+                                            Workplace Contacts
+                                        </span>
+                                    </h3>
+                                </div>
+                            </div>
+                            <div class="kt-portlet__body" style="max-height:300px; overflow-y:auto;padding: 10px!important;">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            @*<th>
+
+                </th>*@
+                                            <th>
+                                                Id
+                                            </th>
+                                            <th>
+                                                Name
+                                            </th>
+
+
+                                            <th>
+                                                Email
+                                            </th>
+                                            <th>
+                                                Mobile
+                                            </th>
+
+
+                                        </tr>
+                                    </thead>
+                                    <tbody v-if="workplaceContact_result.length == 0">
+                                        <tr>
+                                            <td colspan="9">
+                                                <div class="alert alert-brand" role="alert"><span class="col-md-12 text-center">No matching records found</span></div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody v-for="workplace in workplaceContact_result">
+                                        <tr>
+
+                                            <td v-text="workplace.contact_id" style="cursor:pointer;" v-on:click="GoToCompany(workplace.encodedId)"></td>
+                                            <td v-text="workplace.contact_name" style="cursor:pointer;" v-on:click="GoToCompany(workplace.encodedId)"></td>
+
+                                            <td v-text="workplace.email1"></td>
+
+                                            <td v-text="workplace.mobile1"></td>
+
+
+                                        </tr>
+
+                                    </tbody>
+
+                                </table>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    <script src="~/lib/vue-router/vue-router.min.js"></script>
+    <script src="~/js/Admin/Dashboard/SearchResult.js"></script>
+}

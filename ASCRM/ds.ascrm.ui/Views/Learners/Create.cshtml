@@ -1,0 +1,238 @@
+﻿
+@{ Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+
+
+
+
+    
+    }
+
+<style>
+
+    .form-group {
+        margin-bottom: 1rem !important;
+    }
+
+    .link-text:hover {
+        color: #22b9ff !important;
+    }
+
+    .kt-portlet .kt-portlet__foot {
+        padding: 18px 10px 10px 0px !important;
+    }
+
+    .k-dropdown-wrap > .k-input, .k-dropdown .k-dropdown-wrap .k-select, .k-list, .k-reset {
+        background-color: white;
+    }
+</style>
+
+@*<input type="hidden" id="hfd_roleName" value="@ViewBag.RoleName" />
+<input type="hidden" id="hfd_userId" value="@ViewBag.UserId" />
+<input type="hidden" id="hfd_owner" value="@ViewBag.Owner" />*@
+
+<div class="content" id="dv_Create_Learner">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <div class="kt-form__actions kt-portlet__foot">
+                <label id="lblEditHeader" style="font-size: large;font-weight: 500;margin-right: 5px">Add Learner</label>
+            </div>
+            <div class="kt-portlet__head-toolbar">
+                <a href="/Learner/Manage" class="btn btn-clean kt-margin-r-10 btn-sm btn-outline-info">
+                    <i class="la la-arrow-left"></i>
+                    <span class="kt-hidden-mobile">Cancel</span>
+                </a>
+              
+                <div class="btn-group">
+
+                    &nbsp;
+                    <button type="button" v-on:click="submitted(0)" class="btn btn-sm btn-brand">
+                        <i class="la la-check"></i>
+                        <span class="kt-hidden-mobile">Save</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-brand dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+              
+                </div>
+
+
+            </div>
+        </div>
+        <section class="content">
+            <div class="kt-portlet__body">
+                <div class="row">
+                    <div class="col-lg-3">
+                        <label>Title *	</label>
+                        <input type="text" class="form-control" v-model="Learner.Learner_Id_Titles" />
+                    </div>
+                    <div class="col-lg-3">
+                        <label>First Name	</label>
+                        <input type="text" class="form-control" v-model="Learner.Learner_FirstName" />
+                    </div>
+                    <div class="col-lg-3">
+                        <label>Middle Name	</label>
+                        <input type="text" class="form-control" v-model="Learner.Learner_Middlename" />
+                    </div>
+                    <div class="col-lg-3">
+                        <label>Surname *	</label>
+                        <input type="text" class="form-control" v-model="Learner.Learner_Surname" />
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-lg-3">
+                        <label>Gender *		</label>
+                        <select class="form-control" v-model="Learner.Learner_Gender" id="gender_id">
+                            <option v-for="data in Genders" v-bind:value="data.Genders_Id" v-text="data.Genders_Title"></option>
+                        </select>
+                    </div>
+                    <div class="col-lg-3">
+                        <label>DOB *	</label>
+                        <input class="form-control" v-model="Learner.Learner_DOB" type="date" />
+                    </div>
+                    <div class="col-lg-3">
+                        <label>Marital	</label>
+                        <select class="form-control" v-model="Learner.Learner_Id_MaritalStatus" id="mstatus_id">
+                            <option v-for="data in Maritals" v-bind:value="data.MaritalStatus_Id" v-text="data.MaritalStatus_Title"></option>
+                        </select>
+                    </div>
+                    <div class="col-lg-3">
+                        <label>Account	</label>
+                        <select class="form-control" v-model="Learner.Learner_Gender">
+                            <option v-for="data in Genders" v-bind:value="data.Genders_Id" v-text="data.Genders_Title"></option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-3">
+                        <label> Ethnicity	</label>
+                        <select v-model="Learner.Learner_Id_Ethnicity" class="form-control">
+                            <option v-for="data in Ethnicity" v-bind:value="data.LearnerEthnicity_Id" v-text="data.LearnerEthnicity_Title"></option>
+
+                        </select>
+                    </div>
+                    <div class="col-lg-3">
+                        <label>Agency	</label>
+                        <input type="text" class="form-control" v-model="Learner.Learner_FirstName" />
+                    </div>
+                    <div class="col-lg-3">
+                        <label>Post Code *		</label>
+                        <input type="text" v-model="Learner.Learner_PostCode1" class="form-control" />
+                    </div>
+                    <div class="col-lg-3">
+                        <label>Country</label>
+                        <select class="form-control" v-model="Learner.Learner_Id_Country" id="country_id">
+                            <option v-for="data in Country" v-bind:value="data.Country_Id" v-text="data.Country_Name"></option>
+
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-3">
+                        <label>Address	</label>
+                        <input type="text" class="form-control" v-model="Learner.Learner_Address1" />
+                    </div>
+                    <div class="col-lg-3">
+                        <label>	</label>
+                        <input type="text" class="form-control" v-model="Learner.Learner_Address2" />
+                    </div>
+                    <div class="col-lg-3">
+                        <label>	</label>
+                        <input type="text" class="form-control" v-model="Learner.Learner_Address3" />
+                    </div>
+                    <div class="col-lg-3">
+                        <label>	</label>
+                        <input type="text" class="form-control" v-model="Learner.Learner_Address4" />
+                    </div>
+
+                </div>
+
+
+                <div class="row">
+                    <div class="col-lg-3">
+                        <label>Telephone 1	</label>
+                        <input type="text" v-model="Learner.Learner_Telephone" class="form-control" />
+                    </div>
+                    <div class="col-lg-3">
+                        <label>Telephone 2	</label>
+                        <input type="text" v-model="Learner.Learner_Telephone2" class="form-control" />
+                    </div>
+                    <div class="col-lg-3">
+                        <label>Work 1	</label>
+                        <input type="text" v-model="Learner.Learner_TelephoneWork1" class="form-control" />
+                    </div>
+                    <div class="col-lg-3">
+                        <label>Work 2	</label>
+                        <input type="text" v-model="Learner.Learner_TelephoneWork2" class="form-control" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3">
+                        <label>Mobile 1		</label>
+                        <input type="text" v-model="Learner.Learner_Mobile1" class="form-control" />
+                    </div>
+                    <div class="col-lg-3">
+                        <label>Mobile 2		</label>
+                        <input type="text" v-model="Learner.Learner_Mobile2" class="form-control" />
+                    </div>
+                    <div class="col-lg-3">
+                        <label>Email 1		</label>
+                        <input type="text" v-model="Learner.Learner_Email1" class="form-control" />
+                    </div>
+                    <div class="col-lg-3">
+                        <label>Email 2	</label>
+                        <input type="text" v-model="Learner.Learner_Email2" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-3">
+                        Is Overseas <input type="checkbox" class="form-check" />
+                    </div>
+                    <div class="col-lg-3">
+                        <label>Skills Advisors		</label>
+                        <select class="form-control" v-model="Learner.Learner_Id_UserSkillsAdvisors">
+                            <option v-for="data in Advisors" v-bind:value="data.Users_Id" v-text="data.Users_Username"></option>
+
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+@*<partial name="~/Views/Shared/partials/lead/history/_portlet_history.cshtml" />*@
+
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js" type="application/javascript"></script>
+    <script src="~/lib/vue/vuelidate.min.js" type="application/javascript"></script>
+    <script src="~/lib/vue/validators.min.js" type="application/javascript"></script>
+    <script src="~/lib/vue-router/vue-router.min.js" type="application/javascript"></script>
+    <script src="~/js/Admin/Companies/Create.js" type="application/javascript"></script>
+
+    <script>
+        $('#editor').summernote({
+            height: 250,                 // set editor height
+            minHeight: null,             // set minimum height of editor
+            maxHeight: null,             // set maximum height of editor
+        });
+
+    </script>
+
+
+    <script>
+
+
+
+
+
+    </script>
+}
+

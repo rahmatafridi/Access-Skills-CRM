@@ -1,0 +1,52 @@
+﻿@using Microsoft.AspNetCore.Http.Features
+
+@{
+    var consentFeature = Context.Features.Get<ITrackingConsentFeature>();
+    var showBanner = !consentFeature?.CanTrack ?? false;
+    var cookieString = consentFeature?.CreateConsentCookie();
+}
+
+@if (showBanner)
+{
+    <div class="modal fade" id="kt_modal_AcceptCookie" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Accept Cookies</h5>
+                    
+                </div>
+                <div class="modal-body">
+                    <div id="cookieConsent" role="alert" style="width: 100% !important;">
+                        <span style="font-size: 15px;">
+                            Use this space to summarize your privacy and cookie use policy.
+                        </span>
+                        <br />
+
+                        @*<button style="margin-top: 20px;" type="button" class="btn btn-danger" data-dismiss="modal" onclick="onCancel()">Cancel</button>*@
+                        <button style="margin-top: 20px;" type="button" class="btn btn-success" data-dismiss="alert" aria-label="Close" data-cookie-string="@cookieString">
+                            Accept & Re-login
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            var button = document.querySelector("#cookieConsent button[data-cookie-string]");
+            if (button) {
+                button.addEventListener("click", function (event)
+                {
+                    document.cookie = button.dataset.cookieString;
+                    window.location.href = "/Account/Login";
+                }, false);
+            }
+        })();
+
+        function onCancel() {
+            window.location.href = "/Account/Login";
+        }
+    </script>
+}

@@ -1,0 +1,85 @@
+﻿
+@{
+    ViewData["Title"] = "MultipleUploadWithMetaData";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+ 
+
+<div class="content" id="dv_MultipleUpload">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <div class="form__actions kt-portlet__foot">
+                <label style="font-size: large;font-weight: 500;margin-top:10px;margin-left:-15px;">Multiple Documents Upload</label>
+            </div>
+        </div>
+        <div class="kt-portlet__body">
+            <div class="box-header with-border">
+
+                <div class="form-group row">
+                    <div class="col-lg-3 col-md-3 col-sm-6">
+                        <label> Category:</label>
+                        <select class="form-control" v-model="Document.DefaultDoc_Id_Category" v-bind:class="{ 'is-invalid': isDocumentSubmitted && $v.Document.DefaultDoc_Id_Category.$invalid }">
+                            <option v-for="documentCat in DocumentCategories" v-bind:value="documentCat.id" v-text="documentCat.description"></option>
+                        </select>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6">
+                        <label class="">Description:</label>
+                        <textarea class="form-control" v-model="Document.DefaultDoc_Description" v-bind:class="{ 'is-invalid': isDocumentSubmitted && $v.Document.DefaultDoc_Description.$invalid }"></textarea>
+
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6">
+                        <label class="">File:</label>
+                        <input type="file" id="FileUpload1" class="form-control" placeholder="Website">
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6">
+                        @*<label class="">* Name:</label>
+                <input type="text" class="form-control" v-model="Document.DefaultDoc_Name" v-bind:class="{ 'is-invalid': isDocumentSubmitted && $v.Document.DefaultDoc_Name.$invalid }">*@
+                        <label class="">Action:</label>
+                        <br />
+                        <button type="button" class="btn btn-primary" v-on:click="AddDocument">Add</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                </div>
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                Name
+                            </th>
+                            <th>
+                                Category
+                            </th>
+                            <th>
+                                Description
+                            </th>
+                            <th>
+                                File
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="document in DocumentsList">
+                            <td v-text="document.DefaultDoc_Name"></td>
+                            <th v-text="document.DefaultDoc_Id_Category"></th>
+                            <td v-text="document.DefaultDoc_Description"></td>
+                            <td v-text="document.DefaultDoc_FilePath"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" v-on:click="SubmitDocument">Submit With Files</button>
+                    <button type="button" class="btn btn-primary" v-on:click="SubmitDocumentBase64">Submit Base64</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    <script src="~/js/Admin/Document/MultipleUploadWithMetaData.js"></script>
+}
+

@@ -1,0 +1,109 @@
+﻿
+<div class="modal fade" id="kt_modal_lastresults" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" 
+     style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Last Result Leads</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                @Html.Hidden("last_result_val")
+               
+            </div>
+
+            <div class="modal-body">
+                 
+
+                <div class="box-header with-border">
+                    @(Html.Kendo().Grid<ds.portal.leads.Models.LeadViewModel>()
+                        .Name("ModalGridLastResultsLeads")
+                        .Columns(columns =>
+                        {
+                           // columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-danger' style='cursor:pointer;'onclick=PerformLeadDelete('#:Lead_Id#') title='Delete'> <span style='text-align:center;' class='fa fa-trash-alt'></span></a></div>").Width(30).ClientHeaderTemplate(" ");
+                            columns.Bound(p => p.Lead_Id).Title("Id").ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformLeadEdit('#:encodeLeadId#') title='#:Lead_Id#'>#:Lead_Id#</a>").Width(70);
+                           // columns.Bound(p => p.Lead_DateOfEnquiry_D).Format("{0:dd/MM/yyyy}").Title("Enquiry").Width(120);
+                            columns.Bound(p => p.Lead_ContactName).ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformLeadEdit('#:encodeLeadId#') title='#:Lead_ContactName#'>#:Lead_ContactName#</a>").Title("Contact Name").Width(180);
+                            columns.Bound(p => p.Lead_Contact_Mobile).ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformLeadEdit('#:encodeLeadId#','true') title='#:Lead_Contact_Mobile#'>#:Lead_Contact_Mobile#</a>").Title("Mobile").Width(120);
+                           // columns.Bound(p => p.Lead_CourseTitle).Title("Course Level").Width(160);
+                            columns.Bound(p => p.Lead_LastResult).Title("Last Result").Width(160);
+                          //  columns.Bound(p => p.Lead_Status).ClientTemplate("<span class='kt-badge kt-badge--inline kt-badge--pill #= Lead_Status_Class #'>#= Lead_Status #</span>").HtmlAttributes(new { style = "text-align:center" }).Title("Status").Width(100);
+                          //  columns.Bound(p => p.Lead_Last_Action).HtmlAttributes(new { style = "text-align:center" }).Title("Last Action").Width(150);
+                            //if (hasAdminRole)
+                            //{
+                            //    columns.Bound(p => p.Users_Username).ClientTemplate("<a style='cursor:pointer' onclick='return openSalesAdvisor(#= Lead_Id_SalesAdvisor#,#=Lead_Id#)'> #= Users_Username # <a/>").Title("Assigned to").HtmlAttributes(new { style = "text-align:center" }).Width(180);
+                            //    columns.Bound(p => p.Lead_IsDuplicate).ClientTemplate("<a style='cursor:pointer' onclick='return duplicateOnclick(#= Lead_IsDuplicate#,#=Lead_Id#)'> #= Lead_IsDuplicate == 1 ? 'Yes' :'No' # <a/>").Title("Duplicated").HtmlAttributes(new { style = "text-align:center" }).Width(120);
+                            //}
+                            // columns.Bound(p => p.CourseLevelsEnquiry).Title("Course Level Enquiry").Width(150);
+                        })
+                        .Resizable(resize => resize.Columns(true))
+                        .Reorderable(x => x.Columns(true))
+                        .ColumnMenu(c => c.Columns(true))
+                        .Scrollable()
+                        .Sortable()
+                        .Filterable(f => f.Messages(m => m.IsFalse("No")).Messages(m => m.IsTrue("Yes")))
+                        .Sortable(sortable =>
+                        {
+                            sortable.SortMode(GridSortMode.SingleColumn);
+                        })
+                        .Pageable()
+                        .NoRecords()
+                        .Filterable()
+                        .Pageable(pageable => pageable
+                        .Refresh(true)
+                        .PageSizes(true)
+                        .ButtonCount(5))
+                        .DataSource(dataSource =>
+                        dataSource
+                        .WebApi()
+                        .Model(model =>
+                        {
+                            model.Id(p => p.Lead_Id);
+                            model.Field(p => p.AgreedPaymentSchemeId).DefaultValue("#:Id#");
+                        })
+                        .Events(events => events.Error("error_handler"))
+                        .Read(read => read.Action("GetModalLeadsLastResults", "LeadApi").Data("getSelectedValueLastResult"))
+                        .PageSize(20)
+                        )
+                    )
+                </div>                 
+
+            </div>
+
+            <div class="modal-footer">                
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+ 
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    <script src="~/js/Admin/Leads/Manage.js"></script>
+}
+
+<script>
+    /// task module
+    $(document).on('click', '.fc-list-item-title', function (e) {
+        $(this.outerHTML).each(function (i, el) {
+            var inputEl = $(el).children().get(1);
+            console.log(inputEl.innerText);
+            getTaskById(parseInt(inputEl.innerText));
+        });
+    });
+
+    /// diary
+    $(document).on('click', '.fc-content', function (e) {
+        $(this.outerHTML).each(function (i, el) {
+            var inputEl = 0;
+            inputEl = $(el).children().get(2);
+            if (inputEl === undefined) {
+                inputEl = $(el).children().get(1);
+            }
+            console.log(inputEl.innerText);
+            getTaskById(parseInt(inputEl.innerText));
+        });
+    });
+
+</script>

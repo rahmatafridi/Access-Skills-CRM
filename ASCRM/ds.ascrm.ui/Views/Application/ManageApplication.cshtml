@@ -1,0 +1,446 @@
+﻿
+@{
+    ViewData["Title"] = "Manage Application";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+    var canRoleManagerViewTemplate = (permissions == null) ? false : (bool)permissions["TEMPLATE_VIEW"];
+    var canRoleManagerCreateTemplate = (permissions == null) ? false : (bool)permissions["TEMPLATE_CREATE"];
+    var canRoleManagerEditTemplate = (permissions == null) ? false : (bool)permissions["TEMPLATE_EDIT"];
+    var canRoleManagerDeleteTemplate = (permissions == null) ? false : (bool)permissions["TEMPLATE_DEL"];
+
+
+
+    var canRoleManagerDeleteApp = (permissions == null) ? false : (bool)permissions["APP_DEL"];
+    var canRoleManagerCreateApp = (permissions == null) ? false : (bool)permissions["APP_CREATE"];
+    var canRoleManagerRejApp = (permissions == null) ? false : (bool)permissions["APP_REJ"];
+    var canRoleManagerENRApp = (permissions == null) ? false : (bool)permissions["APP_ENR"];
+}
+<style>
+    .kt-portlet .kt-portlet__foot {
+        padding: 10px 5px 10px 10px !important;
+    }
+</style>
+<div class="content" id="dv_Manage_Applications">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <div class="kt-form__actions kt-portlet__foot">
+                <label style="font-size: large;font-weight: 500;margin-top:10px;margin-left:-15px;">Applications</label>
+            </div>
+
+            <div class="kt-portlet__head-toolbar">
+        
+            </div>
+        </div>
+        <div class="kt-portlet__body">
+            <div class="alert  alert-secondary">
+                <div class="col-12">
+                    <div class="form-group row">
+                        <div class="col-4">
+                            <label for="example-url-input" class="col-12 col-form-label">Start a new application</label>
+                        </div>
+                        <div class="col-8 input-group">
+                            <div class="col-8">
+                                <select id="ddl_course_level" class="form-control" v-model="app_officeuse1_courselevel">
+                                    <option v-for="CourseLevel in CourseLevels" v-bind:value="CourseLevel.CL_Id" v-text="CourseLevel.CL_Title"></option>
+                                </select>
+                            </div>
+                            <div class="col-4">
+                                @if (canRoleManagerCreateApp == true)
+                                {
+                                <a v-on:click="AddNewApplication" class="btn btn-sm btn-bold btn-label-brand">
+                                    <i class="fa fa-plus"></i> Start a new application
+                                </a>
+                                }
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-header with-border">
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="#kt_tabs_1_1" v-on:click="RefreshSubmitted">
+                            <i class="fa fa-id-card"></i> Submitted/In Progress
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_2" v-on:click="RefreshNotSubmitted">
+                            <i class="fa fa-chart-bar"></i> Not Submitted
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_3" v-on:click="RefreshRejected">
+                            <i class="fa fa-address-card"></i> Rejected
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_4" v-on:click="RefreshDeleted">
+                            <i class="fa fa-address-card"></i> Deleted
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_5" v-on:click="RefreshEnrolled">
+                            <i class="fa fa-address-card"></i> Enrolled
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="kt_tabs_1_1" role="tabpanel">
+                        @(Html.Kendo().Grid<ds.portal.applications.Models.ApplicationModel>()
+                            .Name("grid_submitted")
+                            .Columns(columns =>
+                            {
+                                columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-brand' style='cursor:pointer;' onclick=PerformApplicationEdit('#:encoded_app_id#') title='Edit'><span style='text-align:center;' class='fa fa-pen'></span></a>" +
+                                                    "&nbsp;&nbsp;<a class='kt-font-dark' style='cursor:pointer;' onclick=PerformPrint('#:encoded_app_id#') title='Print'><span style='text-align:center;' class='fa fa-print'></span></a>" +
+                                                    "&nbsp;&nbsp;<a class='kt-font-dark' style='cursor:pointer;' onclick=PerformDownloadAttach('#:AppUser_App_Id#') title='Download Attachment'><span style='text-align:center;' class='fa fa-download'></span></a>" +
+                                                    "#if(IsReadyToEnroll!='Yes'){# &nbsp;&nbsp;<a class='kt-font-success' style='cursor:pointer;' onclick=PerformReadyToEnroll('#:AppUser_App_Id#') title='Ready To Enroll'><span style='text-align:center;' class='fa fa-user-check'></span></a>#}#" +
+                                                    "#if(IsReadyToEnroll=='Yes'){# &nbsp;&nbsp;<a class='kt-font-success' style='cursor:pointer;' title='Ready to enrolled by ' + '#:AppUser_ReadyToEnrollByUser#' + '\nComments : ' + #:RTE_Comment#><span style='text-align:center;' class='fa fa-user-check'></span></a>#}#" +
+                                                    "&nbsp;&nbsp;<a class='kt-font-info' style='cursor:pointer;' onclick=PerformNotifyChanges('#:AppUser_App_Id#') title='Notify Changes'><span style='text-align:center;' class='fa fa-envelope'></span></a>" +
+                                                    "#if(IsAmended=='Yes'){# &nbsp;&nbsp;<a class='kt-font-info' style='cursor:pointer;' onclick='PerformNotifyChanges(\"#:applicantname#\", \"#:App_Email#\", #:AppUser_App_Id#)' title='Notify Changes'><span style='text-align:center;' class='fa fa-envelope'></span></a>#}#" +
+                                                    //"#if(ErrorDesc==null){# #: DeviceLabel # #}else If(ErrorDesc==""){# #: DeviceLabel # #}else{# #: DeviceText # #}#"
+                                                    "&nbsp;&nbsp;<a class='kt-font-warning' style='cursor:pointer;' onclick=PerformReject('#:AppUser_App_Id#') title='Reject'><span style='text-align:center;' class='fa fa-user-alt-slash'></span></a>" +
+                                                    "&nbsp;&nbsp;<a class='kt-font-danger' style='cursor:pointer;'onclick=PerformApplicationDelete('#:AppUser_App_Id#') title='Delete'> <span style='text-align:center;' class='fa fa-trash-alt'></span></a>" +
+                                                    "</div>").Width(170).ClientHeaderTemplate(" ");
+                                columns.Bound(p => p.AppUser_App_Id).Title("Id").Width(70);
+                                columns.Bound(p => p.AppUser_SubmittedByUser).Title("By User");
+                                columns.Bound(p => p.applicantname).Title("Name");
+                                columns.Bound(p => p.SumittedDate).Title("Date");
+                            })
+                            .Resizable(resize => resize.Columns(true))
+                            .Reorderable(x => x.Columns(true))
+                            .ColumnMenu(c => c.Columns(true))
+                            .Sortable()
+                            .Pageable()
+                            .Filterable()
+                            .NoRecords()
+                            .Pageable(pageable => pageable
+                            .Refresh(true)
+                            .PageSizes(true)
+                            .ButtonCount(5))
+                            .DataSource(dataSource =>
+                            dataSource
+                            .WebApi()
+                            .Model(model =>
+                            {
+                                model.Id(p => p.AppUser_App_Id);
+                            })
+                            .Events(events => events.Error("error_handler"))
+                            .Read(read => read.Action("GetAllApplicationsForAdmin", "ApplicationApi", new { type = "Submitted" }))
+                            .PageSize(20)
+                            )
+                        )
+                    </div>
+                    <div class="tab-pane" id="kt_tabs_1_2" role="tabpanel">
+                        @(Html.Kendo().Grid<ds.portal.applications.Models.ApplicationModel>()
+                            .Name("grid_notsubmitted")
+                            .Columns(columns =>
+                            {
+                                columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-brand' style='cursor:pointer;' onclick=PerformPrint('#:encoded_app_id#') title='Print'><span style='text-align:center;' class='fa fa-print'></span></a>" +
+                                                    "</div>").Width(30).ClientHeaderTemplate(" ");
+                                columns.Bound(p => p.AppUser_App_Id).Title("Id").Width(70);
+                                columns.Bound(p => p.AppUser_CreatedByUser).Title("By User");
+                                columns.Bound(p => p.applicantname).Title("Name");
+                                columns.Bound(p => p.CreatedOn).Title("Date");
+                                columns.Bound(p => p.IsSubmitted).Title("Submitted");
+                                columns.Bound(p => p.SalesAdvisorName).Title("Sales Adv");
+
+
+                            })
+                            .Resizable(resize => resize.Columns(true))
+                            .Reorderable(x => x.Columns(true))
+                            .ColumnMenu(c => c.Columns(true))
+                            .Sortable()
+                            .Pageable()
+                            .Filterable()
+                            .NoRecords()
+                            .Pageable(pageable => pageable
+                            .Refresh(true)
+                            .PageSizes(true)
+                            .ButtonCount(5))
+                            .DataSource(dataSource =>
+                            dataSource
+                            .WebApi()
+                            .Model(model =>
+                            {
+                                model.Id(p => p.AppUser_App_Id);
+                            })
+                            .Events(events => events.Error("error_handler"))
+                            .Read(read => read.Action("GetAllApplicationsForAdmin", "ApplicationApi", new { type = "NotSubmitted" }))
+                            .PageSize(20)
+                            )
+                        )
+                    </div>
+                    <div class="tab-pane" id="kt_tabs_1_3" role="tabpanel">
+                        @(Html.Kendo().Grid<ds.portal.applications.Models.ApplicationModel>()
+                            .Name("grid_rejected")
+                            .Columns(columns =>
+                            {
+                                columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-brand' style='cursor:pointer;' onclick=PerformPrint('#:encoded_app_id#') title='Print'><span style='text-align:center;' class='fa fa-print'></span></a>" +
+                                                    "</div>").Width(30).ClientHeaderTemplate(" ");
+                                columns.Bound(p => p.AppUser_App_Id).Title("Id").Width(70);
+                                columns.Bound(p => p.AppUser_RejectedByUser).Title("By User");
+                                columns.Bound(p => p.applicantname).Title("Name");
+                                columns.Bound(p => p.CreatedOn).Title("Date");
+                                columns.Bound(p => p.IsSubmitted).Title("Submitted");
+                                columns.Bound(p => p.IsRejected).Title("Rejected");
+                                columns.Bound(p => p.RejectedOn).Title("Rejected On");
+                                columns.Bound(p => p.AppUser_RejectedReason).Title("Reason");
+                                columns.Bound(p => p.SalesAdvisorName).Title("Sales Adv");
+                            })
+                            .Resizable(resize => resize.Columns(true))
+                            .Reorderable(x => x.Columns(true))
+                            .ColumnMenu(c => c.Columns(true))
+                            .Sortable()
+                            .Pageable()
+                            .Filterable()
+                            .NoRecords()
+                            .Pageable(pageable => pageable
+                            .Refresh(true)
+                            .PageSizes(true)
+                            .ButtonCount(5))
+                            .DataSource(dataSource =>
+                            dataSource
+                            .WebApi()
+                            .Model(model =>
+                            {
+                                model.Id(p => p.AppUser_App_Id);
+                            })
+                            .Events(events => events.Error("error_handler"))
+                            .Read(read => read.Action("GetAllApplicationsForAdmin", "ApplicationApi", new { type = "Rejected" }))
+                            .PageSize(20)
+                            )
+                        )
+                    </div>
+                    <div class="tab-pane" id="kt_tabs_1_4" role="tabpanel">
+                        @(Html.Kendo().Grid<ds.portal.applications.Models.ApplicationModel>()
+                            .Name("grid_deleted")
+                            .Columns(columns =>
+                            {
+                                columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-brand' style='cursor:pointer;' onclick=PerformPrint('#:encoded_app_id#') title='Print'><span style='text-align:center;' class='fa fa-print'></span></a>" +
+                                                    "</div>").Width(30).ClientHeaderTemplate(" ");
+                                columns.Bound(p => p.AppUser_App_Id).Title("Id").Width(70);
+                                columns.Bound(p => p.AppUser_DeletedByUser).Title("By User");
+                                columns.Bound(p => p.applicantname).Title("Name");
+                                columns.Bound(p => p.CreatedOn).Title("Date");
+                                columns.Bound(p => p.IsSubmitted).Title("Submitted");
+                                columns.Bound(p => p.IsDeleted).Title("Deleted");
+                                columns.Bound(p => p.DeletedOn).Title("Deleted On");
+                                columns.Bound(p => p.AppUser_DeletedReason).Title("Reason");
+                                columns.Bound(p => p.SalesAdvisorName).Title("Sales Adv");
+                            })
+                            .Resizable(resize => resize.Columns(true))
+                            .Reorderable(x => x.Columns(true))
+                            .ColumnMenu(c => c.Columns(true))
+                            .Sortable()
+                            .Pageable()
+                            .Filterable()
+                            .NoRecords()
+                            .Pageable(pageable => pageable
+                            .Refresh(true)
+                            .PageSizes(true)
+                            .ButtonCount(5))
+                            .DataSource(dataSource =>
+                            dataSource
+                            .WebApi()
+                            .Model(model =>
+                            {
+                                model.Id(p => p.AppUser_App_Id);
+                            })
+                            .Events(events => events.Error("error_handler"))
+                            .Read(read => read.Action("GetAllApplicationsForAdmin", "ApplicationApi", new { type = "Deleted" }))
+                            .PageSize(20)
+                            )
+                        )
+                    </div>
+                    <div class="tab-pane" id="kt_tabs_1_5" role="tabpanel">
+                        @(Html.Kendo().Grid<ds.portal.applications.Models.ApplicationModel>()
+                            .Name("grid_enrolled")
+                            .Columns(columns =>
+                            {
+                                columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-brand' style='cursor:pointer;' onclick=PerformPrint('#:encoded_app_id#') title='Print'><span style='text-align:center;' class='fa fa-print'></span></a>" +
+                                                    "</div>").Width(30).ClientHeaderTemplate(" ");
+                                columns.Bound(p => p.AppUser_App_Id).Title("Id").Width(70);
+                                columns.Bound(p => p.AppUser_CreatedByUser).Title("By User");
+                                columns.Bound(p => p.applicantname).Title("Name");
+                                columns.Bound(p => p.CreatedOn).Title("Date");
+                                columns.Bound(p => p.LearnerId).Title("Learner Id");
+                                columns.Bound(p => p.EnrolledDate).Title("Enrolled On");
+                                columns.Bound(p => p.SalesAdvisorName).Title("Sales Adv");
+                            })
+                            .Resizable(resize => resize.Columns(true))
+                            .Reorderable(x => x.Columns(true))
+                            .ColumnMenu(c => c.Columns(true))
+                            .Sortable()
+                            .Pageable()
+                            .Filterable()
+                            .NoRecords()
+                            .Pageable(pageable => pageable
+                            .Refresh(true)
+                            .PageSizes(true)
+                            .ButtonCount(5))
+                            .DataSource(dataSource =>
+                            dataSource
+                            .WebApi()
+                            .Model(model =>
+                            {
+                                model.Id(p => p.AppUser_App_Id);
+                            })
+                            .Events(events => events.Error("error_handler"))
+                            .Read(read => read.Action("GetAllApplicationsForAdmin", "ApplicationApi", new { type = "Enrolled" }))
+                            .PageSize(20)
+                            )
+                        )
+                    </div>
+                </div>
+
+
+                <div class="modal fade" id="kt_modal_ready_to_enroll" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Ready To Enroll</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="kt-form kt-form--label-right">
+                                    <div class="form-group row">
+                                        <label class="col-form-label col-sm-3">Comment:</label>
+                                        <div class="col-sm-9">
+                                            <textarea class="form-control" v-model="readytoenroll_comment" v-bind:class="{ 'is-invalid': isSubmitted && $v.readytoenroll_comment.$invalid }"></textarea>
+                                            <span v-if="isSubmitted && $v.readytoenroll_comment.$invalid" class="form-text text-danger">Comment is required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" v-on:click="PerformReadyToEnroll">Submit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="kt_modal_reject_reason" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Reject</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="kt-form kt-form--label-right">
+                                    <div class="form-group row">
+                                        <label class="col-form-label col-sm-4">Reason for rejection:</label>
+                                        <div class="col-sm-8">
+                                            <textarea class="form-control" v-model="rejected_reason" v-bind:class="{ 'is-invalid': isSubmitted && $v.rejected_reason.$invalid }"></textarea>
+                                            <span v-if="isSubmitted && $v.rejected_reason.$invalid" class="form-text text-danger">Reason is required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" v-on:click="PerformReject">Submit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="kt_modal_delete_reason" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Delete</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="kt-form kt-form--label-right">
+                                    <div class="form-group row">
+                                        <label class="col-form-label col-sm-4">Reason for deletion:</label>
+                                        <div class="col-sm-8">
+                                            <textarea class="form-control" v-model="deleted_reason" v-bind:class="{ 'is-invalid': isSubmitted && $v.deleted_reason.$invalid }"></textarea>
+                                            <span v-if="isSubmitted && $v.deleted_reason.$invalid" class="form-text text-danger">Reason is required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" v-on:click="PerformApplicationDelete">Submit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    <script src="~/js/Admin/Applications/ManageApplication.js"></script>
+    <script>
+        $('#editor').summernote({
+            height: 250,                 // set editor height
+            minHeight: null,             // set minimum height of editor
+            maxHeight: null,             // set maximum height of editor
+        });
+    </script>
+    <script>
+    var _canRoleManagerViewTemplate;
+    var _canRoleManagerCreateTemplate;
+    var _canRoleManagerEditTemplate;
+    var _canRoleManagerDeleteTemplate;
+        var _canDeleteApp;
+        var _canCreateApp;
+        var _canRejApp;
+        var _canEnrApp;
+
+    $(document).ready(function () {
+        _canRoleManagerViewTemplate= @canRoleManagerViewTemplate.ToString().ToLower();
+        _canRoleManagerCreateTemplate= @canRoleManagerCreateTemplate.ToString().ToLower();
+        _canRoleManagerEditTemplate= @canRoleManagerEditTemplate.ToString().ToLower();
+        _canRoleManagerDeleteTemplate= @canRoleManagerDeleteTemplate.ToString().ToLower();
+
+        _canDeleteApp = @canRoleManagerDeleteApp.ToString().ToLower();
+        _canCreateApp =@canRoleManagerCreateApp.ToString().ToLower();
+        _canRejApp = @canRoleManagerRejApp.ToString().ToLower();
+        _canEnrApp = @canRoleManagerENRApp.ToString().ToLower();
+
+        //if (!_canRoleManagerViewTemplate) {
+        //    window.location.href = '/Error/PermissionDenied';
+        //}
+        //resizeGrid1();
+       });
+        function resizeGrid1() {
+            var contentwrapper = $("#kt_aside").innerHeight();
+            var gridElement = $("#grid_submitted"),
+                newHeight = gridElement.innerHeight(),
+                otherElements = gridElement.children().not(".k-grid-content"),
+                otherElementsHeight = 0;
+
+            otherElements.each(function () {
+                otherElementsHeight += $(this).outerHeight();
+            });
+                var newHeight = (contentwrapper - otherElementsHeight) - 330;
+                if (newHeight < 325) newHeight = 325;
+            gridElement.children(".k-grid-content").height(newHeight);
+        }
+
+        function exportEmailPDF() {
+            var grid = $("#grid_submitted").data("kendoGrid");
+            grid.hideColumn(0);
+            $("#grid_submitted").getKendoGrid().saveAsPDF();
+            grid.showColumn(0);
+        }
+
+        function exportEmailExcel() {
+            $("#grid_submitted").getKendoGrid().saveAsExcel();
+        }
+    </script>
+}
+

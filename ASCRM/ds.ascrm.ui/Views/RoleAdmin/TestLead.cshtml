@@ -1,0 +1,102 @@
+﻿
+@{
+    ViewData["Title"] = "TestLead";
+}
+
+<h1>TestLead</h1>
+User Name :
+<input type="text" id="txtUserName" name="txtUserName" />
+Password :
+<input type="text" id="txtPassword" name="txtPassword" />
+Your Name :
+<input type="text" id="txtName" name="txtName" />
+Email :
+<input type="text" id="txtEmail" name="txtEmail" />
+Phone :
+<input type="text" id="txtPhone" name="txtPhone" />
+Select Course :
+<select id="ddlCourse" name="ddlCousre" class="jsCourse">
+<option selected="selected" value="Level 2 Diploma">Level 2 Diploma</option>
+<option value="Level 3 Diploma" >Level 3 Diploma</option>
+<option value="Level 3 CYP">Level 3 CYP</option>
+<option value="Level 4 Diploma">Level 4 Diploma</option>
+<option value="Level 5 Diploma">Level 5 Diploma</option>
+<option value="Level 5 CYP">Level 5 CYP</option>
+<option value="Short Courses CPD">Short Courses CPD</option>
+<option value="E-Learning CPD">E-Learning CPD</option>
+    
+</select>
+Select Job Title :
+<select id="ddlJobTitle" name="ddlJobTitle" class="jsJobTitle">
+   
+    <option value="Owner/Director" selected="selected">Owner/Director</option>
+    <option value="Manager">Manager</option>
+    <option value="Deputy Manager">Deputy Manager</option>
+    <option value="Senior Carer/Senior Support Worker">Senior Carer/Senior Support Worker</option>
+    <option value="Care Assistant/Support Worker">Care Assistant/Support Worker</option>
+    <option value="Seeking Employment">Seeking Employment</option>
+    <option value="Other">Other</option>
+
+
+</select>
+Subject : 
+<input type="text" id="txtSubject" />
+Message : 
+<input type="text" id="txtMessage" />
+<input type="button" id="btncreate" name="btncreate" value="create lead"  />
+
+
+<script>
+    $(document).ready(function () {
+        console.log("jQuery is working");
+        $("#btncreate").click(function () {
+            let lead = new Object();
+            let username = $("#txtUserName").val();
+            let pwd = $("#txtPassword").val();
+            lead.Lead_Email = $("#txtEmail").val();
+            lead.LeadName = $("#txtName").val();
+            lead.Phone = $("#txtPhone").val();
+            lead.JobTitle = $(".jsJobTitle").val();
+            lead.CourseName = $(".jsCourse").text();
+            lead.CourseId = $(".jsCourse").val();
+            lead.Subject = $("#txtSubject").val();
+            lead.Message = $("#txtMessage").val();
+            
+            //let data = JSON.stringify(lead);
+            let data = JSON.stringify({
+                "Lead_ContactName": lead.LeadName,
+                "Lead_Email": lead.Lead_Email,
+                "Lead_Contact_Mobile": lead.Phone,
+                "Lead_Contact_Id_JobTitle": lead.JobTitle,
+                "Lead_CourseTitle": lead.CourseName,
+                //"Lead_Id_Course": lead.CourseId,
+                "Lead_Contact_WebSubject": lead.Subject,
+                "Lead_Contact_WebMessage": lead.Message
+                //,"Lead_Id_LastResult":"1","Lead_Contact_Id_Department":"2","Lead_Contact_Salutation":"Mr."
+            });
+
+           
+            let url = "/api/LeadApi/Create?uid="+username+"&pwd="+pwd;
+            $.ajax({
+                url: url,
+                method: "POST",
+                data:data,
+                dataType: "json",
+                contentType: "application/json",
+                success: function (data) {
+                    
+                    console.log("Success data :::: Type " + data);
+                    
+
+                        },
+                failure: function (data) {
+                    console.log("failure");
+                },
+                error: function (data) {
+                    console.log("Error  ::: "+data);
+                }
+            });
+        });
+
+    });
+</script>

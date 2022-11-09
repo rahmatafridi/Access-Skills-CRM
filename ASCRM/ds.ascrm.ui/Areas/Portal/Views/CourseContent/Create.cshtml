@@ -1,0 +1,108 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{ Layout = "~/Views/Shared/_Layout_Portal.cshtml"; }
+
+<style>
+
+    .form-group {
+        margin-bottom: 1rem !important;
+    }
+
+    .link-text:hover {
+        color: #22b9ff !important;
+    }
+
+    .kt-portlet .kt-portlet__foot {
+        padding: 18px 10px 10px 0px !important;
+    }
+
+    .k-dropdown-wrap > .k-input, .k-dropdown .k-dropdown-wrap .k-select, .k-list, .k-reset {
+        background-color: white;
+    }
+</style>
+
+
+
+<div class="content" id="dv_Create_Course">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <div class="kt-form__actions kt-portlet__foot">
+                <label id="lblEditHeader" style="font-size: large;font-weight: 500;margin-right: 5px">Add Course Content</label>
+            </div>
+            <div class="kt-portlet__head-toolbar">
+                <a asp-controller="CourseContent" asp-action="Manage" class="btn btn-clean kt-margin-r-10 btn-sm btn-outline-info">
+                    <i class="la la-arrow-left"></i>
+                    <span class="kt-hidden-mobile">Cancel</span>
+                </a>
+                <div class="btn-group">
+
+                    &nbsp;
+                    <button type="button" v-on:click="submitted()" class="btn btn-sm btn-brand">
+                        <i class="la la-check"></i>
+                        <span class="kt-hidden-mobile">Save</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-brand dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                    <div class="dropdown-menu dropdown-menu-right" style="">
+                        <ul class="kt-nav">
+                            <li class="kt-nav__item">
+                                <a v-on:click="submitted()" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon flaticon2-reload"></i>
+                                    <span class="kt-nav__link-text">Save &amp; Stay</span>
+                                </a>
+                            </li>
+                            <li class="kt-nav__item">
+                                <a v-on:click="submitted()" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon flaticon2-power"></i>
+                                    <span class="kt-nav__link-text">Save &amp; Go back</span>
+                                </a>
+                            </li>
+                            <li class="kt-nav__item">
+                                <a v-on:click="submitted()" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon flaticon2-edit-interface-symbol-of-pencil-tool"></i>
+                                    <span class="kt-nav__link-text">Save &amp; Sign out</span>
+                                </a>
+                            </li>
+                            <li class="kt-nav__item">
+                                <a v-on:click="submitted()" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon flaticon2-add-1"></i>
+                                    <span class="kt-nav__link-text">Save &amp; Add new</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+        <section class="content">
+            <div class="kt-portlet__body">
+           
+            </div>
+        </section>
+    </div>
+</div>
+
+@*<partial name="~/Views/Shared/partials/lead/history/_portlet_history.cshtml" />*@
+
+
+@section Scripts{
+
+
+
+    <script src="~/lib/vue/vue.js" type="application/javascript"></script>
+    <script src="~/lib/vue-router/vue-router.min.js" type="application/javascript"></script>
+
+    <script src="~/js/Portal/CourseContents/Create.js"></script>
+    <script>
+
+        $('.summernote').summernote({
+            placeholder: '',
+            tabsize: 2,
+            height: 100
+        });
+    </script>
+
+    
+}
+

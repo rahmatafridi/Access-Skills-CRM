@@ -1,0 +1,349 @@
+﻿
+
+<div class="modal fade" id="modal_session_expiring" aria-hidden="true" data-keyboard="false" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Are you still there?</h4>
+            </div>
+            <div class="modal-body">
+                Your session will time out in <span id="timer_seconds"></span> seconds due to inactivity. Would you like to stay signed in?
+            </div>
+            <div class="modal-footer">
+                <button id="btnLogoutNow" type="button" class="btn btn-default" style="padding: 6px 12px; margin-bottom: 0; font-size: 14px; font-weight: normal; border: 1px solid transparent; border-radius: 4px;  background-color: #dfe9f2; color: #FFF;">Sign Out</button>
+                <button id="btnOk" type="button" class="btn btn-default" style="padding: 6px 12px; margin-bottom: 0; font-size: 14px; font-weight: normal; border: 1px solid transparent; border-radius: 4px;  background-color: #428bca; color: #FFF;">Keep me signed in</button>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+
+<div class="modal fade" id="modal_session_expired" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Session Expired</h4>
+            </div>
+            <div class="modal-body">
+                Your session is expired.
+            </div>
+            <div class="modal-footer">
+                <button id="btnExpiredOk" onclick="sessionExpiredRedirect()" type="button" class="btn btn-primary" data-dismiss="modal" style="padding: 6px 12px; margin-bottom: 0; font-size: 14px; font-weight: normal; border: 1px solid transparent; border-radius: 4px; background-color: #428bca; color: #FFF;">Login</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+
+    var sessionExpired = document.getElementById("modal_session_expired");
+    sessionExpired.addEventListener("click", sessionExpiredClicked, false);
+    var serverSessionTimeOut = 0;
+
+
+    //var sessServerAliveTime = 10 * 60 * 200;
+    //var sessionTimeout = 20000;
+
+    //var sessServerAliveTime = 10 * 60 * 2;
+    //var sessionTimeout = 0;//1 * 60000;
+    //var sessLastActivity;
+    //var idleTimer, remainingTimer;
+    //var isTimout = false;
+
+    //var sess_intervalID, idleIntervalID;
+    //var sess_lastActivity;
+    //var timer;
+    //var isIdleTimerOn = false;
+    //localStorage.setItem('sessionSlide', 'isStarted');
+    //var _serverIntervalTime = 0;
+ 
+      /********************/
+     $(document).ready(function () {
+        getServerTimeoutTime();
+       // initSessionMonitor();
+    });
+
+    /********************/
+    function sessionExpiredClicked(evt) {
+        window.location = "/Account/Logout";
+    }
+
+    function getServerTimeoutTime() {
+        $.ajax({
+            url: "/api/CoreConfigurationApi/GetSessionOutTime",
+            type: "GET",
+            contentType: "application/json",
+            dataType: "json"
+        }).done(function (response) {
+            console.log(response);           
+            serverSessionTimeOut = response * 60000; //in minutes
+        }).fail(function (xhr) {
+            toastr.error(xhr.responseText, 'Error!');
+        });
+    }
+
+
+
+
+
+
+
+
+
+
+    var counter = 60;
+    var idleTime = 0;
+    var countdown;
+    $(document).ready(function () {
+
+        $(window).click(function () {
+           // console.log("click has occured");
+            idleTime = 0;
+        })
+        $(window).keyup(function () {
+            //console.log("key up has occured")
+            idleTime = 0;
+        })
+
+        //Increment the idle time counter every minute.
+        var idleInterval = setInterval(timerIncrement, 30000);//serverSessionTimeOut); //found 60000 = 1min
+
+        $('#keep').click(function () {
+            idleTime = 0;
+            $('#modal_session_expiring').hide();
+             $("#modal_session_expiring").modal('hide');
+        });
+
+    });
+
+    function timerIncrement() {
+        idleTime = idleTime + 1;
+        console.log(idleTime);
+        if (idleTime > 0) //13
+        {
+            $('#modal_session_expiring').show();
+            $("#modal_session_expiring").modal('show');
+            startTimer();
+        }
+        //if (idleTime > 1) { // 14 
+        //    $("#modal_session_expired").modal('show');
+        //    //window.location.href = '/login.aspx';
+        //  // alert("You session has expired due to no activity.");
+        //}
+    };
+
+
+    function startTimer() {
+        countdown = setInterval(countDownClock, 1000);
+    };
+
+    function countDownClock() {
+        counter = counter - 1
+        if (counter < 10) {
+            console.log(counter);
+            $('#timer_seconds').text("0" + counter);
+        }
+        else {
+            console.log(counter);
+            $('#timer_seconds').text(counter);
+        }
+        if (counter == 0) {
+            counter = 60;
+            clearInterval(countdown);
+
+          
+             $("#modal_session_expiring").modal('hide');
+             $("#modal_session_expired").modal('show');
+         
+            console.log(counter);
+            console.log("done");
+        }
+    };
+
+
+
+
+
+
+    /********************/
+
+   
+    //function sessPingServer() {
+    //    if (!isTimout) {
+    //        return true;
+    //    }
+    //}
+
+    //function sessServerAlive() {
+    //    sess_intervalID = setInterval('sessPingServer()', sessServerAliveTime);
+    //}
+
+    //function initSessionMonitor() {
+    //    $(document).bind('keypress.session', function (ed, e) {
+    //        sessKeyPressed(ed, e);
+    //    });
+    //    $(document).bind('mousedown keydown', function (ed, e) {
+    //        sessKeyPressed(ed, e);
+    //    });
+    //    sessServerAlive();
+    //    startIdleTime();
+    //}
+
+    //$(window).scroll(function (e) {
+    //    localStorage.setItem('sessionSlide', 'isStarted');
+    //    startIdleTime();
+    //});
+
+    //function sessKeyPressed(ed, e) {
+    //    var target = ed ? ed.target : window.event.srcElement;
+    //    var sessionTarget = $(target).parents("#modal_session_expiring").length;
+
+    //    if (sessionTarget != null && sessionTarget != undefined) {
+    //        if (ed.target.id != "btnSessionExpiredCancelled" && ed.target.id != "btnSessionModal" && ed.currentTarget.activeElement.id != "modal_session_expiring" && ed.target.id != "btnExpiredOk"
+    //            && ed.currentTarget.activeElement.className != "modal fade modal-overflow in" && ed.currentTarget.activeElement.className != 'modal-header'
+    //            && sessionTarget != 1 && ed.target.id != "modal_session_expiring") {
+    //            localStorage.setItem('sessionSlide', 'isStarted');
+    //            startIdleTime();
+    //        }
+    //    }
+    //}
+
+    //function startIdleTime() {
+    //    stopIdleTime();
+    //    localStorage.setItem("sessIdleTimeCounter", $.now());
+    //    idleIntervalID = setInterval('checkIdleTimeout()', 1000);
+    //    isIdleTimerOn = false;
+    //}
+    
+    
+   
+    //function stopIdleTime() {
+    //    clearInterval(idleIntervalID);
+    //    clearInterval(remainingTimer);
+    //}
+
+    //function checkIdleTimeout() {
+    //    // $('#sessionValue').val() * 60000;
+    //    var idleTime = (parseInt(localStorage.getItem('sessIdleTimeCounter')) + (sessionTimeout));
+    //    if ($.now() > idleTime + 60000) {
+    //        $("#modal_session_expiring").modal('hide');
+    //        $("#modal_session_expired").modal('show');
+    //        clearInterval(sess_intervalID);
+    //        clearInterval(idleIntervalID);
+
+    //        $('.modal-backdrop').css("z-index", parseInt($('.modal-backdrop').css('z-index')) + 100);
+    //        $("#modal_session_expired").css('z-index', 2000);
+    //        $('#btnExpiredOk').css('background-color', '#428bca');
+    //        $('#btnExpiredOk').css('color', '#fff');
+
+    //        isTimout = true;
+
+    //        sessLogOut();
+
+    //    }
+    //    else if ($.now() > idleTime) {
+    //        //debugger;
+    //        ////var isDialogOpen = $("#modal_session_expiring").is(":visible");
+    //        if (!isIdleTimerOn) {
+    //            ////alert('Reached idle');
+    //            localStorage.setItem('sessionSlide', false);
+    //            countdownDisplay();
+
+    //            $('.modal-backdrop').css("z-index", parseInt($('.modal-backdrop').css('z-index')) + 500);
+    //            $('#modal_session_expiring').css('z-index', 1500);
+    //            $('#btnOk').css('background-color', '#428bca');
+    //            $('#btnOk').css('color', '#fff');
+    //            $('#btnSessionExpiredCancelled').css('background-color', '#428bca');
+    //            $('#btnSessionExpiredCancelled').css('color', '#fff');
+    //            $('#btnLogoutNow').css('background-color', '#428bca');
+    //            $('#btnLogoutNow').css('color', '#fff');
+
+    //            $("#timer_seconds").empty();
+    //            $("#modal_session_expiring").modal('show');
+
+    //            isIdleTimerOn = true;
+    //        }
+    //    }
+    //}
+
+    $("#btnSessionExpiredCancelled").click(function () {
+        $('.modal-backdrop').css("z-index", parseInt($('.modal-backdrop').css('z-index')) - 500);
+    });
+
+    $("#btnOk").click(function () {
+
+        idleTime = 0;
+        $('#modal_session_expiring').hide();
+        counter = 60;
+
+        $("#modal_session_expiring").modal('hide');
+
+        var idleInterval = setInterval(timerIncrement, 30000);//serverSessionTimeOut); //found 60000 = 1min
+
+       // $('.modal-backdrop').css("z-index", parseInt($('.modal-backdrop').css('z-index')) - 500);
+       // startIdleTime();
+       // clearInterval(remainingTimer);
+       // localStorage.setItem('sessionSlide', 'isStarted');
+    });
+
+    $("#btnLogoutNow").click(function () {
+        localStorage.setItem('sessionSlide', 'loggedOut');
+        window.location = "/Account/Logout";
+        sessLogOut();
+        $("#modal_session_expired").modal('hide');
+
+    });
+
+    $('#modal_session_expired').on('shown.bs.modal', function () {
+        $("#modal_session_expiring").modal('hide');
+        $(this).before($('.modal-backdrop'));
+        $(this).css("z-index", parseInt($('.modal-backdrop').css('z-index')) + 1);
+    });
+
+    $("#modal_session_expired").on("hidden.bs.modal", function () {
+        window.location = "/Account/Logout";
+    });
+
+    $('#modal_session_expiring').on('shown.bs.modal', function () {
+        $("#modal_session_expiring").modal('show');
+        $(this).before($('.modal-backdrop'));
+        $(this).css("z-index", parseInt($('.modal-backdrop').css('z-index')) + 1);
+    });
+
+    //function countdownDisplay() {
+
+    //    var dialogDisplaySeconds = 60;
+
+    //    remainingTimer = setInterval(function () {
+    //        if (localStorage.getItem('sessionSlide') == "isStarted") {
+    //            $("#modal_session_expiring").modal('hide');
+    //            startIdleTime();
+    //            clearInterval(remainingTimer);
+    //        }
+    //        else if (localStorage.getItem('sessionSlide') == "loggedOut") {
+    //            $("#modal_session_expiring").modal('hide');
+    //            $("#modal_session_expired").modal('show');
+    //        }
+    //        else {
+    //            if (dialogDisplaySeconds <= 0) { dialogDisplaySeconds = 60;}
+    //            $('#timer_seconds').html(dialogDisplaySeconds);
+    //            dialogDisplaySeconds -= 1;
+    //        }
+    //    }
+    //        , _serverIntervalTime);
+    //};
+
+    function sessLogOut() {
+        // $.ajax({
+        //     url: 'Logout.html',
+        //     dataType: "json",
+        //      async: false,
+        //      type: "POST"
+        //   });
+
+        window.location = "/Account/Logout";
+    }
+</script>

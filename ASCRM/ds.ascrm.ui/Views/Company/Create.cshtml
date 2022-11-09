@@ -1,0 +1,511 @@
+﻿
+@{ Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+    var canRoleManagerEditNotes = (permissions == null) ? false : (bool)permissions["CE_NOTE"];
+    var canRoleManagerCreateNotes = (permissions == null) ? false : (bool)permissions["COMPANY_ADD_NOTE"];
+    var canRoleManagerViewNotes = (permissions == null) ? false : (bool)permissions["CL_NOTE"];
+    var canRoleManagerDeleteNotes = (permissions == null) ? false : (bool)permissions["CDE_NOTE"];
+
+
+    var canRoleManagerEditCompanyWorkplace = (permissions == null) ? false : (bool)permissions["CWP_EDIT"];
+    var canRoleManagerCreateCompanyWorkplace = (permissions == null) ? false : (bool)permissions["CWP_ADD"];
+    var canRoleManagerViewCompanyWorkplace = (permissions == null) ? false : (bool)permissions["CWP_VIEW"];
+    var canRoleManagerDeleteCompanyWorkplace = (permissions == null) ? false : (bool)permissions["CWP_DELETE"];
+
+
+    var canRoleManagerEditCompanyWorkplaceContact = (permissions == null) ? false : (bool)permissions["CWP_EDIT"];
+    var canRoleManagerCreateCompanyWorkplaceContact = (permissions == null) ? false : (bool)permissions["CWP_ADD"];
+    var canRoleManagerViewCompanyWorkplaceContact = (permissions == null) ? false : (bool)permissions["CWP_VIEW"];
+    var canRoleManagerDeleteCompanyWorkplaceContact = (permissions == null) ? false : (bool)permissions["CWP_DELETE"];
+
+
+    var canRoleManagerEditCompany = (permissions == null) ? false : (bool)permissions["COMPANY_EDIT"];
+    var canRoleManagerCreateCompany = (permissions == null) ? false : (bool)permissions["COMPANY_CREATE"];
+    var canRoleManagerViewCompany = (permissions == null) ? false : (bool)permissions["COMPANY_VIEW"];
+    var canRoleManagerDeleteCompany = (permissions == null) ? false : (bool)permissions["COMPANY_DEL"];
+
+
+    var canRoleManagerEditCompanyContact = (permissions == null) ? false : (bool)permissions["CC_EDIT"];
+    var canRoleManagerCreateCompanyContact = (permissions == null) ? false : (bool)permissions["CC_ADD"];
+    var canRoleManagerViewCompanyContact = (permissions == null) ? false : (bool)permissions["CC_VIEW"];
+    var canRoleManagerDeleteCompanyContact = (permissions == null) ? false : (bool)permissions["CC_DELETE"];
+
+
+    var canRoleManagerEditCompanyAssignedLearner = (permissions == null) ? false : (bool)permissions["CAL_EDIT"];
+    var canRoleManagerCreateCompanyAssignedLearner = (permissions == null) ? false : (bool)permissions["CAL_ADD"];
+    var canRoleManagerViewCompanyAssignedLearner = (permissions == null) ? false : (bool)permissions["CAL_VIEW"];
+    var canRoleManagerDeleteCompanyAssignedLearner = (permissions == null) ? false : (bool)permissions["CAL_DELETE"];
+
+
+    var canRoleManagerEditCompanyInvites = (permissions == null) ? false : (bool)permissions["CAL_EDIT"];
+    var canRoleManagerCreateCompanyInvites = (permissions == null) ? false : (bool)permissions["CAL_ADD"];
+    var canRoleManagerViewCompanyInvites = (permissions == null) ? false : (bool)permissions["CAL_VIEW"];
+    var canRoleManagerDeleteCompanyInvites = (permissions == null) ? false : (bool)permissions["CAL_DELETE"];
+
+
+
+    var companyId = ViewBag.Company_Id;
+    var companyId_ForLead = ViewBag.CompanyId_ForLead;
+    var acceptDocumentTypes = ViewBag.acceptDocumentTypes;
+    var isMultipleDocumentUpload = ViewBag.isMultipleDocumentUpload;
+    var maxDocumentUpload = ViewBag.maxDocumentUpload;
+    var maxDocumentFileSize = ViewBag.maxDocumentFileSize;
+
+    var isOwner = ViewBag.Owner; }
+
+<style>
+
+    .form-group {
+        margin-bottom: 1rem !important;
+    }
+
+    .link-text:hover {
+        color: #22b9ff !important;
+    }
+
+    .kt-portlet .kt-portlet__foot {
+        padding: 18px 10px 10px 0px !important;
+    }
+
+    .k-dropdown-wrap > .k-input, .k-dropdown .k-dropdown-wrap .k-select, .k-list, .k-reset {
+        background-color: white;
+    }
+</style>
+
+<input type="hidden" id="hfd_roleName" value="@ViewBag.RoleName" />
+<input type="hidden" id="hfd_userId" value="@ViewBag.UserId" />
+<input type="hidden" id="hfd_owner" value="@ViewBag.Owner" />
+
+<div class="content" id="dv_Create_Company">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <div class="kt-form__actions kt-portlet__foot">
+                <label id="lblEditHeader" style="font-size: large;font-weight: 500;margin-right: 5px">Add Company</label>
+            </div>
+            <div class="kt-portlet__head-toolbar">
+                <a href="/Company/Manage" class="btn btn-clean kt-margin-r-10 btn-sm btn-outline-info">
+                    <i class="la la-arrow-left"></i>
+                    <span class="kt-hidden-mobile">Cancel</span>
+                </a>
+                @if (companyId != "0")
+                {
+    <a href="/Lead/Create?CompnayId=@companyId_ForLead" class="btn  kt-margin-r-10 btn-sm btn-brand">
+        <i class="la la-plus"></i>
+        <span class="kt-hidden-mobile">Create Lead</span>
+    </a>}
+                <div class="btn-group">
+
+                    &nbsp;
+                    <button type="button" v-on:click="submitted(0)" class="btn btn-sm btn-brand">
+                        <i class="la la-check"></i>
+                        <span class="kt-hidden-mobile">Save</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-brand dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                    <div class="dropdown-menu dropdown-menu-right" style="">
+                        <ul class="kt-nav">
+                            <li class="kt-nav__item">
+                                <a v-on:click="submitted(0)" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon flaticon2-reload"></i>
+                                    <span class="kt-nav__link-text">Save &amp; Stay</span>
+                                </a>
+                            </li>
+                            <li class="kt-nav__item">
+                                <a v-on:click="submitted(1)" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon flaticon2-power"></i>
+                                    <span class="kt-nav__link-text">Save &amp; Go back</span>
+                                </a>
+                            </li>
+                            <li class="kt-nav__item">
+                                <a v-on:click="submitted(2)" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon flaticon2-edit-interface-symbol-of-pencil-tool"></i>
+                                    <span class="kt-nav__link-text">Save &amp; Sign out</span>
+                                </a>
+                            </li>
+                            <li class="kt-nav__item">
+                                <a v-on:click="submitted(3)" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon flaticon2-add-1"></i>
+                                    <span class="kt-nav__link-text">Save &amp; Add new</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+        <section class="content">
+            <div class="kt-portlet__body">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="#kt_tabs_1_1">
+                            <i class="fa fa-building"></i> Details
+                        </a>
+
+                    </li>
+
+                    @if (canRoleManagerViewCompanyContact == true)
+                    {
+        <li class="nav-item" v-if="parameters.id > 0">
+            <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_3">
+                <i class="fa fa-sticky-note"></i> Contact
+            </a>
+        </li>}
+                    @if (canRoleManagerViewCompanyWorkplace == true)
+                    {
+        <li class="nav-item" v-if="parameters.id > 0">
+            <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_5">
+                <i class="fa fa-sticky-note"></i> Workplaces
+            </a>
+        </li>}
+                    @if (canRoleManagerViewCompanyAssignedLearner == true)
+                    {
+        <li class="nav-item" v-if="parameters.id > 0">
+            <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_6">
+                <i class="fa fa-sticky-note"></i> Enrolled  Learners
+            </a>
+        </li>}
+                    @if (canRoleManagerViewNotes == true)
+                    {
+        <li class="nav-item" v-if="parameters.id > 0">
+            <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_4">
+                <i class="fa fa-sticky-note"></i> Notes
+            </a>
+        </li>
+}
+                    @if (canRoleManagerViewNotes == true)
+                    {
+        <li class="nav-item" v-if="parameters.id > 0">
+            <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_7">
+                <i class="fa fa-sticky-note"></i> Leads
+            </a>
+        </li>
+}
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="kt_tabs_1_1" role="tabpanel">
+
+                        <partial name="~/Views/Shared/partials/company/tab_company_details/_tab_company_form.cshtml" />
+                        <partial name="~/Views/Shared/partials/company/tab_company_details/_modal_company_duplicate_form.cshtml" />
+
+                    </div>
+                    <div class="tab-pane" id="kt_tabs_1_2" role="tabpanel">
+
+                        <partial name="~/Views/Shared/partials/company/tab_contact_details/_tab_contact_details_form.cshtml" />
+
+                    </div>
+                    <div class="tab-pane" id="kt_tabs_1_3" role="tabpanel">
+                        <div class="kt-portlet">
+                            <div class="kt-portlet__head">
+                                <div class="kt-portlet__head-label">
+                                    <button type="button" class="btn btn-bold btn-label-brand btn-sm btnhide" v-on:click="NewCompanyContact"><i class="fa fa-plus"></i> Add Contact</button>
+                                </div>
+                            </div>
+
+                            <partial name="~/Views/Shared/partials/company/tab_company_contact/_tab_company_contact_grid.cshtml" />
+
+                            <partial name="~/Views/Shared/partials/company/tab_company_contact/_modal_company_contact_form.cshtml" />
+
+
+                        </div>
+
+                    </div>
+
+                    <div class="tab-pane" id="kt_tabs_1_4" role="tabpanel">
+                        <div class="kt-portlet">
+                            <div class="kt-portlet__head">
+                                <div class="kt-portlet__head-label">
+                                    <button type="button" class="btn btn-bold btn-label-brand btn-sm btnhide" v-on:click="NewNote"><i class="fa fa-plus"></i> Add Note</button>
+                                </div>
+                            </div>
+
+                            <partial name="~/Views/Shared/partials/company/tab_notes/_tab_notes_grid.cshtml" />
+
+                            <partial name="~/Views/Shared/partials/company/tab_notes/_modal_notes_form.cshtml" />
+
+
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="kt_tabs_1_6" role="tabpanel">
+                        <div class="kt-portlet">
+                            <div class="kt-portlet__head">
+
+                            </div>
+
+                            <partial name="~/Views/Shared/partials/company/tab_assigned_learners/_tab_assigned_learners_grid.cshtml" />
+
+
+
+                        </div>
+                    </div>
+
+                    <div class="tab-pane" id="kt_tabs_1_5" role="tabpanel">
+                        <div class="kt-portlet">
+
+
+                            <partial name="~/Views/Shared/partials/company/tab_workplace_addresses/_tab_workplace_grid.cshtml" />
+
+                            <partial name="~/Views/Shared/partials/company/tab_workplace_addresses/_modal_workplace_form.cshtml" />
+
+                            <partial name="~/Views/Shared/partials/company/tab_workplace_addresses/_modal_workplace_contact_form.cshtml" />
+
+                        </div>
+                    </div>
+
+                    <div class="tab-pane" id="kt_tabs_1_7" role="tabpanel">
+
+                        <partial name="~/Views/Shared/partials/company/tab_company_lead/_tab_company_lead_grid.cshtml" />
+
+                    </div>
+
+                    @*tab notes*@
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+@*<partial name="~/Views/Shared/partials/lead/history/_portlet_history.cshtml" />*@
+
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js" type="application/javascript"></script>
+    <script src="~/lib/vue/vuelidate.min.js" type="application/javascript"></script>
+    <script src="~/lib/vue/validators.min.js" type="application/javascript"></script>
+    <script src="~/lib/vue-router/vue-router.min.js" type="application/javascript"></script>
+    <script src="~/js/Admin/Companies/Create.js" type="application/javascript"></script>
+
+    <script>
+        $('#editor').summernote({
+            height: 250,                 // set editor height
+            minHeight: null,             // set minimum height of editor
+            maxHeight: null,             // set maximum height of editor
+        });
+
+    </script>
+
+
+    <script>
+
+
+
+        var _canRoleManagerEditCompanyWorkplace;
+        var _canRoleManagerCreateCompanyWorkplace;
+        var _canRoleManagerViewCompanyWorkplace;
+        var _canRoleManagerDeleteCompanyWorkplace;
+
+        var _canRoleManagerViewNotes;
+        var _canRoleManagerCreateNotes;
+        var _canRoleManagerEditNotes;
+        var _canRoleManagerDeleteNotes;
+
+        var _canRoleManagerEditCompany;
+        var _canRoleManagerCreateCompany;
+        var _canRoleManagerViewCompany;
+        var _canRoleManagerDeleteCompany;
+
+
+        var _canRoleManagerEditCompanyContact;
+        var _canRoleManagerCreateCompanyContact;
+        var _canRoleManagerViewCompanyContact;
+        var _canRoleManagerDeleteCompanyContact;
+
+
+        var _canRoleManagerEditCompanyAssignedLearner;
+        var _canRoleManagerCreateCompanyAssignedLearner;
+        var _canRoleManagerViewCompanyAssignedLearner;
+        var _canRoleManagerDeleteCompanyAssignedLearner;
+
+        var _companyId;
+        var _acceptDocumentTypes;
+        var _allowedExtensions = [];
+        var _isMultipleDocumentUpload;
+        var _maxDocumentUpload;
+        var _maxDocumentFileSize;
+
+        $(document).ready(function () {
+
+            $("#btnIcon").attr('disabled', true);
+            _canRoleManagerEditCompanyAssignedLearner = @canRoleManagerEditCompanyAssignedLearner.ToString().ToLower();
+            _canRoleManagerCreateCompanyAssignedLearner =@canRoleManagerCreateCompanyAssignedLearner.ToString().ToLower();
+            _canRoleManagerViewCompanyAssignedLearner =@canRoleManagerViewCompanyAssignedLearner.ToString().ToLower();
+            _canRoleManagerDeleteCompanyAssignedLearner = @canRoleManagerDeleteCompanyAssignedLearner.ToString().ToLower();
+
+            _canRoleManagerEditCompanyWorkplace = @canRoleManagerEditCompanyWorkplace.ToString().ToLower();
+            _canRoleManagerCreateCompanyWorkplace =@canRoleManagerCreateCompanyWorkplace.ToString().ToLower();
+            _canRoleManagerViewCompanyWorkplace =@canRoleManagerViewCompanyWorkplace.ToString().ToLower();
+            _canRoleManagerDeleteCompanyWorkplace = @canRoleManagerDeleteCompanyWorkplace.ToString().ToLower();
+
+
+             _canRoleManagerEditCompany = @canRoleManagerEditCompany.ToString().ToLower();
+             _canRoleManagerCreateCompany =@canRoleManagerCreateCompany.ToString().ToLower();
+             _canRoleManagerViewCompany =@canRoleManagerViewCompany.ToString().ToLower();
+             _canRoleManagerDeleteCompany = @canRoleManagerDeleteCompany.ToString().ToLower();
+
+
+             _canRoleManagerEditCompanyContact = @canRoleManagerEditCompanyContact.ToString().ToLower();
+             _canRoleManagerCreateCompanyContact =@canRoleManagerCreateCompanyContact.ToString().ToLower();
+             _canRoleManagerViewCompanyContact =@canRoleManagerViewCompanyContact.ToString().ToLower();
+             _canRoleManagerDeleteCompanyContact = @canRoleManagerDeleteCompanyContact.ToString().ToLower();
+
+            _canRoleManagerViewNotes = @canRoleManagerViewNotes.ToString().ToLower();
+            _canRoleManagerCreateNotes = @canRoleManagerCreateNotes.ToString().ToLower();
+            _canRoleManagerEditNotes = @canRoleManagerEditNotes.ToString().ToLower();
+            _canRoleManagerDeleteNotes = @canRoleManagerDeleteNotes.ToString().ToLower();
+
+
+
+            if(@companyId )
+            _companyId = @companyId;
+            app.Populate();
+            app.mounted();
+
+            _acceptDocumentTypes = '@acceptDocumentTypes';
+            _isMultipleDocumentUpload = (@isMultipleDocumentUpload == 1) ? true : false;
+            _maxDocumentUpload = @maxDocumentUpload;
+            _maxDocumentFileSize = @maxDocumentFileSize;
+
+           if (_acceptDocumentTypes !== null)
+           {
+               if (_acceptDocumentTypes.includes(',')) {
+                   var item = _acceptDocumentTypes.split(',');
+                   for (var count = 0; count < item.length; count++) {
+                       if (item[count] !== "") {
+                           _allowedExtensions.push('' + item[count] + '');
+                       }
+                   }
+               }
+               else
+               {
+                   _allowedExtensions.push('' + _acceptDocumentTypes + '');
+               }
+           }
+
+          // uploadFile();
+
+           $("#span_fileUpload").text("Max file size is " + _maxDocumentFileSize + " MB and allowed file types: " + _allowedExtensions.toString());
+
+           $(".attachDocuments").attr("style", "display:none");
+
+           $("#chkAttachDocuments").change(function ()
+           {
+               if ($(this).prop('checked')) {
+                   $(".attachDocuments").attr("style", "display:inline");
+               } else {
+                   $(".attachDocuments").attr("style", "display:none");
+               }
+           });
+
+           if (_companyId != "0") {
+               //edit lead
+                $("#ddl_SalesAdvisor").data("kendoDropDownList").value($("#hfd_userId").val());
+                if ($("#hfd_roleName").val() == "Admin" || $("#hfd_roleName").val() == "Administrator") {
+                    $("#ddl_SalesAdvisor").data("kendoDropDownList").enable(true);
+                }
+                else {
+                    $("#ddl_SalesAdvisor").data("kendoDropDownList").enable(false);
+                    $("#ddl_SalesAdvisor").data("kendoDropDownList").value($("#hfd_userId").val());
+                }
+           }
+           else {
+
+                if ($("#hfd_roleName").val() == "Admin" || $("#hfd_roleName").val() == "Administrator") {
+                    $("#ddl_SalesAdvisor").data("kendoDropDownList").enable(true);
+                }
+                else {
+                    $("#ddl_SalesAdvisor").data("kendoDropDownList").enable(false);
+                    $("#ddl_SalesAdvisor").data("kendoDropDownList").value($("#hfd_userId").val());
+                }
+           }
+
+
+
+           //if ($("#hfd_roleName").val() == "Sales Advisor") {
+           //    $("#chk_IsValidateDuplicate").attr("disabled", "disabled");
+           //}
+           //else {
+           //    $("#chk_IsValidateDuplicate").removeAttr("disabled");
+           //}
+
+           /// country default set - UK.
+           //if (app.lead.Lead_Contact_Id_Country === 0)
+           //{
+           //    app.lead.Lead_Contact_Id_Country = 4;
+           //}
+
+
+
+           resizeGrid1();
+           resizeGrid2();
+           resizeGrid3();
+           setTimeout(function() {
+                   if (app.parameters.Act == "Y") {
+                       $('.nav-tabs a[href="#kt_tabs_1_6"]').tab('show');
+                   }
+               },
+               1000);
+              });
+        function resizeGrid1() {
+            var contentwrapper = $("#kt_aside").innerHeight();
+            var gridElement = $("#notesGrid"),
+                newHeight = gridElement.innerHeight(),
+                otherElements = gridElement.children().not(".k-grid-content"),
+                otherElementsHeight = 0;
+
+            otherElements.each(function () {
+                otherElementsHeight += $(this).outerHeight();
+            });
+            var newHeight = (contentwrapper - otherElementsHeight) - 660;
+            if (newHeight < 200) newHeight = 200;
+            gridElement.children(".k-grid-content").height(newHeight);
+        }
+        function resizeGrid2() {
+            var contentwrapper = $("#kt_aside").innerHeight();
+            var gridElement = $("#DocumentsGrid"),
+                newHeight = gridElement.innerHeight(),
+                otherElements = gridElement.children().not(".k-grid-content"),
+                otherElementsHeight = 0;
+
+            otherElements.each(function () {
+                otherElementsHeight += $(this).outerHeight();
+            });
+            var newHeight = (contentwrapper - otherElementsHeight) - 660;
+            if (newHeight < 200) newHeight = 200;
+            gridElement.children(".k-grid-content").height(newHeight);
+        }
+        function resizeGrid3() {
+            var contentwrapper = $("#kt_aside").innerHeight();
+            var gridElement = $("#ActivitiesGrid"),
+                newHeight = gridElement.innerHeight(),
+                otherElements = gridElement.children().not(".k-grid-content"),
+                otherElementsHeight = 0;
+
+            otherElements.each(function () {
+                otherElementsHeight += $(this).outerHeight();
+            });
+            var newHeight = (contentwrapper - otherElementsHeight) - 660;
+            if (newHeight < 200) newHeight = 200;
+            gridElement.children(".k-grid-content").height(newHeight);
+        }
+        function validate_fileupload(input_element) {
+            var el = document.getElementById("inputDocument");
+            var fileName = input_element.value;
+            var allowed_extensions = new Array("jpg", "png", "gif");
+            var file_extension = fileName.split('.').pop();
+            for (var i = 0; i < allowed_extensions.length; i++) {
+                if (allowed_extensions[i] == file_extension) {
+                    valid = true; // valid file extension
+                    el.innerHTML = "";
+                    return;
+                }
+            }
+            el.innerHTML = "Invalid file";
+            valid = false;
+        }
+
+
+    </script>
+}
+

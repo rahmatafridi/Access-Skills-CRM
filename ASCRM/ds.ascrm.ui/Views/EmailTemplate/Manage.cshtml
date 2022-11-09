@@ -1,0 +1,205 @@
+﻿
+@{ ViewData["Title"] = "Manage";
+                Layout = "~/Views/Shared/_Layout.cshtml";
+
+                var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+                var canRoleManagerViewTemplate = (permissions == null) ? false : (bool)permissions["TEMPLATE_VIEW"];
+                var canRoleManagerCreateTemplate = (permissions == null) ? false : (bool)permissions["TEMPLATE_CREATE"];
+                var canRoleManagerEditTemplate = (permissions == null) ? false : (bool)permissions["TEMPLATE_EDIT"];
+                var canRoleManagerDeleteTemplate = (permissions == null) ? false : (bool)permissions["TEMPLATE_DEL"]; }
+
+<div class="content" id="dv_Manage_EmailTemplates">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <div class="kt-form__actions kt-portlet__foot">
+                <label style="font-size: large;font-weight: 500;margin-top:10px;margin-left:-15px;">Templates</label>
+            </div>
+
+            <div class="kt-portlet__head-toolbar">
+                <button type="button" class="btn btn-sm btn-bold btn-label-brand" v-on:click="NewTemplate"><i class="fa fa-plus"></i> Add Template</button>
+                &nbsp;
+                <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-brand">
+                        <i class="la la-check"></i>
+                        <span class="kt-hidden-mobile">Export Options</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-brand dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                    <div class="dropdown-menu dropdown-menu-right" style="">
+                        <ul class="kt-nav">
+                            <li class="kt-nav__item">
+                                <a onclick="return exportEmailPDF()" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon"></i>
+                                    <span class="kt-nav__link-text">PDF</span>
+                                </a>
+                            </li>
+                            <li class="kt-nav__item">
+                                <a onclick="return exportEmailExcel()" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon"></i>
+                                    <span class="kt-nav__link-text">Excel</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="kt-portlet__body">
+            <div class="box-header with-border">
+
+                @(Html.Kendo().Grid<ds.core.emailtemplates.Models.EmailTemplateViewModel>()
+                    .Name("templateGrid")
+                    .Columns(columns =>
+                    {
+                        columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-brand' style='cursor:pointer;' onclick=PerformTemplateEdit('#:ET_Id#') title='Edit'><span style='text-align:center;' class='fa fa-pen'></span></a>" +
+                                            "&nbsp;&nbsp;<a class='kt-font-danger' style='cursor:pointer;'onclick=PerformTemplateDelete('#:ET_Id#') title='Delete'> <span style='text-align:center;' class='fa fa-trash-alt'></span></a>" +
+                                            "</div>").Width(55).ClientHeaderTemplate(" ");
+                        columns.Bound(p => p.ET_Id).Title("Id").Width(70);
+                        columns.Bound(p => p.ET_Title).Title("Title");
+                        columns.Bound(p => p.ET_TemplateType).Title("Type");
+                        columns.Bound(p => p.ET_Code).Title("Code");
+                        columns.Bound(p => p.ET_IsActive).ClientTemplate("<input class='k-checkbox-label k-no-text' disabled type='checkbox' #= ET_IsActive == 1 ? checked='checked' :'' # />").Title("Active").HtmlAttributes(new { style = "text-align:center" }).Width(90);
+                    })
+                    .Resizable(resize => resize.Columns(true))
+             .Reorderable(x => x.Columns(true))
+             .ColumnMenu(c => c.Columns(true))
+                    .Sortable()
+                    .Pageable()
+                    .Filterable()
+                    .NoRecords()
+                    .Pageable(pageable => pageable
+                    .Refresh(true)
+                    .PageSizes(true)
+                    .ButtonCount(5))
+                    .DataSource(dataSource =>
+                    dataSource
+                    .WebApi()
+                    .Model(model =>
+                    {
+                        model.Id(p => p.ET_Id);
+                    })
+                    .Events(events => events.Error("error_handler"))
+                    .Read(read => read.Action("GetAllEmailTemplates", "Core_EmailTemplateApi"))
+                    .PageSize(20)
+                    )
+                )
+
+            </div>
+        </div>
+        <div class="modal fade" id="kt_modal_template" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Template</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="kt-form kt-form--label-right">
+                            <div class="form-group row">
+                                <label class="col-form-label col-sm-2">Type:</label>
+                                <div class="col-sm-10">
+                                    <select class="form-control" v-model="EmailTemplate.ET_Type" v-bind:class="{ 'is-invalid': isSubmitted && $v.EmailTemplate.ET_Type.$invalid }">
+                                        <option v-for="TemplateType in TemplateTypes" v-bind:value="TemplateType.id" v-text="TemplateType.description"></option>
+                                    </select>
+                                    <span v-if="isSubmitted && $v.EmailTemplate.ET_Type.$invalid" class="form-text text-danger">Type is required</span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="recipient-name" class="col-form-label col-sm-2">Title:</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" v-model="EmailTemplate.ET_Title" v-bind:class="{ 'is-invalid': isSubmitted && $v.EmailTemplate.ET_Title.$invalid }">
+                                    <span v-if="isSubmitted && $v.EmailTemplate.ET_Title.$invalid" class="form-text text-danger">Title is required</span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="recipient-name" class="col-form-label col-sm-2">Subject:</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" v-model="EmailTemplate.ET_Subject" v-bind:class="{ 'is-invalid': isSubmitted && $v.EmailTemplate.ET_Subject.$invalid }">
+                                    <span v-if="isSubmitted && $v.EmailTemplate.ET_Subject.$invalid" class="form-text text-danger">Subject is required</span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="recipient-name" class="col-form-label col-sm-2">Code:</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" v-model="EmailTemplate.ET_Code" v-bind:class="{ 'is-invalid': isSubmitted && $v.EmailTemplate.ET_Code.$invalid }">
+                                    <span v-if="isSubmitted && $v.EmailTemplate.ET_Code.$invalid" class="form-text text-danger">Code is required</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @*<label for="recipient-name" class="col-form-label col-sm-2">Body:</label>*@
+                                <div class="col-sm-12">
+                                    <textarea id="editor" class="form-control ckeditor" v-model="EmailTemplate.ET_Body"></textarea>
+                                    @*v-bind:class="{ 'is-invalid': isSubmitted && $v.EmailTemplate.ET_Body.$invalid }"*@
+                                    @*<span v-if="isSubmitted && $v.EmailTemplate.ET_Body.$invalid" class="form-text text-danger">Body is required</span>*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" v-on:click="AddEditEmailTemplate"><span v-text="buttonText"></span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    <script src="~/js/Admin/Core_EmailTemplate/Manage.js"></script>
+
+    <script>
+        $('#editor').summernote({
+            height: 250,                 // set editor height
+            minHeight: null,             // set minimum height of editor
+            maxHeight: null,             // set maximum height of editor
+        });
+    </script>
+    <script>
+    var _canRoleManagerViewTemplate;
+    var _canRoleManagerCreateTemplate;
+    var _canRoleManagerEditTemplate;
+    var _canRoleManagerDeleteTemplate;
+
+    $(document).ready(function () {
+        _canRoleManagerViewTemplate= @canRoleManagerViewTemplate.ToString().ToLower();
+        _canRoleManagerCreateTemplate= @canRoleManagerCreateTemplate.ToString().ToLower();
+        _canRoleManagerEditTemplate= @canRoleManagerEditTemplate.ToString().ToLower();
+        _canRoleManagerDeleteTemplate= @canRoleManagerDeleteTemplate.ToString().ToLower();
+
+        if (!_canRoleManagerViewTemplate) {
+            window.location.href = '/Error/PermissionDenied';
+        }
+        resizeGrid1();
+       });
+        function resizeGrid1() {
+            var contentwrapper = $("#kt_aside").innerHeight();
+            var gridElement = $("#templateGrid"),
+                newHeight = gridElement.innerHeight(),
+                otherElements = gridElement.children().not(".k-grid-content"),
+                otherElementsHeight = 0;
+
+            otherElements.each(function () {
+                otherElementsHeight += $(this).outerHeight();
+            });
+                var newHeight = (contentwrapper - otherElementsHeight) - 330;
+                if (newHeight < 325) newHeight = 325;
+            gridElement.children(".k-grid-content").height(newHeight);
+        }
+
+        function exportEmailPDF() {
+            var grid = $("#templateGrid").data("kendoGrid");
+            grid.hideColumn(0);
+            $("#templateGrid").getKendoGrid().saveAsPDF();
+            grid.showColumn(0);
+        }
+
+        function exportEmailExcel() {
+            $("#templateGrid").getKendoGrid().saveAsExcel();
+        }
+    </script>
+}
+

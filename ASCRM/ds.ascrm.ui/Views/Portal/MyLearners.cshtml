@@ -1,0 +1,308 @@
+﻿@{
+    ViewData["Title"] = "My Learners";
+    Layout = "~/Views/Shared/_Layout_Portal.cshtml";
+    var role = ViewBag.Role;
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+    var canRoleManagerAccessMyLearner = (permissions == null) ? false : (bool)permissions["AC_ML"];
+
+}
+
+<div class="kt-portlet" id="dv_MyLearner">
+    <div class="kt-portlet__head">
+        <div class="form__actions kt-portlet__foot">
+            <label style="font-size: large;font-weight:500;margin-left:-10px;margin-top:10px;">My Learners</label>
+        </div>
+        <div class="kt-portlet__head-toolbar">
+
+        </div>
+    </div>
+    <div class="kt-portlet__body">
+        @(Html.Kendo().Grid<crm.portal.OscaModel.Learner>
+            ()
+            .Name("gridmylearner")
+            .Columns(columns =>
+            {
+
+                columns.Bound(p => p.Learner_ID).Title("Id").Width(50);
+                //columns.Bound(p => p.Lead_DateOfEnquiry_D).Format("{0:dd/MM/yyyy}").Title("Enquiry").Width(120);
+                columns.Bound(p => p.Learner_FirstName).Title("First Name").ClientTemplate("<a style='cursor:pointer;' class='link-text'  title='#:Learner_FirstName#'>#:Learner_FirstName#</a>").Width(180);
+                columns.Bound(p => p.Learner_Surname).Title("Last Name").Width(200);
+                columns.Bound(p => p.CurrentLevel).Title("Course Name").Width(200);
+                columns.Template("<div class='kt-font-primary'><a class='kt-font-brand' style='cursor:pointer;' title='View' onclick=PerformView('#:Learner_ID#')><span style='text-align:center;' class='fa fa-eye''></span></a>" +
+                                  "</div>").Width(50).ClientHeaderTemplate(" ");
+
+
+            })
+            .Resizable(resize => resize.Columns(true))
+            .Reorderable(x => x.Columns(true))
+            .ColumnMenu(c => c.Columns(true))
+            .Scrollable()
+            .Sortable()
+            .Filterable(f => f.Messages(m => m.IsFalse("No")).Messages(m => m.IsTrue("Yes")))
+            .Sortable(sortable =>
+            {
+                sortable.SortMode(GridSortMode.SingleColumn);
+            })
+            .Pageable()
+            .NoRecords()
+            .Filterable()
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .PageSizes(true)
+            .ButtonCount(5))
+            .DataSource(dataSource =>
+            dataSource
+            .WebApi()
+            .Model(model =>
+            {
+                model.Id(p => p.Id);
+            })
+            //.Events(events => events.Error("error_handler")) ---TODO
+            .Read(read => read.Action("GetMyLearners", "PortalApi"))
+            .PageSize(30)
+            )
+            )
+
+    </div>
+
+
+    <div class="modal fade" id="kt_modal_view" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Learner</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="kt-form kt-form--label-right">
+                        <div class="row">
+
+                            <table class="table">
+                                <tr>
+                                    <th>Topic</th>
+                                    <th>Progress Status</th>
+                                </tr>
+                                <tr v-for="doc in List">
+                                    @*<td> {{file.file_name}}</td>
+                                    <td>{{file.file_ext}}</td>
+                                    <td>{{file.file_size}}</td>*@
+
+
+                                </tr>
+                            </table>
+                        </div>
+
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts{
+<script src="~/lib/vue/vue.js"></script>
+<script src="~/lib/vue/vuelidate.min.js"></script>
+<script src="~/lib/vue/validators.min.js"></script>
+<script src="~/js/Portal/Assessor/MyLearners.js"></script>
+}
+
+<script type="text/javascript">
+    $("#addnew").click(function () {
+            location.href = $(this).data("request-url");
+    });
+    var _canRoleManagerAccessMyLearner;
+
+
+
+    function PerformUserEdit(user_Id) {
+        if (!_canRoleManagerAccessUser) {
+            toastr.warning('You cannot edit user please contact administrator.', 'Permission denied!');
+        }
+        else {
+            window.location.href = 'Portal/EditUser?id=' + user_Id;
+        }
+    }
+
+    function PerformViewPermissions(id)
+    {
+        //if (!_canRoleManagerEditPermissions && !_canRoleManagerViewPermissions) {
+        //    toastr.error('You cannot edit please contact administrator', 'Permission denied!');
+        //}
+        //else {
+            location.href = $("#hrf").val() + "/" + id;
+       /* }*/
+    }
+
+    function PerformDelete(id) {
+        //if (!_canRoleManagerDeleteRole) {
+        //    toastr.error('You cannot create please contact administrator', 'Permission denied!');
+        //    return false;
+        //    }
+        //    else {
+            Swal.fire({
+                title: 'Delete?',
+                text: "Are you sure you want to delete?",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.dismiss !== "cancel") {
+                    $.ajax({
+                        url: '/api/RoleAdminApi/DeleteRole',
+                        type: "GET",
+                        cache: false,
+                        datatype: "JSON",
+                        data: { "roleid": id },
+                        beforeSend: function () {
+                            //displaySpinner();
+                        },
+                        success: function (result) {
+                            if (result) {
+                                $('#grid').data('kendoGrid').dataSource.read();
+                                $('#grid').data('kendoGrid').refresh();
+
+                                toastr.success('Role has been deleted successfully.', 'Deleted!');
+                            }
+                            else {
+                                toastr.error(result.errMsg, 'Error Deleted!');
+                            }
+                        },
+                        error: function (xhr) {
+                            toastr.error(xhr.responseText, 'Error Deleted!');
+                            return false;
+                        },
+                        complete: function () {
+                            //shideSpinner();
+                        },
+                    });
+                }
+            })
+           /* }*/
+    }
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+
+            alert(message);
+
+            $('#grid').data('kendoGrid').dataSource.read();
+            $('#grid').data('kendoGrid').refresh();
+        }
+    }
+
+    function sync_handler(e) {
+        //this.read();
+        $('#grid').data('kendoGrid').dataSource.read();
+        $('#grid').data('kendoGrid').refresh();
+    }
+
+    var _canRoleManagerViewRoles;
+    var _canRoleManagerCreateRole;
+    var _canRoleManagerEditRole;
+    var _canRoleManagerDeleteRole;
+    var _canRoleManagerEditPermissions;
+    var _canRoleManagerViewPermissions;
+
+    $(document).ready(function () {
+
+        _canRoleManagerAccessMyLearner = @canRoleManagerAccessMyLearner.ToString().ToLower();
+
+        if (!_canRoleManagerAccessMyLearner) {
+            window.location.href = '/Error/PermissionDenied';
+        }
+
+
+        @*_canRoleManagerViewRoles = @canRoleManagerViewRoles.ToString().ToLower();
+        _canRoleManagerCreateRole = @canRoleManagerCreateRole.ToString().ToLower();
+        _canRoleManagerEditRole = @canRoleManagerEditRole.ToString().ToLower();
+        _canRoleManagerDeleteRole = @canRoleManagerDeleteRole.ToString().ToLower();
+        _canRoleManagerEditPermissions = @canRoleManagerEditPermissions.ToString().ToLower();
+        _canRoleManagerViewPermissions = @canRoleManagerViewPermissions.ToString().ToLower();
+
+        if (!_canRoleManagerCreateRole && !_canRoleManagerEditRole && !_canRoleManagerDeleteRole && !_canRoleManagerViewRoles) {
+            window.location.href = '/Error/PermissionDenied';
+        }*@
+    });
+
+</script>
+
+<script>
+    $(document).ready(function () {
+        resizeGrid1();
+        resizeGrid2();
+    });
+
+    function resizeGrid1() {
+        var contentwrapper = $("#kt_aside").innerHeight();
+        var gridElement = $("#grid"),
+            newHeight = gridElement.innerHeight(),
+            otherElements = gridElement.children().not(".k-grid-content"),
+            otherElementsHeight = 0;
+
+        otherElements.each(function () {
+            otherElementsHeight += $(this).outerHeight();
+        });
+        var newHeight = (contentwrapper - otherElementsHeight) - 395;
+        if (newHeight < 325) newHeight = 325;
+        gridElement.children(".k-grid-content").height(newHeight);
+    }
+
+
+    function resizeGrid2() {
+        var contentwrapper = $("#kt_aside").innerHeight();
+        var gridElement = $("#gridUsersInRole"),
+            newHeight = gridElement.innerHeight(),
+            otherElements = gridElement.children().not(".k-grid-content"),
+            otherElementsHeight = 0;
+
+        otherElements.each(function () {
+            otherElementsHeight += $(this).outerHeight();
+        });
+
+        var newHeight = (contentwrapper - otherElementsHeight) - 395;
+        if (newHeight < 325) newHeight = 325;
+        gridElement.children(".k-grid-content").height(newHeight);
+    }
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+            $('#grid').data('kendoGrid').dataSource.read();
+            $('#grid').data('kendoGrid').refresh();
+        }
+    }
+
+    function exportPDF() {
+        var grid = $("#grid").data("kendoGrid");
+        grid.hideColumn(0);
+        $("#grid").getKendoGrid().saveAsPDF();
+        grid.showColumn(0);
+    }
+
+    function exportExcel() {
+        $("#grid").getKendoGrid().saveAsExcel();
+    }
+</script>

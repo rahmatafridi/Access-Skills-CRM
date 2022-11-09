@@ -1,0 +1,2094 @@
+﻿
+@{
+    //ViewData["Title"] = ViewBag.Page;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var learnerId = ViewBag.Learner_Id;
+}
+
+
+<div class="content" id="dv_Learner_Detail">
+    <div class="kt-portlet">
+
+        <div class="kt-portlet__head">
+            <label id="lblUserHeader" style="font-size: large;font-weight:500;margin-left:-10px;margin-top:20px;">Learner Detail (@ViewBag.Learner_Id)</label>
+            <div class="kt-portlet__head-toolbar">
+                <button class="btn btn-sm btn-brand pull-right" v-on:click="Save">Save</button>
+            </div>
+        </div>
+
+        <section class="content">
+            <div class="kt-portlet__body">
+
+                <div class="box-header with-border">
+
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="tab" href="#kt_tabs_1_1" onclick="">
+                                <i class="fa fa-id-card"></i> Personal
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_2" onclick="">
+                                <i class="fa fa-address-card"></i>Courses
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_3" onclick="">
+                                <i class="fa fa-address-card"></i> Employer
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_4" onclick="">
+                                <i class="fa fa-address-card"></i> Assessment
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_5" onclick="">
+                                <i class="fa fa-address-card"></i> Upload Docs
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_6" onclick="">
+                                <i class="fa fa-address-card"></i> Notes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_7" onclick="">
+                                <i class="fa fa-address-card"></i> Matrix
+                            </a>
+                        </li>
+
+
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="kt_tabs_1_1" role="tabpanel">
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-toggle="tab" href="#kt_tabs_2_1" onclick="">
+                                        <i class="fa fa-id-card"></i> Personal
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link " data-toggle="tab" href="#kt_tabs_2_2" onclick="">
+                                        <i class="fa fa-id-card"></i> Off The Job
+                                    </a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="kt_tabs_2_1" role="tabpanel">
+                                    <ul class="nav nav-tabs" role="tablist">
+                                        <li class="nav-item">
+                                            <a class="nav-link active" data-toggle="tab" href="#kt_tabs_3_1" onclick="">
+                                                <i class="fa fa-id-card"></i> Personal Details
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link " data-toggle="tab" href="#kt_tabs_3_2" onclick="">
+                                                <i class="fa fa-id-card"></i> Contact Details
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link " data-toggle="tab" href="#kt_tabs_3_3" onclick="">
+                                                <i class="fa fa-id-card"></i> 	Delivery Details
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link " data-toggle="tab" href="#kt_tabs_3_4" onclick="">
+                                                <i class="fa fa-id-card"></i> Employment & Qualifications
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link " data-toggle="tab" href="#kt_tabs_3_5" onclick="">
+                                                <i class="fa fa-id-card"></i> Observation Questionnaire
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link " data-toggle="tab" href="#kt_tabs_3_6" onclick="">
+                                                <i class="fa fa-id-card"></i> Marketing Contact Consent
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link " data-toggle="tab" href="#kt_tabs_3_7" onclick="">
+                                                <i class="fa fa-id-card"></i>
+                                                Equal Opportunities
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link " data-toggle="tab" href="#kt_tabs_3_8" onclick="">
+                                                <i class="fa fa-id-card"></i>
+                                                BKSB Assessment Results
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <div class="tab-content">
+                                        <div class="tab-pane active" id="kt_tabs_3_1" role="tabpanel">
+                                            <div class="kt-portlet__body">
+                                                <div class="row">
+                                                    <div class="col-lg-3">
+                                                        <label>Title</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_Titles" id="titile_id">
+                                                            <option v-for="data in Titles" v-bind:value="data.Titles_Id" v-text="data.Titles_Title"></option>
+
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>First Name*</label>
+                                                        <input class="form-control" v-model="Learner.Learner_FirstName" type="text" />
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Middle Name</label>
+                                                        <input class="form-control" v-model="Learner.Learner_Middlename" type="text" />
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Surname</label>
+                                                        <input class="form-control" v-model="Learner.Learner_Surname" type="text" />
+                                                    </div>
+
+                                                </div>
+                                                <div class="row" style="margin-top:5px;">
+                                                    <div class="col-lg-3">
+                                                        <label>Gender</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Gender" id="gender_id">
+                                                            <option v-for="data in Genders" v-bind:value="data.Genders_Id" v-text="data.Genders_Title"></option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Marital	</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_MaritalStatus" id="mstatus_id">
+                                                            <option v-for="data in Maritals" v-bind:value="data.MaritalStatus_Id" v-text="data.MaritalStatus_Title"></option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Status</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_Status" id="status_id">
+                                                            <option v-for="data in Status" v-bind:value="data.IdRole" v-text="data.CandidateStatus_Title"></option>
+
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>DOB*</label>
+                                                        <input class="form-control" v-model="Learner.Learner_DOB" type="date" />
+                                                    </div>
+
+                                                </div>
+                                                <div class="row" style="margin-top:5px;">
+                                                    <div class="col-lg-2">
+                                                        <label>NI</label>
+                                                        <input class="form-control" v-model="Learner.Learner_NI" type="text" />
+                                                    </div>
+                                                    <div class="col-lg-2">
+                                                        <label>ULN</label>
+                                                        <input class="form-control" v-model="Learner.Learner_ULN" type="text" />
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Group</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_CandidateGroup" id="group_id">
+                                                            <option v-for="data in Groups" v-bind:value="data.CandidateGroup_Id" v-text="data.CandidateGroup_Title"></option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Immigration Status</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_ImmigrationStatus" id="immigstatus_id">
+                                                            <option v-for="data in ImmigrationStatus" v-bind:value="data.LIS_Id" v-text="data.LIS_Title"></option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2" style="margin-top: 37px;">
+                                                        <input type="checkbox" v-model="Learner.Learner_IsVisibleInPortal" /> Portal
+                                                    </div>
+                                                </div>
+                                                <div class="row" style="margin-top:5px">
+                                                    <div class="col-lg-3">
+                                                        <label>Address1</label>
+                                                        <input type="text" v-model="Learner.Learner_Address1" class="form-control" />
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Address2</label>
+                                                        <input type="text" v-model="Learner.Learner_Address2" class="form-control" />
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Address3</label>
+                                                        <input type="text" v-model="Learner.Learner_Address3" class="form-control" />
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Address4</label>
+                                                        <input type="text" v-model="Learner.Learner_Address4" class="form-control" />
+                                                    </div>
+                                                </div>
+                                                <div class="row" style="margin-top:5px;">
+                                                    <div class="col-lg-3">
+                                                        <label>Post Code *</label>
+                                                        <input type="text" v-model="Learner.Learner_PostCode1" class="form-control" />
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Region</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_Regions" id="Region_id">
+                                                            <option v-for="data in Regions" v-bind:value="data.Region_Id" v-text="data.Region_Title"></option>
+
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Country</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_Country" id="country_id">
+                                                            <option v-for="data in Country" v-bind:value="data.Country_Id" v-text="data.Country_Name"></option>
+
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <div class="row">
+                                                            <div class="col-lg-8">
+                                                                <label>Photo Id Sent</label>
+                                                                <input type="checkbox" v-model="Learner.Learner_IsIdCardSent" />
+                                                                <input type="text" v-model="Learner.Learner_IdCardSentDate" class="form-control" />
+                                                            </div>
+                                                            <div class="col-lg-4">
+                                                                <img src="~/Images/avatar.png" width="100" height="100" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="tab-pane " id="kt_tabs_3_2" role="tabpanel">
+                                            <div class="kt-portlet__body">
+                                                <div class="row">
+                                                    <div class="col-lg-3">
+                                                        <label>Telephone 1	</label>
+                                                        <input type="text" v-model="Learner.Learner_Telephone" class="form-control" />
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Telephone 2	</label>
+                                                        <input type="text" v-model="Learner.Learner_Telephone2" class="form-control" />
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Work 1	</label>
+                                                        <input type="text" v-model="Learner.Learner_TelephoneWork1" class="form-control" />
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Work 2	</label>
+                                                        <input type="text" v-model="Learner.Learner_TelephoneWork2" class="form-control" />
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-3">
+                                                        <label>Mobile 1		</label>
+                                                        <input type="text" v-model="Learner.Learner_Mobile1" class="form-control" />
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Mobile 2		</label>
+                                                        <input type="text" v-model="Learner.Learner_Mobile2" class="form-control" />
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Email 1		</label>
+                                                        <input type="text" v-model="Learner.Learner_Email1" class="form-control" />
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Email 2	</label>
+                                                        <input type="text" v-model="Learner.Learner_Email2" class="form-control" />
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-3">
+                                                        <label>Skills Advisors		</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_UserSkillsAdvisors">
+                                                            <option v-for="data in Advisors" v-bind:value="data.Users_Id" v-text="data.Users_Username"></option>
+
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Funding Type	</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_TrainingProvider">
+                                                            <option v-for="data in FundingTypes" v-bind:value="data.TrainingProvider_Id" v-text="data.TrainingProvider_Title"></option>
+
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Project Type	</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_ProjectType">
+                                                            <option v-for="data in ProjectTypes" v-bind:value="data.Opt_Value" v-text="data.Opt_Title"></option>
+
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>DBS Number		</label>
+                                                        <input type="text" class="form-control" v-model="Learner.Learner_DBS_Number" />
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-3">
+                                                        <label>DBS Date	</label>
+                                                        <input class="form-control" v-model="Learner.Learner_DBS_Date" />
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane " id="kt_tabs_3_3" role="tabpanel">
+                                            <div class="kt-portlet__body">
+                                                <div class="row">
+                                                    <div class="col-lg-3">
+                                                        <label>Restart date		</label>
+                                                        <input type="checkbox" v-model="Learner.Learner_IsApplicationRcvd" />
+                                                        <input type="date" class="form-control" v-model="Learner.Learner_ApplicationRcvdDate" />
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Estimated Completion Date	</label>
+                                                        <input type="date" class="form-control" v-model="Learner.Learner_EstimatedCompletionDate" />
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Enrolment Date	</label>
+                                                        <input type="date" class="form-control" v-model="Learner.Learner_StartDate" />
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Last Date of Learning	</label>
+                                                        <input type="date" class="form-control" v-model="Learner.Learner_LastDayLearning" />
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-3">
+                                                        <label>Planned End Date	</label>
+                                                        <input type="date" class="form-control" v-model="Learner.Learner_PlannedEndDate" />
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Practical End Date</label>
+                                                        <input type="date" class="form-control" v-model="Learner.Learner_PracticalEndDate" />
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Registered with Awarding Body	</label>
+                                                        <input type="checkbox" v-model="Learner.Learner_IsRegisteredAwardingBody" />
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Awarding Body	</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_AwardingBodyLearner">
+                                                            <option v-for="data in AwardingBodys" v-bind:value="data.AwardingBodyLearner_Id" v-text="data.AwardingBodyLearner_Title"></option>
+
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-3">
+                                                        <label>Obs. Completed</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_LearnerObservationStatus">
+                                                            <option value="0">N/A</option>
+                                                            <option value="1">Yes</option>
+                                                            <option value="2">No</option>
+                                                            <option value="3">Planned</option>
+                                                            <option value="4">On Hold</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Learner Outcome	</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_LearnerOutcome">
+                                                            <option v-for="data in OutComes" v-bind:value="data.LO_Id" v-text="data.LO_Title"></option>
+
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Risk Rating	</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_RiskRating">
+                                                            <option v-for="data in Riskings" v-bind:value="data.RiskRating_Id" v-text="data.RiskRating_Title"></option>
+
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Learner Job Roles	</label>
+                                                        <input type="text" class="form-control" v-model="Learner.Learner_JobRole" />
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-3">
+                                                        <label>Progress	</label>
+                                                        <input class="form-control" placeholder="%" v-model="Learner.Learner_PercentageCompleted" />
+
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Course Status		</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_CourseStatusDetails">
+                                                            <option v-for="data in CourseStatus" v-bind:value="data.LCS_Id" v-text="data.LCS_Title"></option>
+
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Observation Assessor	</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_LearnerObservationStatus">
+                                                            <option v-for="data in ObservationAssessors" v-bind:value="data.Users_Id" v-text="data.Users_Username"></option>
+
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Supporting Assessor</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_ObsAssessor">
+                                                            <option v-for="data in ObservationAssessors" v-bind:value="data.Users_Id" v-text="data.Users_Username"></option>
+
+                                                        </select>
+                                                    </div>
+
+                                                </div>
+
+
+                                                <div class="row">
+
+                                                    <div class="col-lg-3">
+                                                        <label>Additional Support Assessor</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_AddSupportiveAssessor">
+                                                            <option v-for="data in ObservationAssessors" v-bind:value="data.Users_Id" v-text="data.Users_Username"></option>
+
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Employer Paid</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_EmployerPaid">
+                                                            <option v-for="data in AccountStatus" v-bind:value="data.AccountStatus_Id" v-text="data.AccountStatus_Title"></option>
+
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Finance Status	</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_FinanceStatus">
+                                                            <option v-for="data in FinanceStaus" v-bind:value="data.IdRoles" v-text="data.FS_Title"></option>
+
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Payment Status	</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_AccountStatus">
+                                                            <option v-for="data in PaymentStaus" v-bind:value="data.AccountStatus_Id" v-text="data.AccountStatus_Title"></option>
+
+                                                        </select>
+                                                    </div>
+
+                                                </div>
+                                                <div class="row" style="margin-top:5px;">
+                                                    <div class="col-lg-2">
+                                                        <div>
+                                                            <label>Mid Point 	</label>
+
+                                                        </div>
+                                                        <div>
+                                                            <input type="checkbox" v-model="Learner.Learner_IsMidPoint" />
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-lg-2">
+                                                        <div>
+                                                            <label>Levy Paying Empl. 	</label>
+
+                                                        </div>
+                                                        <div>
+                                                            No
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-2">
+                                                        <div>
+                                                            <label>Entered ILR</label>
+
+                                                        </div>
+                                                        <div>
+                                                            <input type="checkbox" v-model="Learner.Learner_IsEnterredILR" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-2">
+                                                        <div>
+                                                            <label>Entered ACE 	</label>
+
+                                                        </div>
+                                                        <div>
+                                                            <input type="checkbox" v-model="Learner.Learner_IsEnterredACE" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-2">
+                                                        <div>
+                                                            <label>Audit Sample 		</label>
+
+                                                        </div>
+                                                        <div>
+                                                            <input type="checkbox" v-model="Learner.Learner_IsAuditSample" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-2">
+                                                        <div>
+                                                            <label>Confirmed on LPP	</label>
+
+                                                        </div>
+                                                        <div>
+                                                            <input type="checkbox" v-model="Learner.Learner_IsConfirmedLLP" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row" style="margin-top:5px;">
+
+                                                    <div class="col-lg-3">
+                                                        <div class="row">
+                                                            <div class="col-lg-8">
+                                                                <label>IDD 1</label>
+
+                                                                <input type="text" class="form-control" v-model="Learner.Learner_IddRefNo" />
+                                                            </div>
+                                                            <div class="col-lg-4">
+                                                                <label>On</label>
+                                                                <select class="form-control" v-model="Learner.Learner_Idd1Day">
+                                                                    <option value="0">0</option>
+                                                                    <option value="5">5</option>
+                                                                    <option value="20">20</option>
+                                                                    <option value="28">28</option>
+
+                                                                </select>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <div class="row">
+                                                            <div class="col-lg-8">
+                                                                <label>IDD 2</label>
+
+                                                                <input type="text" class="form-control" v-model="Learner.Learner_IddABFNo" />
+                                                            </div>
+                                                            <div class="col-lg-4">
+                                                                <label>On</label>
+                                                                <select class="form-control" v-model="Learner.Learner_Idd2Day">
+
+                                                                    <option value="0">0</option>
+                                                                    <option value="5">5</option>
+                                                                    <option value="20">20</option>
+                                                                    <option value="28">28</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <div class="row">
+                                                            <div class="col-lg-8">
+                                                                <label>IDD 3</label>
+
+                                                                <input type="text" class="form-control" v-model="Learner.Learner_IddRefNo3" />
+                                                            </div>
+                                                            <div class="col-lg-4">
+                                                                <label>On</label>
+                                                                <select class="form-control" v-model="Learner.Learner_Idd3Day">
+                                                                    <option value="0">0</option>
+                                                                    <option value="5">5</option>
+                                                                    <option value="20">20</option>
+                                                                    <option value="28">28</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label style="margin-top:30px;">Assigned to</label>
+                                                        {{caseloadassignedto}}
+                                                    </div>
+
+                                                </div>
+                                                <div class="row" style="margin-top:5px;">
+                                                    <div class="col-lg-3">
+                                                        <label>Last Bad Debt Status Date	</label>
+                                                        {{FinanceLastDate}}
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Last Status Change Date	</label>
+                                                        {{StatusChangeDate}}
+                                                    </div>
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="kt_tabs_3_4" class="tab-pane">
+                                            <div class="kt-portlet__body">
+                                                <div class="row">
+                                                    <div class="col-lg-3">
+                                                        <label>Prior Attainment	</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_LearnerPA">
+
+                                                            <option v-for="data in PriorAttainment" v-bind:value="data.LPA_Value" v-text="data.title"></option>
+
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Household situation (HHS)		</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_LearnerHHS">
+                                                            <option v-for="data in LearnerHHS" v-bind:value="data.LPA_Value" v-text="data.title"></option>
+
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Employment Status		</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_EmploymentStatus">
+                                                            <option v-for="data in EmploymentStatus" v-bind:value="data.Opt_Value" v-text="data.Opt_Title"></option>
+
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Employment Intensity Indicator		</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_EmploymentIntensityIndicator">
+                                                            <option v-for="data in EmploymentIntensity " v-bind:value="data.Opt_Value" v-text="data.Opt_Title"></option>
+
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-3">
+                                                        <label>Length Of Employment	</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_LengthOfEmployment">
+                                                            <option v-for="data in LengthOfEmployment " v-bind:value="data.Opt_Value" v-text="data.Opt_Title"></option>
+
+                                                        </select>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="kt_tabs_3_5" class="tab-pane">
+                                            <div class="kt-portlet__body">
+                                                <div class="row">
+                                                    <div class="col-lg-4">
+                                                        <label>Sent Date	</label>
+                                                        <div class="row">
+                                                            <div class="col-lg-1">
+                                                                <input style="margin-top:10px" v-model="Learner.Learner_IsObservationQuestionnaireSent" type="checkbox" />
+                                                            </div>
+                                                            <div class="col-lg-8">
+                                                                <input type="date" v-model="Learner.Learner_ObservationQuestionnaireSentDate" class="form-control" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4">
+                                                        <label>Received Date	</label>
+                                                        <div class="row">
+                                                            <div class="col-lg-1">
+                                                                <input style="margin-top:10px" v-model="Learner.Learner_IsObservationQuestionnaireReceived" type="checkbox" />
+                                                            </div>
+                                                            <div class="col-lg-8">
+                                                                <input type="date" v-model="Learner.Learner_ObservationQuestionnaireReceivedDate" class="form-control" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="kt_tabs_3_6" class="tab-pane">
+                                            <div class="kt-portlet__body">
+                                                <div class="row">
+                                                    <div class="col-lg-4">
+                                                        <label>To be contacted for future training requirements after programme learning is completed	</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_MarketingContactConsent">
+                                                            <option v-for="data in MarketingContactConsent" v-bind:value="data.Opt_Value" v-text="data.Opt_Title"></option>
+
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="kt_tabs_3_7" class="tab-pane">
+                                            <div class="kt-portlet__body">
+                                                <div class="row">
+                                                    <div class="col-lg-3">
+                                                        <label> Ethnicity	</label>
+                                                        <select v-model="Learner.Learner_Id_Ethnicity" class="form-control">
+                                                            <option v-for="data in Ethnicity" v-bind:value="data.LearnerEthnicity_Id" v-text="data.LearnerEthnicity_Title"></option>
+
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label> Nationality	</label>
+                                                        <select v-model="Learner.Learner_Id_Nationality" class="form-control">
+                                                            <option v-for="data in Nationality" v-bind:value="data.Nationality_Id" v-text="data.Nationality_Title "></option>
+
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label> Primary LLDD		</label>
+                                                        <select class="form-control" v-model="Learner.Learner_Id_LearnerLLDD">
+                                                            <option v-for="data in LearnerLLDD" v-bind:value="data.LPA_Value" v-text="data.title"></option>
+
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <div class="row">
+
+                                                            <div class="col-lg-3">
+                                                                <label> Additional LLDD		</label>
+
+                                                                <input type="checkbox" v-model="Learner.Learner_Eq_IsDifficulties" />
+                                                            </div>
+                                                            <div class="col-lg-9">
+                                                                <label style="margin-left:10px;">Details</label>
+
+                                                                <input type="text" class="form-control" v-model="Learner.Learner_Eq_Difficulties" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-3">
+                                                        <div class="row">
+
+                                                            <div class="col-lg-4">
+                                                                <label> Particular assessment requirements?		</label>
+
+                                                                <input type="checkbox" v-model="Learner.Learner_Eq_IsNeedAssessReq" />
+                                                            </div>
+                                                            <div class="col-lg-8">
+                                                                <label style="margin-left:10px;">Details</label>
+
+                                                                <input type="text" class="form-control" v-model="Learner.Learner_Eq_NeedAssessReq" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <div class="row">
+
+                                                            <div class="col-lg-4">
+                                                                <label>Any social difficulties?	</label>
+
+                                                                <input type="checkbox" v-model="Learner.Learner_Eq_IsSocialDifficulties" />
+                                                            </div>
+                                                            <div class="col-lg-8">
+                                                                <label style="margin-left:10px;">Details</label>
+
+                                                                <input type="text" class="form-control" v-model="Learner.Learner_Eq_SocialDifficulties" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div id="kt_tabs_3_8" class="tab-pane">
+                                            <div class="kt-portlet__body">
+                                                <div class="row">
+                                                    <div class="col-lg-3">
+                                                        <label>Maths – Initial Assessment	</label>
+                                                        <select class="form-control" v-model="Learner.Learner_MathInitial_Assessment">
+                                                            <option v-for="data in MathsInitial" v-bind:value="data.Opt_Value" v-text="data.Opt_Title"></option>
+
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>English – Initial Assessment	</label>
+                                                        <select class="form-control" v-model="Learner.Learner_EnglishInitial_Assessment">
+                                                            <option v-for="data in MathsInitial" v-bind:value="data.Opt_Value" v-text="data.Opt_Title"></option>
+
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>Maths – Diagnostic Assessment	</label>
+                                                        <select class="form-control" v-model="Learner.Learner_MathDiagnostic_Assessment">
+                                                            <option v-for="data in MathsInitial" v-bind:value="data.Opt_Value" v-text="data.Opt_Title"></option>
+
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label>English – Diagnostic Assessment	</label>
+                                                        <select class="form-control" v-model="Learner.Learner_EnglishDiagnostic_Assessment">
+                                                            <option v-for="data in MathsInitial" v-bind:value="data.Opt_Value" v-text="data.Opt_Title"></option>
+
+                                                        </select>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="tab-pane " id="kt_tabs_2_2" role="tabpanel">
+                                    <h3>Off the Job Calculation</h3>
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            Apprentice Hours Per Week
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <input class="form-control" v-model="Learner.Learner_HRSWorkPerWeek" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            Weeks On Programme (wks)
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <input class="form-control" v-model="Learner.Learner_WeeksOnProgramme" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            Less Annual Leave Entitlement (wks)
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <input class="form-control" v-model="Learner.Learner_AnnualLeaveEntitlement" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            Total Hours
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <input class="form-control" v-model="Learner.Learner_TotalHours" disabled />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            Minimum 20% Off The Job Calculation (hrs)
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <input class="form-control" v-model="MOJC" disabled />
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane " id="kt_tabs_1_2" role="tabpanel">
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-toggle="tab" href="#kt_tabs_2_3" onclick="">
+                                        <i class="fa fa-id-card"></i> Course
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link " data-toggle="tab" href="#kt_tabs_2_4" onclick="">
+                                        <i class="fa fa-id-card"></i> QR
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link " data-toggle="tab" href="#kt_tabs_2_5" onclick="">
+                                        <i class="fa fa-id-card"></i> ILP
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link " data-toggle="tab" href="#kt_tabs_2_6" onclick="">
+                                        <i class="fa fa-id-card"></i> CPD
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link " data-toggle="tab" href="#kt_tabs_2_7" onclick="">
+                                        <i class="fa fa-id-card"></i> TAP
+                                    </a>
+                                </li>
+                            </ul>
+
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="kt_tabs_2_3" role="tabpanel">
+                                    <div style="margin-top:5px;">
+                                        <h5>Qualifications/Courses</h5>
+                                        <div class="row">
+                                            <div class="col-lg-3">
+                                                <label>Course Name</label>
+                                                <select class="form-control" v-model="CourseUpdate.LearnerCourses_Id_Course" id="Region_id">
+                                                    <option v-for="data in QualCourses" v-bind:value="data.Course_Id" v-text="data.CourseTitle"></option>
+
+                                                </select>
+                                            </div>
+
+                                            <div class="col-lg-3">
+                                                <label>Course Status</label>
+                                                <select class="form-control" v-model="CourseUpdate.LearnerCourses_Id_CoursesStatus">
+                                                    <option v-for="data in CourseStatus1" v-bind:value="data.CoursesStatus_Id" v-text="data.CoursesStatus_Title"></option>
+
+                                                </select>
+                                            </div>
+                                            <div class="col-lg-3">
+                                                <label>Completed Date</label>
+                                                <input type="date" class="form-control" v-model="CourseUpdate.LearnerCourses_CompletedDate" />
+                                            </div>
+
+                                            <div class="col-lg-3">
+                                                <input type="checkbox" style="margin-top:38px;" v-model="CourseUpdate.LearnerCourses_IsFunded" />Is Funded?
+                                            </div>
+                                            <div style=" margin-top:10px; margin-left:10px;">
+                                                <input type="button" class="btn btn-primary" value="Update" v-on:click="UpdateCourseDetail" />
+                                            </div>
+                                        </div>
+                                        <div class="row">
+
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <hr />
+
+                                    <h5>Course Details</h5>
+                                    <div class="row">
+                                        <div class="col-lg-12">
+
+
+                                            <table class="table table-responsive">
+                                                <tr>
+                                                    <th>Id</th>
+                                                    <th>Status Status</th>
+                                                    <th>Scheme</th>
+                                                    <th>Course Title</th>
+                                                    <th>Status</th>
+                                                    <th>Active Day</th>
+                                                    <th></th>
+                                                </tr>
+                                                <tr v-for="data in CourseDetail ">
+                                                    <td>{{data.LearnerCourses_id}}</td>
+                                                    <td>{{data.StatusDate}}</td>
+                                                    <td>{{data.Course_SchemeCode}}</td>
+                                                    <td>{{data.Course_Title}}</td>
+                                                    <td>{{data.CoursesStatus_Title}}</td>
+                                                    <td>{{data.LearnerCourses_IsFunded}}</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane " id="kt_tabs_2_4" role="tabpanel">
+                                    <h4>
+                                        List of Reviews
+                                    </h4>
+                                    <br />
+                                    <button class="btn btn-primary" v-on:click="GenerateCourseSummary">Generate Course Summary</button>
+                                    <br />
+                                    <div class="col-lg-4">
+                                        <label>Course</label>
+                                        <select class="form-control">
+                                            <option v-for="data in ReviewCourse" v-bind:value="data.LearnerCourses_id" v-text="data.Course_Title"></option>
+
+                                        </select>
+                                    </div>
+                                    <table class="table  table-responsive">
+                                        <tr>
+                                            <th>Review #	</th>
+                                            <th>Date</th>
+                                            <th>Due</th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th>Learner</th>
+                                            <th>
+                                                Employer
+                                            </th>
+                                        </tr>
+                                        <tr v-for="data in ListReview">
+                                            <td>{{data.SSQR_ReviewNumber}}</td>
+                                            <td>{{data.SSQR_ReviewDate}}</td>
+                                            <td>{{data.due}}</td>
+                                            <td><button class="btn btn-primary" v-on:click="ReviewDetail">View</button></td>
+                                            <td><button class="btn btn-primary">Pdf</button></td>
+                                            <td><button class="btn btn-primary">Doc</button></td>
+                                            <td><button class="kt-menu__link-icon flaticon-email"></button></td>
+                                            <td><button class="kt-menu__link-icon flaticon-email"></button></td>
+                                        </tr>
+                                    </table>
+
+                                </div>
+                                <div class="tab-pane " id="kt_tabs_2_5" role="tabpanel">
+                                    <p>Couse 3 testing</p>
+                                </div>
+                                <div class="tab-pane " id="kt_tabs_2_6" role="tabpanel">
+                                    <div class="col-lg-4">
+                                        <label>Course</label>
+                                        <select class="form-control">
+                                            <option v-for="data in ReviewCourse" v-bind:value="data.LearnerCourses_id" v-text="data.Course_Title"></option>
+
+                                        </select>
+                                    </div>
+                                    <br />
+
+                                    <h4>
+                                        Quick CPD Prime Stats
+                                    </h4>
+                                    <hr />
+                                    <div class="row">
+                                        <div class="col-lg-3">
+                                            <label>Learner Start Date	</label>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <input type="text" v-model="CPD.date_start" class="form-control" disabled />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-3">
+                                            <label>Practical End Date		</label>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <input type="text" v-model="CPD.date_practical_end" class="form-control" disabled />
+
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-3">
+                                            <label>Hours Worked per Week		</label>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <input type="text" v-model="CPD.weekly_hrs" class="form-control" disabled />
+
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-3">
+                                            <label>Daily Hours	</label>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <input type="text" v-model="CPD.daily_hrs" class="form-control" disabled />
+
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-3">
+                                            <label>Min 20% OTJ Hours		</label>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <input type="text" v-model="CPD.actual_otj_hrs" class="form-control" disabled />
+
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-3">
+                                            <label>Actual OTJ Hours		</label>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <input type="text" v-model="CPD.min_20_otj_hrs" class="form-control" disabled />
+
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-3">
+                                            <label>Remaining OTJ Hours		</label>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <input type="text" v-model="CPD.remaining_otj_hrs" class="form-control" disabled />
+
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-3">
+                                            <label>OTJ Working at Status		</label>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <input type="text" v-model="CPD.otj_working_percentage" class="form-control" disabled />
+
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <h4>Completed Activities</h4>
+                                    <br />
+                                    <table class="table table-responsive">
+                                        <tr>
+                                            <th>Id</th>
+                                            <th>Completed Apprenticeship Activities</th>
+                                            <th>Completed Date</th>
+                                            <th>Planned 20% OTJ Hrs</th>
+                                            <th>Actual OTJ Hrs</th>
+                                            <th></th>
+                                        </tr>
+                                        <tr v-for="data in CompleteActivites">
+                                            <td>{{data.PId}}</td>
+                                            <td>{{data.Topic_Title}}</td>
+                                            <td>{{data.Completed_Date}}</td>
+                                            <td> <input class="form-control" v-model="data.Planned_OTJ" /> </td>
+                                            <td> <input class="form-control" v-model="data.Actual_OTJ" /> </td>
+                                            <td>
+                                                <a class='kt-font-primary' style='cursor:pointer;' title='Edit'> <span style='text-align:center;' class='fa fa-pen'></span></a>
+                                                <a class='kt-font-danger' style='cursor:pointer;' title='Delete'> <span style='text-align:center;' class='fa fa-trash-alt'></span></a>
+
+                                            </td>
+                                        </tr>
+                                    </table>
+
+
+                                    <h4>Additional Activities</h4>
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-lg-3">
+                                            <input class="btn btn-primary" type="button" v-on:click="addNew" value="Add New" />
+                                        </div>
+                                        <div class="col-lg-9">
+
+                                        </div>
+                                    </div>
+                                    <table class="table table-responsive">
+                                        <tr>
+                                            <th>Id</th>
+                                            <th>Additional OTJ Activities Completed</th>
+                                            <th>Description</th>
+                                            <th>Completed Date</th>
+                                            <th>Actual OTJ Hrs</th>
+                                            <th></th>
+                                        </tr>
+                                        <tr v-for="data in AdditionalActivites">
+                                            <td>{{data.CPD_Id}}</td>
+                                            <td>{{data.Activity_Title}}</td>
+                                            <td>{{data.Description}}</td>
+                                            <td>{{data.Completed_Date}}</td>
+                                            <td>{{data.Actual_Otj}}</td>
+
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="tab-pane " id="kt_tabs_2_7" role="tabpanel">
+
+                                    <h4>History of generated documents</h4>
+                                    <br />
+                                    <table class="table table-responsive">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Date</th>
+                                            <th>Due</th>
+                                            <th>Is Apprentic</th>
+                                            <th>Coord Signed Date</th>
+                                            <th>Learner Signed Date</th>
+                                            <th></th>
+                                        </tr>
+                                        <tr v-for="data in TabHistory">
+                                            <td>{{data.TAP_ReviewNumber}}</td>
+                                            <td>{{data.TAP_ReviewDate}}</td>
+                                            <td>{{data.Due}}</td>
+                                            <td>{{data.TAP_IsApprenticeship}}</td>
+                                            <td>{{data.TAP_CoordinatorSignatureDate}}</td>
+                                            <td>{{data.TAP_LearnerSignatureDate}}</td>
+
+                                        </tr>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="kt_tabs_1_3" role="tabpanel">
+                            <h4>Current Employer</h4>
+
+                            <hr />
+                            <div>
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label>Employer Id:	</label>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <input type="text" class="form-control" disabled v-model="Employer.Employer_Id" />
+
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label>Date:		</label>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <input type="text" class="form-control" disabled v-model="Employer.UpdatedDate" />
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label>Group Name:		</label>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <input type="text" class="form-control" disabled v-model="Employer.Group_Name" />
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label>Employer Name:		</label>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <input type="text" class="form-control" disabled v-model="Employer.Employer_Name" />
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label>Primary Contact:	</label>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <select class="form-control" v-model="Employer.ECD_ID">
+                                            <option v-for="data in PrimaryContatcs" v-bind:value="data.ECD_ID" v-text="data.ECD_Name"></option>
+
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label>Contact Number:		</label>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <input type="text" class="form-control" disabled v-model="Employer.ECD_Tel" />
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label>Contact Email:		</label>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <input type="text" class="form-control" disabled v-model="Employer.ECD_Email" />
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label>Contact Job Title:		</label>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <input type="text" class="form-control" disabled v-model="Employer.ECD_JobTitle" />
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label>Address:		</label>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <input type="text" class="form-control" disabled v-model="Employer.Employer_Address" />
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label>PostCode:		</label>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <input type="text" class="form-control" disabled v-model="Employer.Employer_PostCode" />
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label>Number of Employees:		</label>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <input type="text" class="form-control" disabled v-model="Employer.Employer_NbEmployees" />
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label>Levy Paying Employer:	</label>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <input type="text" class="form-control" disabled v-model="Employer.Employer_IsLevyPayingEmployer" />
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label>Employer EDRS Number:		</label>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <input type="text" class="form-control" disabled v-model="Employer.Employer_EDRSNumber" />
+                                    </div>
+                                </div>
+
+                            </div>
+                            <hr />
+                            <div class="row">
+
+                                <h4>Update Employer	</h4>
+                                <div class="col-lg-4">
+                                    <input type="text" class="form-control" placeholder="Load Employer" id="searchemployer" />
+
+                                </div>
+                                <div class="col-lg-1">
+                                    <input type="button" value="Update" v-on:click="updateEmployer" class="btn btn-primary" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="kt_tabs_1_4" role="tabpanel">
+                            <h4>Current Assessment Address</h4>
+
+                            <hr />
+                            <div>
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label>Employer Id:	</label>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <input type="text" class="form-control" disabled v-model="Employer.Employer_Id" />
+
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label>Date:		</label>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <input type="text" class="form-control" disabled v-model="Employer.UpdatedDate" />
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label>Group Name:		</label>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <input type="text" class="form-control" disabled v-model="Employer.Group_Name" />
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label>Employer Name:		</label>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <input type="text" class="form-control" disabled v-model="Employer.Employer_Name" />
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label>Primary Contact:	</label>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <select class="form-control" v-model="Employer.ECD_ID">
+                                            <option v-for="data in PrimaryContatcs" v-bind:value="data.ECD_ID" v-text="data.ECD_Name"></option>
+
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label>Contact Number:		</label>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <input type="text" class="form-control" disabled v-model="Employer.ECD_Tel" />
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label>Contact Email:		</label>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <input type="text" class="form-control" disabled v-model="Employer.ECD_Email" />
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label>Contact Job Title:		</label>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <input type="text" class="form-control" disabled v-model="Employer.ECD_JobTitle" />
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label>Address:		</label>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <input type="text" class="form-control" disabled v-model="Employer.Employer_Address" />
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label>PostCode:		</label>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <input type="text" class="form-control" disabled v-model="Employer.Employer_PostCode" />
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label>Number of Employees:		</label>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <input type="text" class="form-control" disabled v-model="Employer.Employer_NbEmployees" />
+
+                                    </div>
+                                </div>
+
+                                <div class="row">
+
+                                    <h4>Update Employer	</h4>
+                                    <div class="col-lg-4">
+                                        <input type="text" class="form-control" placeholder="Load Employer" id="searchemployer" />
+
+                                    </div>
+                                    <div class="col-lg-1">
+                                        <input type="button" value="Update" v-on:click="updateAssessment" class="btn btn-primary" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="kt_tabs_1_5" role="tabpanel">
+
+                            <div>
+                                <h4>SELECT DOCUMENT TYPE</h4>
+                            </div>
+                            <hr />
+                            <div class="col-lg-4">
+
+                            </div>
+                            <div class="col-lg-4">
+                                <select class="form-control" id="typchange">
+                                    <option value="0">--Select Document type--</option>
+                                    <option value="1">Learner Sign Up Documentation</option>
+                                    <option value="2">Portfolio Activity</option>
+                                    <option value="3">IV-EV Documentation</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-4">
+
+                            </div>
+
+                            <div>
+                                <input id="hdnUploadDocFileId" type="hidden" value="" />
+
+                                @*<center>
+                                    <br />   <label style="display: block;" id="box">Upload learner signup documents</label>
+
+                                    <br />
+                                    <div style="text-align: left; padding: 0 0 20px 0;">
+                                    </div>
+                                    <div id="dZUpload2" class="dropzone">
+                                        <div class="dz-default dz-message">
+                                            Drop files here or click to upload.
+
+                                        </div>
+                                    </div>
+                                    <div style="text-align: left; padding-top: 10px;">
+                                        <button type="button" class="ob_btn" id="submitForm2">Upload selected files </button>
+                                        <button type="button" class="ob_btn" id="submitUpdatebtn2" style="display: none; background: green; color: white; padding: 5px;">Update selected files </button>
+                                        <label style="color: red;" id="error2"></label>
+                                        <label style="color: green;" id="response2"></label>
+                                    </div>
+                                </center>*@
+
+                            </div>
+                            <br />
+                            <div class="row" id="signupdoc">
+                                <hr />
+
+                                <div class="col-lg-8">
+                                    <input type="text" class="form-control" id="singupdocsearch" placeholder="Enter Topic" />
+                                    <br />
+                                    <table class="table table-responsive">
+                                        <tr>
+                                            <th>Id</th>
+                                            <th>Title</th>
+                                            <th>Date</th>
+
+                                            <th>Download</th>
+                                            <th>Action</th>
+                                        </tr>
+                                        <tr v-for="data in SingupDocs">
+                                            <td>{{data.Id}}</td>
+                                            <td> <input type="text" class="form-control" v-model="data.Title" /> </td>
+                                            @*<td>{{data.cat}}</td>*@
+                                            <td>{{data.UploadDate}}</td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-lg-4">
+
+                                </div>
+                            </div>
+
+
+
+
+                            <div class="row" id="profile">
+                                <hr />
+
+                                <div class="col-lg-8">
+                                    <div>
+                                        <lable>Topic</lable>
+                                        <select class="form-control" v-model="docTopicId">
+                                            <option v-for="data in docTopics" v-bind:value="data.SSJLP_Id" v-text="data.SSJLP_Topic"></option>
+
+                                        </select>
+                                    </div>
+                                    <input type="text" class="form-control" placeholder="Enter Topic" />
+                                    <br />
+                                    <table class="table table-responsive">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Doc Topic</th>
+                                            <th>Title</th>
+                                            <th>Date</th>
+                                            <th>Download</th>
+                                            <th>Action</th>
+                                        </tr>
+                                        <tr v-for="data in ProfileActivty">
+                                            <td>{{data.LearnerUploadedDocsId}}</td>
+                                            <td>{{data.DocTopic}}</td>
+                                            @*<td>{{data.FileName}}</td>*@
+                                            <td>{{data.FileTitle}}</td>
+                                            <td>{{data.UploadedDate}}</td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-lg-4">
+
+                                </div>
+                            </div>
+
+
+
+
+                            <div class="row" id="ives">
+                                <hr />
+
+                                <div class="col-lg-8">
+                                    <input type="text" class="form-control" placeholder="Enter Topic" />
+                                    <br />
+                                    <table class="table table-responsive">
+                                        <tr>
+                                            <th>Id</th>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Upload Date</th>
+                                            <th>Uploaded By</th>
+                                            <th>Download</th>
+                                            <th>Action</th>
+                                        </tr>
+                                        <tr v-for="data in IVEVS">
+                                            <td>{{data.LearnerDocs_Id}}</td>
+                                            <td> <input type="text" class="form-control" v-model="data.LearnerDocs_Caption" /> </td>
+                                            @*<td>{{data.cat}}</td>*@
+                                            <td>{{data.CreatedDate}}</td>
+                                            <td>{{data.Users_Username}}</td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-lg-4">
+
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                        <div id="kt_tabs_1_6" class="tab-pane">
+                            <input class="btn btn-primary" type="button" value="Add Note" v-on:click="NewNote" />
+                            <div class="row">
+                                <div class="col-lg-8">
+
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <h4>
+                                                Search in Notes
+                                            </h4>
+                                            <br />
+                                            <div class="row">
+                                                <div class="col-lg-3">
+                                                    <label>Looking For</label>
+                                                    <input class="form-control" />
+
+                                                </div>
+                                                <div class="col-lg-3">
+                                                    <label>In</label>
+                                                    <select class="form-control">
+                                                        <option value="0">any/all</option>
+                                                        <option v-for="data in NoteCates" v-bind:value="data.LNC_Id" v-text="data.LNC_Title"></option>
+
+                                                    </select>
+
+                                                </div>
+                                                <div class="col-lg-6" style="margin-top:26px;">
+                                                    <button class="btn btn-primary btm-sm">Search</button>
+                                                    <button class="btn btn-primary btm-sm">Reset</button>
+                                                    <button class="btn btn-primary btm-sm">PDF Export</button>
+                                                    <button class="btn btn-primary btm-sm">Excel Export</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-lg-8">
+                                            <h4>Notes</h4>
+                                            <hr />
+                                            <br />
+                                            <table class="table table-responsive">
+                                                <tr>
+                                                    <th>Id</th>
+                                                    <th>Date</th>
+                                                    <th>Category</th>
+                                                    <th>Note</th>
+                                                    <th>Remember</th>
+                                                    <th>By</th>
+                                                    <th>Pinned By</th>
+
+                                                </tr>
+                                                <tr v-for="data in NoteList">
+                                                    <td>{{data.id}}</td>
+                                                    <td>{{data.NoteCategory}}</td>
+                                                    <td>{{data.NoteDate}}</td>
+                                                    <td>{{data.Reminder}}</td>
+                                                    <td>{{data.isPinned}}</td>
+                                                    <td>{{data.PinnedBy_User}}</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="kt_tabs_1_7" class="tab-pane">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div>
+                                        <label>
+                                            Learner Course
+                                        </label>
+                                        <div>
+                                            <select class="form-control" v-model="matrixlearnercourseid">
+                                                <option v-for="data in MatrixLearnerCourses" v-bind:value="data.LearnerCourses_id" v-text="data.LearnerCourse"></option>
+
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label>Type</label>
+                                        <select class="form-control" v-model="matrixtypeid">
+                                            <option value="1">Normal</option>
+                                            <option value="2">KSB</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label>Topic</label>
+                                        <select class="form-control" v-model="matrixtopicid">
+                                            <option v-for="data in MatrixTopic" v-bind:value="data.SSMB_Id" v-text="data.SSMB_Title"></option>
+
+                                        </select>
+                                    </div>
+
+                                    <div style="margin-top:10px">
+                                        <button class="btn btn-primary">Download Complete Summary</button>
+                                        <button class="btn btn-primary">View Complete Summary</button>
+                                        <button class="btn btn-primary">Generate CTC</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="modal fade" id="cpd_ReviewDetail" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog" role="note">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">
+                            Review Details
+                       </h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+
+                            <input type="hidden" class="form-control" id="" />
+                            <input type="hidden" class="form-control" id="LearnerId" />
+
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <label>Review Date	</label>
+                                    <input type="date" class="form-control" />
+                                </div>
+                                <div class="col-lg-6">
+                                    <lable>Status</lable>
+                                    <select class="form-control">
+                                        <option value="N/A">N/A</option>
+                                        <option value="1">In Progress</option>
+                                        <option value="2">Completed</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <label>Completed By		</label>
+                                    <select class="form-control">
+                                        <option value="N/A">N/A</option>
+                                        <option value="1">In Progress</option>
+                                        <option value="2">Completed</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-6">
+                                    <lable>Completed Date	</lable>
+                                    <input type="date" class="form-control" /> <input type="checkbox" />
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <label>Completed Task head line text	</label>
+                                    <input type="text" class="form-control" /> 
+                                </div>
+                                
+                            </div>     
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <label>Notes		</label>
+                                    <input type="text" class="form-control" /> 
+                                </div>
+                                
+                            </div>
+
+                        </div>
+                      
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" v-on:click="AddCPD" class="btn btn-success">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="cpd_model" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog" role="note">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title"> Additional Activity</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+
+                            <input type="hidden" class="form-control" id="AddId" />
+                            <input type="hidden" class="form-control" id="LearnerId" />
+
+                            <div class="col-lg-12">
+                                <label>Additional OTJ Completed Activity*</label>
+                                <input type="text" v-model="CPD.Activity_Title" class="form-control" />
+
+
+                            </div>
+
+                            <div class="col-lg-12" style="margin-bottom:15px;">
+                                <label>Description <span style="font-size:10px;">(Please provide a description of the completed activity)</span></label>
+                                <input type="text" v-model="CPD.Description" class="form-control" />
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label>Completed Date*</label>
+                                <input type="date" v-model="CPD.Completed_Date" class="form-control" />
+
+
+                            </div>
+                            <div class="col-lg-6">
+                                <label>Actual OTJ Hours*</label>
+                                <input type="text" v-model="CPD.Actual_Otj" class="form-control" />
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" v-on:click="AddCPD" class="btn btn-success">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="note_model" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog" role="note">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title"> Add New Note</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <lable>Category</lable>
+                                <select class="form-control" v-model="Note.cateId">
+                                    <option v-for="data in NoteCates" v-bind:value="data.LNC_Id" v-text="data.LNC_Title"></option>
+
+                                </select>
+                            </div>
+                            <div class="col-lg-6">
+                                <label>Reminder Date:	</label>
+                                <input type="date" v-model="Note.date" class="form-control" />
+                            </div>
+                            <div class="col-lg-3">
+                                <span> Pinned:</span>  <input v-model="Note.pinned" type="checkbox" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <textarea class="form-control" rows="6" v-model="Note.note">
+
+                                            </textarea>
+                            </div>
+
+                        </div>
+                        <hr />
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="submit" v-on:click="AddNote" class="btn btn-success">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.devbridge-autocomplete/1.2.27/jquery.autocomplete.min.js"></script>
+<script src="~/js/dropzone/dropzone1.js"></script>
+<link href="~/css/dropzone/dropzone.css" rel="stylesheet" />
+
+<style>
+    .autocomplete-suggestions {
+        border: 1px solid #999;
+        background: #FFF;
+        overflow: auto;
+    }
+
+    .autocomplete-suggestion {
+        padding: 2px 5px;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .autocomplete-selected {
+        background: #F0F0F0;
+    }
+
+    .autocomplete-suggestions strong {
+        font-weight: normal;
+        color: #3399FF;
+    }
+
+    .autocomplete-group {
+        padding: 2px 5px;
+    }
+
+        .autocomplete-group strong {
+            display: block;
+            border-bottom: 1px solid #000;
+        }
+</style>
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    <script src="~/js/Admin/Osca/Learners/Detail.js"></script>
+    <script>
+        var _learnerId;
+        //function SearchEmployee() {
+        //    var x = document.getElementById("searchemployer").value;
+        //    app.searchEmployer(x);
+        //}
+
+        $(document).ready(function () {
+            $("#ives").hide();
+            $("#profile").hide();
+            $("#signupdoc").hide();
+
+            $("#typchange").change(function () {
+                var end = this.value;
+                if (end == "0") {
+                    $("#signupdoc").hide();
+                    $("#ives").hide();
+                    $("#profile").hide();
+                }
+                if (end == "1") {
+                    $("#signupdoc").show();
+                    $("#ives").hide();
+                    $("#profile").hide();
+                }
+
+                if (end == "2") {
+                    $("#signupdoc").hide();
+                    $("#ives").hide();
+                    $("#profile").show();
+                }
+                if (end == "3") {
+                    $("#signupdoc").hide();
+                    $("#ives").show();
+                    $("#profile").hide();
+                }
+                var firstDropVal = $('#pick').val();
+            });
+
+          //  Dropzone.autoDiscover = false;
+            //Simple Dropzonejs 
+            $("#dZUpload").dropzone(
+                {
+                    url: "UploadDocs.ashx",
+                    maxFiles: 20,
+                    maxFilessize: 20,
+                    autoProcessQueue: false,
+                    uploadMultiple: true,
+                    addRemoveLinks: true,
+                    parallelUploads: 20,
+
+                    init: function () {
+                        var myDropZone = this;
+                        var submitButton = document.querySelector("#submitForm");
+                        var updateButton = document.querySelector("#submitUpdatebtn");
+                        var wrapperThis = this;
+
+                        submitButton.addEventListener("click", function () {
+                            $("#errorTopic").html("<span></span>");
+                            $("#error").html("<span></span>");
+                            $("#response").html("<span></span>");
+                            //if ($("#txtDocTopic").val() == null || $("#txtDocTopic").val() == "") {
+                            //    $("#errorTopic").html("<span>Please select a topic</span>");
+                            //}else
+                            if (myDropZone.files.length < 1) {
+                                $("#error").html("<span>No File Selected</span>");
+                            }
+                            else
+                                if (myDropZone.files.length > 20) {
+                                    $("#error").html("<span>You cannot select more than 20 files</span>");
+                                }
+                                else {
+                                    wrapperThis.processQueue();
+                                }
+                            //else {
+                            //    //myDropzone.uploadFiles([]); //send empty 
+                            //    $("#error").html("<span>No File Selected</span>");
+                            //}
+
+                        });
+
+                        updateButton.addEventListener("click", function () {
+                            $("#errorTopic").html("<span></span>");
+                            $("#error").html("<span></span>");
+                            $("#response").html("<span></span>");
+
+                            if (myDropZone.files.length > 1) {
+                                $("#error").html("<span>Only 1 files can be selected</span>");
+                            }
+                            else if (myDropZone.files.length == 1) {
+                                wrapperThis.processQueue();
+                            }
+                            else if (myDropZone.files.length < 1) {
+                                //myDropZone.uploadFiles([]); //send empty 
+                                //wrapperThis.processQueue();
+                                var id = $("#hdnUploadDocFileId").val();
+                               // var ddlTopic = document.getElementById("<%=ddl_SSTopics.ClientID%>");
+                                var topic = ddlTopic.options[ddlTopic.selectedIndex].text;
+                                var fileTitle = $("#hdnDocFileTitle").val();
+
+                                //$.ajax({
+                                //    url: "UploadDocs.ashx",
+                                //    data: {
+                                //        "DocumentId": id,
+                                //        "Topic": topic,
+                                //        "LearnerId": document.getElementById("<%=currentLearnerId.ClientID%>").value,
+                                //        "UserId": document.getElementById("<%=currentUserId.ClientID%>").value,
+                                //        "fileTitle": fileTitle
+                                //    },
+                                //    success: function () {
+                                //        $("#response").html("<span> Topic updated successfully. </span>");
+                                //        //__doPostBack('pnlUploadDocs', '');
+                                //        // refresh grid and also refresh the form reset it
+                                //        //PortfolioActivitySection default-state xxxxxxxxxxxxxxx
+                                //        resetPortfolioDocSection();
+                                //        $("#response").html("<span> Topic updated successfully. </span>");
+
+                                //    }
+                                //});
+                            }
+
+                        });
+
+
+                        this.on("addedfile", function (file) {
+                            // Create the remove button
+                            //string yourclass="abc";
+                            //var removeButton = Dropzone.createElement("<button class=abc> Remove File</button>");
+                            // Listen to the click event
+                            //removeButton.addEventListener("click", function (e) {
+                            //    // Make sure the button click doesn't submit the form:
+                            //    e.preventDefault();
+                            //    e.stopPropagation();
+                            //    // Remove the file preview.
+                            //    wrapperThis.removeFile(file);
+                            //});
+                            //file.previewElement.appendChild(removeButton);
+                        });
+
+                        //// Also if you want to post any additional data, you can do it here
+                        //this.on('sending', function (data, xhr, formData) {
+                        //    var ddlTopic = document.getElementById("<%=ddl_SSTopics.ClientID%>");
+                        //    var DocTopic = ddlTopic.options[ddlTopic.selectedIndex].text;
+                        //    var fileTitle = $("#hdnDocFileTitle").val();
+                        //    formData.append("DocTopic", DocTopic);
+                        //    formData.append("LearnerId", );
+                        //    formData.append("UserId", document.getElementById("<%=currentUserId.ClientID%>").value);
+                        //    formData.append("DocumentId", $("#hdnUploadDocFileId").val());
+                        //    formData.append("LearnerName", document.getElementById("<%=hdnLearnerName.ClientID%>").value);
+                        //    formData.append("FileTitle", fileTitle);
+                        //});
+
+                        this.on("maxfilesexceeded", function (file) {
+                            alert('max files exceeded');
+                            // handle max+1 file.
+                        });
+                    },
+
+                    success: function (file, response) {
+                        $("#error").html("<span></span>");
+                        $("#response").html("<span> " + response + " </span>");
+                        //__doPostBack('<%= btnRefreshPortfolio.ClientID %>', '');
+                        //debugger;
+                        document.getElementById('<%= btnRefreshPortfolio.ClientID %>').click();
+                        // __doPostBack('pnlUploadDocs', '');
+                    },
+
+
+                    error: function (file, response) {
+                        $("#error").html("<span> " + response + " </span>");
+                    }
+                }
+            );
+
+
+            $("#searchemployer").keyup(function () {
+                var value = this.value;
+                app.searchEmployer(value);
+            });
+            $('#searchemployer').autocomplete({
+                lookup: app.AutoEmployer,
+                onSelect: function (suggestion) {
+                    app.EmployerId = suggestion.data;
+	          }
+              });
+            _learnerId = @learnerId;
+            app.learnerId = _learnerId;
+            app.loadStatusChangeDate(_learnerId);
+            app.loadcaseassigned(_learnerId);
+            app.loadGetFinanceLastDate(_learnerId);
+            app.loadNoteList(_learnerId, '%', 1);
+            app.loadMatrixLearnerCourses(_learnerId);
+            app.loaddocTopics(_learnerId);
+            app.loadSingupDocs(_learnerId);
+            app.loadIVEVS(_learnerId);
+            app.loadProfileActivty(_learnerId);
+            app.loadDetial(_learnerId);
+            app.loadCourseDetail(_learnerId);
+            app.loadReviewCourse(_learnerId);
+            app.loadcpdPrime(_learnerId);
+            app.loadCompleteActivites(_learnerId);
+            app.loadAdditionalActivites(_learnerId);
+            app.loadTabHistory(_learnerId);
+            app.loadEmployer(_learnerId);
+            app.loadPrimaryContatcs(_learnerId);
+
+        });
+    </script>
+
+}
+

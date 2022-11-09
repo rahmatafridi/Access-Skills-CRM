@@ -1,0 +1,821 @@
+﻿
+@{ Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+    var canRoleManagerEditLead = (permissions == null) ? false : (bool)permissions["MD_LEAD_EDIT"];
+    var canRoleManagerCreateLead = (permissions == null) ? false : (bool)permissions["MD_LEAD_CREATE"];
+
+    var canRoleManagerViewActivity = false;//TODO Disable for now  (permissions == null) ? false : (bool)permissions["MD_LEAD_ACT_VIEW"];
+    var canRoleManagerCreateActivity = false;//(permissions == null) ? false : (bool)permissions["MD_LEAD_ACT_CREATE"];
+    var canRoleManagerEditActivity = (permissions == null) ? false : (bool)permissions["MD_LEAD_ACT_EDIT"];
+    var canRoleManagerDeleteActivity = (permissions == null) ? false : (bool)permissions["MD_LEAD_ACT_DEL"];
+
+    var canRoleManagerViewNotes = (permissions == null) ? false : (bool)permissions["MD_LEAD_NOTE_VIEW"];
+    var canRoleManagerCreateNotes = (permissions == null) ? false : (bool)permissions["MD_LEAD_NOTE_CREATE"];
+    var canRoleManagerEditNotes = (permissions == null) ? false : (bool)permissions["MD_LEAD_NOTE_EDIT"];
+    var canRoleManagerDeleteNotes = (permissions == null) ? false : (bool)permissions["MD_LEAD_NOTE_DEL"];
+
+    var canRoleManagerViewDocument = (permissions == null) ? false : (bool)permissions["MD_LEAD_DOC_VIEW"];
+    var canRoleManagerCreateDocument = (permissions == null) ? false : (bool)permissions["MD_LEAD_DOC_CREATE"];
+    var canRoleManagerEditDocument = (permissions == null) ? false : (bool)permissions["MD_LEAD_DOC_EDIT"];
+    var canRoleManagerDeleteDocument = (permissions == null) ? false : (bool)permissions["MD_LEAD_DOC_DEL"];
+
+    var canRoleManagerViewCSL = (permissions == null) ? false : (bool)permissions["MD_LEAD_CSL_VIEW"];
+    var canRoleManagerCreateCSL = (permissions == null) ? false : (bool)permissions["MD_LEAD_CSL_CREATE"];
+    var canRoleManagerEditCSL = (permissions == null) ? false : (bool)permissions["MD_LEAD_CSL_EDIT"];
+    var canRoleManagerDeleteCSL = (permissions == null) ? false : (bool)permissions["MD_LEAD_CSL_DEL"];
+
+    var canRoleManagerViewTask = (permissions == null) ? false : (bool)permissions["LEAD_TASK_VIEW"];
+    var canRoleManagerCreateTask = (permissions == null) ? false : (bool)permissions["LEAD_TASK_CREATE"];
+    var canRoleManagerEditTask = (permissions == null) ? false : (bool)permissions["LEAD_TASK_EDIT"];
+    var canRoleManagerDeleteTask = (permissions == null) ? false : (bool)permissions["LEAD_TASK_DEL"];
+
+
+    var canRoleManagerViewInvites = (permissions == null) ? false : (bool)permissions["LEAD_INVITES_VIEW"];
+    var canRoleManagerCreateInvites = (permissions == null) ? false : (bool)permissions["LEAD_INVITES_CREATE"];
+    var canRoleManagerEditInvites = (permissions == null) ? false : (bool)permissions["LEAD_INVITES_EDIT"];
+    var canRoleManagerDeleteInvites = (permissions == null) ? false : (bool)permissions["LEAD_INVITES_DEL"];
+
+    var leadId = ViewBag.Lead_Id;
+    var acceptDocumentTypes = ViewBag.acceptDocumentTypes;
+    var isMultipleDocumentUpload = ViewBag.isMultipleDocumentUpload;
+    var maxDocumentUpload = ViewBag.maxDocumentUpload;
+    var maxDocumentFileSize = ViewBag.maxDocumentFileSize;
+    var companyId = ViewBag.Company_Id;
+    var isOwner = ViewBag.Owner;
+    //var roleName = ViewBag.roleName1;
+    }
+
+<style>
+
+    .form-group {
+        margin-bottom: 1rem !important;
+    }
+
+    .link-text:hover {
+        color: #22b9ff !important;
+    }
+
+    .kt-portlet .kt-portlet__foot {
+        padding: 18px 10px 10px 0px !important;
+    }
+
+    .k-dropdown-wrap > .k-input, .k-dropdown .k-dropdown-wrap .k-select, .k-list, .k-reset {
+        background-color: white;
+    }
+</style>
+
+<input type="hidden" id="hfd_roleName" value="@ViewBag.RoleName" />
+<input type="hidden" id="hfd_userId" value="@ViewBag.UserId" />
+<input type="hidden" id="hfd_owner" value="@ViewBag.Owner" />
+
+<div class="content" id="dv_Create_Lead">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <div class="kt-form__actions kt-portlet__foot">
+                <label id="lblEditHeader" style="font-size: large;font-weight: 500;margin-right: 5px">Lead</label>
+            </div>
+            <div class="kt-portlet__head-toolbar">
+                <a href="/Lead/Manage" class="btn btn-clean kt-margin-r-10 btn-sm btn-outline-info">
+                    <i class="la la-arrow-left"></i>
+                    <span class="kt-hidden-mobile">Cancel</span>
+                </a>
+
+                <div class="btn-group">
+                    &nbsp;
+                    <button v-on:click="NewNote" type="button" class="btn btn-sm btn-outline-info">
+                        <i class="la la-plus"></i>
+                        <span class="kt-hidden-mobile">Note</span>
+                    </button>
+                    &nbsp;
+                    <button v-on:click="NewDocument" type="button" class="btn btn-sm btn-outline-info">
+                        <i class="la la-plus"></i>
+                        <span class="kt-hidden-mobile">Doc</span>
+                    </button>
+
+                    @if (canRoleManagerCreateCSL == true)
+                    {
+        @:&nbsp;
+        <button v-on:click="NewCSL" type="button" class="btn btn-sm btn-outline-info">
+            <i class="la la-plus"></i>
+            <span class="kt-hidden-mobile">CSL</span>
+        </button>}
+                    @if (canRoleManagerCreateTask == true)
+                    {
+        @:&nbsp;
+        <button v-on:click="NewTask" type="button" class="btn btn-sm btn-outline-info">
+            <i class="la la-plus"></i>
+            <span class="kt-hidden-mobile">Task</span>
+        </button>}
+
+                    @if (canRoleManagerCreateActivity == true)
+                    {
+        @:&nbsp;
+        <button v-on:click="NewActivity" type="button" class="btn btn-sm btn-outline-info">
+            <i class="la la-plus"></i>
+            <span class="kt-hidden-mobile">Activity</span>
+        </button>}
+
+                    &nbsp;
+                    <button type="button" v-on:click="submitted(0)" class="btn btn-sm btn-brand">
+                        <i class="la la-check"></i>
+                        <span class="kt-hidden-mobile">Save</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-brand dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                    <div class="dropdown-menu dropdown-menu-right" style="">
+                        <ul class="kt-nav">
+                            <li class="kt-nav__item">
+                                <a v-on:click="submitted(0)" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon flaticon2-reload"></i>
+                                    <span class="kt-nav__link-text">Save &amp; Stay</span>
+                                </a>
+                            </li>
+                            <li class="kt-nav__item">
+                                <a v-on:click="submitted(1)" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon flaticon2-power"></i>
+                                    <span class="kt-nav__link-text">Save &amp; Go back</span>
+                                </a>
+                            </li>
+                            <li class="kt-nav__item">
+                                <a v-on:click="submitted(2)" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon flaticon2-edit-interface-symbol-of-pencil-tool"></i>
+                                    <span class="kt-nav__link-text">Save &amp; Sign out</span>
+                                </a>
+                            </li>
+                            <li class="kt-nav__item">
+                                <a v-on:click="submitted(3)" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon flaticon2-add-1"></i>
+                                    <span class="kt-nav__link-text">Save &amp; Add new</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <section class="content">
+            <div class="kt-portlet__body">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="#kt_tabs_1_1">
+                            <i class="fa fa-id-card"></i> Contact Details
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_2">
+                            <i class="fa fa-id-card-alt"></i> Contact Summary
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_3">
+                            <i class="fa fa-building"></i> Company Details
+                        </a>
+                    </li>
+
+                    @if (canRoleManagerViewCSL == true)
+                    {
+        <li class="nav-item" v-if="parameters.id > 0">
+            <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_7">
+                <i class="fa fa-history"></i> Call Summary Log
+            </a>
+        </li>
+}
+
+                    @if (canRoleManagerViewNotes == true)
+                    {
+        <li class="nav-item" v-if="parameters.id > 0">
+            <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_4">
+                <i class="fa fa-sticky-note"></i> Notes
+            </a>
+        </li>
+}
+
+
+                    @if (canRoleManagerViewTask == true)
+                    {
+        <li class="nav-item" v-if="parameters.id > 0">
+            <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_8">
+                <i class="fa fa-tasks"></i> Tasks
+            </a>
+        </li>
+}
+
+                    @if (canRoleManagerViewDocument == true)
+                    {
+        <li class="nav-item" v-if="parameters.id > 0">
+            <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_5">
+                <i class="fa fa-file-alt"></i> Documents
+            </a>
+        </li>
+}
+
+                    @if (canRoleManagerViewActivity == true)
+                    {
+        <li class="nav-item" v-if="parameters.id > 0">
+            <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_6">
+                <i class="fa fa-history"></i> Activities
+            </a>
+        </li>
+}
+
+                    @if (canRoleManagerViewInvites == true)
+                    {
+        <li class="nav-item" v-if="parameters.id > 0">
+            <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_9">
+                <i class="fa fa-sticky-note"></i> Invites
+            </a>
+        </li>}
+
+
+
+
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="kt_tabs_1_1" role="tabpanel">
+
+                        <partial name="~/Views/Shared/partials/lead/tab_contact_details/_tab_contact_details_form.cshtml" />
+
+                    </div>
+                    <div class="tab-pane" id="kt_tabs_1_2" role="tabpanel">
+
+                        <partial name="~/Views/Shared/partials/lead/tab_contact_summary/_tab_contact_summary_form.cshtml" />
+
+                    </div>
+
+                    <div class="tab-pane" id="kt_tabs_1_3" role="tabpanel">
+
+                        <partial name="~/Views/Shared/partials/lead/tab_company/_tab_company_form.cshtml" />
+
+                    </div>
+
+                    @*tab notes*@
+                    <div class="tab-pane" id="kt_tabs_1_4" role="tabpanel">
+                        <div class="kt-portlet">
+                            <div class="kt-portlet__head">
+                                <div class="kt-portlet__head-label">
+                                    <button type="button" class="btn btn-bold btn-label-brand btn-sm" v-on:click="NewNote"><i class="fa fa-plus"></i> Add Note</button>
+                                </div>
+                            </div>
+
+                            <partial name="~/Views/Shared/partials/lead/tab_notes/_tab_notes_grid.cshtml" />
+
+                            <partial name="~/Views/Shared/partials/lead/tab_notes/_modal_notes_form.cshtml" />
+
+
+                        </div>
+                    </div>
+
+                    @*tab documents*@
+                    <div class="tab-pane" id="kt_tabs_1_5" role="tabpanel">
+                        <div class="kt-portlet">
+                            <div class="kt-portlet__head">
+                                <div class="kt-portlet__head-label">
+                                    <h3 class="kt-portlet__head-title">
+                                        <button type="button" id="btn_add_document" class="btn btn-bold btn-label-brand btn-sm" v-on:click="NewDocument"><i class="fa fa-plus"></i> Add Document</button>
+                                    </h3>
+                                </div>
+                            </div>
+                            <partial name="~/Views/Shared/partials/lead/tab_documents/_tab_documents_grid.cshtml" />
+
+                            <partial name="~/Views/Shared/partials/lead/tab_documents/_modal_documents_form.cshtml" />
+
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="kt_tabs_1_6" role="tabpanel">
+                        <div class="kt-portlet">
+                            <div class="kt-portlet__head">
+                                <div class="kt-portlet__head-label">
+                                    <h3 class="kt-portlet__head-title">
+                                        <button type="button" id="btn_add_activity" class="btn btn-bold btn-label-brand btn-sm" v-on:click="NewActivity"><i class="fa fa-plus"></i> Add Activity</button>
+                                    </h3>
+                                </div>
+                            </div>
+                            <partial name="~/Views/Shared/partials/lead/tab_activities/_modal_activity_grid.cshtml" />
+
+                        </div>
+                    </div>
+
+                    @*tab Call Summary Log*@
+                    <div class="tab-pane" id="kt_tabs_1_7" role="tabpanel">
+                        <div class="kt-portlet">
+
+
+                            @if (canRoleManagerCreateCSL == true)
+                            {
+                <div class="kt-portlet__head">
+                    <div class="kt-portlet__head-label">
+                        <h3 class="kt-portlet__head-title">
+                            <button type="button" id="btn_add_comm_summary_log" class="btn btn-bold btn-label-brand btn-sm" v-on:click="NewCSL"><i class="fa fa-plus"></i> Add Call Summary Log</button>
+                        </h3>
+                    </div>
+                </div>}
+
+                            <partial name="~/Views/Shared/partials/lead/tab_comm_summary_log/_tab_comm_summary_log_grid.cshtml" />
+
+                            <partial name="~/Views/Shared/partials/lead/tab_comm_summary_log/_modal_comm_summary_log_form.cshtml" />
+
+                        </div>
+                    </div>
+
+
+                    @*tab Tasks *@
+                    <div class="tab-pane" id="kt_tabs_1_8" role="tabpanel">
+                        <div class="kt-portlet">
+
+
+                        @if (canRoleManagerCreateTask == true)
+                 {
+                     <div class="kt-portlet__head">
+                      <div class="kt-portlet__head-label">
+                        <h3 class="kt-portlet__head-title">
+                            <button type="button" id="btn_add_task" class="btn btn-bold btn-label-brand btn-sm" v-on:click="NewTask"><i class="fa fa-plus"></i> Create a Task</button>
+                        </h3>
+                      </div>
+                     </div>
+                }
+
+                            <partial name="~/Views/Shared/partials/lead/tab_tasks/_tab_task_grid.cshtml" />
+
+                            <partial name="~/Views/Shared/partials/lead/tab_tasks/_modal_task_form.cshtml" />
+
+                        </div>
+                    </div>
+
+                    <div class="tab-pane" id="kt_tabs_1_9" role="tabpanel">
+                        <div class="kt-portlet">
+                            <div class="kt-portlet__head">
+                                <div class="kt-portlet__head-label">
+                                    <button type="button" class="btn btn-bold btn-label-brand btn-sm" v-on:click="NewInvites"><i class="fa fa-plus"></i> Add Invites</button>
+                                </div>
+                            </div>
+
+                            <partial name="~/Views/Shared/partials/lead/tab_invites/_tab_grid_appinvites.cshtml" />
+
+                            <partial name="~/Views/Shared/partials/lead/tab_invites/_modal_form_create_invite.cshtml" />
+
+
+                        </div>
+                    </div>
+
+                    @*tab duplicate*@
+                    <partial name="~/Views/Shared/partials/lead/duplicate/_modal_lead_duplicate_form.cshtml" />
+
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+@*<partial name="~/Views/Shared/partials/lead/history/_portlet_history.cshtml" />*@
+
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js" type="application/javascript"></script>
+    <script src="~/lib/vue/vuelidate.min.js" type="application/javascript"></script>
+    <script src="~/lib/vue/validators.min.js" type="application/javascript"></script>
+    <script src="~/lib/vue-router/vue-router.min.js" type="application/javascript"></script>
+    <script src="~/js/Admin/Leads/Create.js" type="application/javascript"></script>
+
+    <script>
+        $('#editor').summernote({
+            height: 250,                 // set editor height
+            minHeight: null,             // set minimum height of editor
+            maxHeight: null,             // set maximum height of editor
+        });
+
+    </script>
+
+    <script>
+
+        function UploadActivityWithoutAttchments() {
+            var formData = new FormData();
+            formData.append("activityData", JSON.stringify(app.Activity));
+            formData.append("defaultAttachments", JSON.stringify(app.DefaultAttachments));
+
+            $.ajax({
+                url: "/api/LeadApi/InserLeadActivityAndSendEmail",
+                data: formData,
+                type: "Post",
+                contentType: false,
+                processData: false,
+            }).done(function (response) {
+                if (response == true) {
+                    if (app.Activity.Activity_Id > 0) {
+                        toastr.success("Activity updated successfully.", "Success!");
+                    } else {
+                        toastr.success("Activity added successfully.", "Success!");
+                    }
+                    myDropZone.removeAllFiles(true);
+                    $('#editor').summernote('code', "");
+                    app.isActivitySubmitted = false;
+                    app.Activity_Id_DocCategory = 0;
+                    app.Activity = { Activity_Id: 0, Activity_Id_Lead: 0, Activity_Id_Type: 0, Activity_Id_Action: 0, Activity_Reminder_Date: '', Activity_Note: '', Activity_EmailBody: '', Activity_Date: null, Activity_Location: null, Activity_EmailSubject: '' };
+                    $("#kt_modal_activity").modal("hide");
+                    $('#ActivitiesGrid').data('kendoGrid').dataSource.read();
+                    $('#ActivitiesGrid').data('kendoGrid').refresh();
+                } else {
+                    toastr.error("Activity cannot added. Please try again.", "Error!");
+                }
+            }).fail(function (xhr) {
+                toastr.error(xhr.responseText, 'Error!');
+            });
+        }
+
+        // set the dropzone container id
+        var myDropZone = null;
+        $("#kt_dropzone_2").dropzone({
+            url: "/api/LeadApi/InserLeadActivityAndSendEmail",
+            maxFiles: 10,
+            maxFilessize: 20,
+            autoProcessQueue: false,
+            uploadMultiple: true,
+            addRemoveLinks: true,
+            parallelUploads: 10,
+
+            init: function () {
+                var myDropZone2 = this;
+                var submitButton2 = document.querySelector("#submitForm2");
+                var wrapperThis2 = this;
+                myDropZone = this;
+
+                submitButton2.addEventListener("click", function () {
+                    // debugger;
+
+                    app.isActivitySubmitted = true;
+                    if (app.$v.Activity.$invalid) {
+                        toastr.error("Error in validation", 'Error!');
+                        return;
+                    } else {
+                        app.Activity.Activity_Id_Lead = app.parameters.id;
+                        var email = app.lead.Lead_Contact_Email;
+
+                        app.Activity.Activity_EmailBody = $('#editor').summernote('code');
+                        app.Activity.Activity_EmailTo = email;
+
+                        if (myDropZone2.files.length > 10) {
+                            toastr.error('You cannot select more than 10 files.', 'Error!');
+                        }
+                        else {
+                            if (myDropZone2.files.length < 1) {
+                                UploadActivityWithoutAttchments();
+                            } else {
+                                wrapperThis2.processQueue();
+                            }
+                        }
+                    }
+                });
+
+                this.on("addedfile", function (file) {
+                });
+
+                this.on("removedfile", function (file) {
+                    let i = app.DefaultAttachments.indexOf(file.path) // find index of your object
+                    app.DefaultAttachments.splice(i, 1)
+                });
+
+                // Also if you want to post any additional data, you can do it here
+                //this.on('sending', function (data, xhr, formData) {
+                //    //debugger;
+
+                //    formData.append("documentData", app.Activity);
+
+                //})
+                this.on('sendingmultiple', function (data, xhr, formData) {
+                    //debugger;
+                    formData.append("activityData", JSON.stringify(app.Activity));
+                    formData.append("defaultAttachments", JSON.stringify(app.DefaultAttachments));
+                });
+
+                this.on("maxfilesexceeded", function (file) {
+                    toastr.error('max files exceeded.', 'Error!');
+                    // handle max+1 file.
+                });
+
+                this.on("successmultiple", function (file, response) {
+                    if (response == true) {
+                        if (app.Activity.Activity_Id > 0) {
+                            toastr.success("Activity updated successfully.", "Success!");
+                        } else {
+                            toastr.success("Activity added successfully.", "Success!");
+                        }
+                        this.removeAllFiles(true);
+                        $('#editor').summernote('code', "");
+                        app.isActivitySubmitted = false;
+                        app.Activity_Id_DocCategory = 0;
+                        app.Activity = { Activity_Id: 0, Activity_Id_Lead: 0, Activity_Id_Type: 0, Activity_Id_Action: 0, Activity_Reminder_Date: '', Activity_Note: '', Activity_EmailBody: '', Activity_Date: null, Activity_Location: null, Activity_EmailSubject: '' };
+                        $("#kt_modal_activity").modal("hide");
+                        $('#ActivitiesGrid').data('kendoGrid').dataSource.read();
+                        $('#ActivitiesGrid').data('kendoGrid').refresh();
+                    } else {
+                        toastr.error("Activity cannot added. Please try again.", "Error!");
+                    }
+                });
+            },
+
+            success: function (file, response) {
+                if (response == true) {
+                    if (app.Activity.Activity_Id > 0) {
+                        toastr.success("Activity updated successfully.", "Success!");
+                    } else {
+                        toastr.success("Activity added successfully.", "Success!");
+                    }
+                    this.removeAllFiles(true);
+                    $('#editor').summernote('code', "");
+                    app.isActivitySubmitted = false;
+                    app.Activity_Id_DocCategory = 0;
+                    app.Activity = { Activity_Id: 0, Activity_Id_Lead: 0, Activity_Id_Type: 0, Activity_Id_Action: 0, Activity_Reminder_Date: '', Activity_Note: '', Activity_EmailBody: '', Activity_Date: null, Activity_Location: null, Activity_EmailSubject: '' };
+                    $("#kt_modal_activity").modal("hide");
+                    $('#ActivitiesGrid').data('kendoGrid').dataSource.read();
+                    $('#ActivitiesGrid').data('kendoGrid').refresh();
+                } else {
+                    toastr.success("Activity updated successfully.", "Success!");
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Activity cannot added. Please try again.',
+                        type: 'error',
+                        confirmButtonText: 'Ok'
+                    })
+                }
+            },
+
+            error: function (file, response) {
+                $("#error2").html("<span> " + response + " </span>");
+            }
+        })
+    </script>
+
+    <script>
+        var _canRoleManagerEditLead;
+        var _canRoleManagerCreateLead;
+
+        var _canRoleManagerViewActivity;
+        var _canRoleManagerCreateActivity;
+        var _canRoleManagerEditActivity;
+        var _canRoleManagerDeleteActivity;
+
+        var _canRoleManagerViewNotes;
+        var _canRoleManagerCreateNotes;
+        var _canRoleManagerEditNotes;
+        var _canRoleManagerDeleteNotes;
+
+        var _canRoleManagerViewDocument;
+        var _canRoleManagerCreateDocument;
+        var _canRoleManagerEditDocument;
+        var _canRoleManagerDeleteDocument;
+
+        var _canRoleManagerViewCommSummaryLog;
+        var _canRoleManagerCreateCommSummaryLog;
+        var _canRoleManagerEditCommSummaryLog;
+        var _canRoleManagerDeleteCommSummaryLog;
+
+         var _canRoleManagerViewTask;
+        var _canRoleManagerCreateTask;
+        var _canRoleManagerEditTask;
+        var _canRoleManagerDeleteTask;
+
+        var _canRoleManagerViewInvites;
+        var _canRoleManagerCreateInvites;
+        var _canRoleManagerEditInvites;
+        var _canRoleManagerDeleteInvites;
+
+        var _leadId;
+        var _acceptDocumentTypes;
+        var _allowedExtensions = [];
+        var _isMultipleDocumentUpload;
+        var _maxDocumentUpload;
+        var _maxDocumentFileSize;
+        var _companyId;
+        var _roleName  ;
+       $(document).ready(function () {
+
+           _canRoleManagerEditLead = @canRoleManagerEditLead.ToString().ToLower();
+            _canRoleManagerCreateLead = @canRoleManagerCreateLead.ToString().ToLower();
+
+            _canRoleManagerViewActivity = false ;//TODO DISABLE FOR NOW @canRoleManagerViewActivity.ToString().ToLower();
+            _canRoleManagerCreateActivity = @canRoleManagerCreateActivity.ToString().ToLower();
+            _canRoleManagerEditActivity = @canRoleManagerEditActivity.ToString().ToLower();
+            _canRoleManagerDeleteActivity = @canRoleManagerDeleteActivity.ToString().ToLower();
+
+            _canRoleManagerViewNotes = @canRoleManagerViewNotes.ToString().ToLower();
+            _canRoleManagerCreateNotes = @canRoleManagerCreateNotes.ToString().ToLower();
+            _canRoleManagerEditNotes = @canRoleManagerEditNotes.ToString().ToLower();
+            _canRoleManagerDeleteNotes = @canRoleManagerDeleteNotes.ToString().ToLower();
+
+            _canRoleManagerViewDocument = @canRoleManagerViewDocument.ToString().ToLower();
+            _canRoleManagerCreateDocument = @canRoleManagerCreateDocument.ToString().ToLower();
+            _canRoleManagerEditDocument = @canRoleManagerEditDocument.ToString().ToLower();
+            _canRoleManagerDeleteDocument = @canRoleManagerDeleteDocument.ToString().ToLower();
+
+            _canRoleManagerViewCommSummaryLog = @canRoleManagerViewCSL.ToString().ToLower();
+            _canRoleManagerCreateCommSummaryLog = @canRoleManagerCreateCSL.ToString().ToLower();
+            _canRoleManagerEditCommSummaryLog= @canRoleManagerEditCSL.ToString().ToLower();
+            _canRoleManagerDeleteCommSummaryLog= @canRoleManagerDeleteCSL.ToString().ToLower();
+
+            _canRoleManagerViewTask = @canRoleManagerViewTask.ToString().ToLower();
+            _canRoleManagerCreateTask = @canRoleManagerCreateTask.ToString().ToLower();
+            _canRoleManagerEditTask= @canRoleManagerEditTask.ToString().ToLower();
+            _canRoleManagerDeleteTask= @canRoleManagerDeleteTask.ToString().ToLower();
+
+            _canRoleManagerViewInvites =  @canRoleManagerViewInvites.ToString().ToLower();
+            _canRoleManagerCreateInvites = @canRoleManagerCreateInvites.ToString().ToLower();
+            _canRoleManagerEditInvites = @canRoleManagerEditInvites.ToString().ToLower();
+            _canRoleManagerDeleteInvites = @canRoleManagerDeleteInvites.ToString().ToLower();
+
+
+           _leadId = @leadId;
+           _companyId = @companyId;
+            app.Populate();
+          //  app.mounted();
+
+            _acceptDocumentTypes = '@acceptDocumentTypes';
+            _isMultipleDocumentUpload = (@isMultipleDocumentUpload == 1) ? true : false;
+            _maxDocumentUpload = @maxDocumentUpload;
+            _maxDocumentFileSize = @maxDocumentFileSize;
+
+           if (_acceptDocumentTypes !== null)
+           {
+               if (_acceptDocumentTypes.includes(',')) {
+                   var item = _acceptDocumentTypes.split(',');
+                   for (var count = 0; count < item.length; count++) {
+                       if (item[count] !== "") {
+                           _allowedExtensions.push('' + item[count] + '');
+                       }
+                   }
+               }
+               else
+               {
+                   _allowedExtensions.push('' + _acceptDocumentTypes + '');
+               }
+           }
+
+           uploadFile();
+
+           $("#span_fileUpload").text("Max file size is " + _maxDocumentFileSize + " MB and allowed file types: " + _allowedExtensions.toString());
+
+           $(".attachDocuments").attr("style", "display:none")
+
+           $("#chkAttachDocuments").change(function ()
+           {
+               if ($(this).prop('checked')) {
+                   $(".attachDocuments").attr("style", "display:inline");
+               } else {
+                   $(".attachDocuments").attr("style", "display:none");
+               }
+           });
+
+           if (_leadId != "0") {
+               _roleName = $("#hfd_roleName").val();
+               //edit lead
+              //  $("#ddl_SalesAdvisor").data("kendoDropDownList").value($("#hfd_userId").val());
+                if ($("#hfd_roleName").val() == "Admin" || $("#hfd_roleName").val() == "Administrator") {
+                    $("#ddl_SalesAdvisor").data("kendoDropDownList").enable(true);
+                }
+                else {
+                    $("#ddl_SalesAdvisor").data("kendoDropDownList").enable(false);
+                   // $("#ddl_SalesAdvisor").data("kendoDropDownList").value($("#hfd_userId").val());
+                }
+           }
+           else {
+
+                if ($("#hfd_roleName").val() == "Admin" || $("#hfd_roleName").val() == "Administrator") {
+                    $("#ddl_SalesAdvisor").data("kendoDropDownList").enable(true);
+                }
+                else {
+                    $("#ddl_SalesAdvisor").data("kendoDropDownList").enable(false);
+                    $("#ddl_SalesAdvisor").data("kendoDropDownList").value($("#hfd_userId").val());
+                }
+           }
+
+           if (_companyId != "0") {
+
+           }
+
+           if ($("#hfd_roleName").val() == "Sales Advisor") {
+               $("#chk_IsValidateDuplicate").attr("disabled", "disabled");
+           }
+           else {
+               $("#chk_IsValidateDuplicate").removeAttr("disabled");
+           }
+
+           /// country default set - UK.
+           if (app.lead.Lead_Contact_Id_Country === 0)
+           {
+               app.lead.Lead_Contact_Id_Country = 4;
+           }
+
+           if (!_canRoleManagerEditLead && !_canRoleManagerCreateLead) {
+               window.location.href = '/Error/PermissionDenied';
+           }
+
+
+           resizeGrid1();
+           resizeGrid2();
+           resizeGrid3();
+           setTimeout(function () {
+           if (app.parameters.Act == "Y") {
+                $('.nav-tabs a[href="#kt_tabs_1_6"]').tab('show');
+           }
+           }, 1000)
+       });
+
+    function resizeGrid1() {
+        var contentwrapper = $("#kt_aside").innerHeight();
+        var gridElement = $("#notesGrid"),
+            newHeight = gridElement.innerHeight(),
+            otherElements = gridElement.children().not(".k-grid-content"),
+            otherElementsHeight = 0;
+
+        otherElements.each(function () {
+            otherElementsHeight += $(this).outerHeight();
+        });
+            var newHeight = (contentwrapper - otherElementsHeight) - 660;
+            if (newHeight < 200) newHeight = 200;
+        gridElement.children(".k-grid-content").height(newHeight);
+    }
+    function resizeGrid2() {
+        var contentwrapper = $("#kt_aside").innerHeight();
+        var gridElement = $("#DocumentsGrid"),
+            newHeight = gridElement.innerHeight(),
+            otherElements = gridElement.children().not(".k-grid-content"),
+            otherElementsHeight = 0;
+
+        otherElements.each(function () {
+            otherElementsHeight += $(this).outerHeight();
+        });
+            var newHeight = (contentwrapper - otherElementsHeight) - 660;
+            if (newHeight < 200) newHeight = 200;
+        gridElement.children(".k-grid-content").height(newHeight);
+    }
+    function resizeGrid3() {
+        var contentwrapper = $("#kt_aside").innerHeight();
+        var gridElement = $("#ActivitiesGrid"),
+            newHeight = gridElement.innerHeight(),
+            otherElements = gridElement.children().not(".k-grid-content"),
+            otherElementsHeight = 0;
+
+        otherElements.each(function () {
+            otherElementsHeight += $(this).outerHeight();
+        });
+            var newHeight = (contentwrapper - otherElementsHeight) - 660;
+            if (newHeight < 200) newHeight = 200;
+        gridElement.children(".k-grid-content").height(newHeight);
+    }
+    function validate_fileupload(input_element) {
+        var el = document.getElementById("inputDocument");
+        var fileName = input_element.value;
+        var allowed_extensions = new Array("jpg", "png", "gif");
+        var file_extension = fileName.split('.').pop();
+        for (var i = 0; i < allowed_extensions.length; i++) {
+            if (allowed_extensions[i] == file_extension) {
+                valid = true; // valid file extension
+                el.innerHTML = "";
+                return;
+            }
+        }
+        el.innerHTML = "Invalid file";
+        valid = false;
+    }
+    $("#txtContactName").blur(function (e) {
+        var contactName = $("#txtContactName").val();
+        if (contactName !== "" && contactName !== '' && contactName !== null && contactName !== undefined)
+        {
+            if (contactName.indexOf(' ') != -1) {
+                var firstName = contactName.split(' ');
+                if (firstName.length > 0) {
+                    if (firstName[0] != null && firstName[0] != "" && firstName[0] != '') {
+                        app.lead.Lead_Contact_FirstName = '';
+                        app.lead.Lead_Contact_LastName = '';
+
+                        $.each(firstName, function (index, value) {
+                            app.lead.Lead_Contact_FirstName = firstName[0];
+                            if (index !== 0) {
+                                app.lead.Lead_Contact_LastName += firstName[index] + ' ';
+                            }
+                        });
+                        app.lead.Lead_Contact_LastName = app.lead.Lead_Contact_LastName.trim();
+                    }
+                    else
+                    {
+                        app.lead.Lead_Contact_LastName = '';
+                    }
+                }
+                else {
+                    app.lead.Lead_Contact_LastName = '';
+                }
+            }
+            else
+            {
+                app.lead.Lead_Contact_FirstName = contactName.trim();
+                app.lead.Lead_Contact_LastName = '';
+            }
+        }
+            });
+
+
+
+
+    </script>
+}
+

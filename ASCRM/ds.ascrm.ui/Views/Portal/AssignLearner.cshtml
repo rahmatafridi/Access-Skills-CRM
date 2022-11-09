@@ -1,0 +1,190 @@
+﻿@{
+    ViewData["Title"] = "Assign Learner";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var role = ViewBag.Role;
+    var userId = ViewBag.UserId; }
+<style>
+    .link-text:hover {
+        color: #22b9ff !important;
+    }
+
+    .kt-portlet .kt-portlet__foot {
+        padding: 10px 5px 10px 10px !important;
+    }
+
+    .k-grid-header .k-filterable, .k-grid-header .k-with-icon {
+        padding-right: calc(1px + .5rem + 1.5em + .5rem);
+    }
+</style>
+
+<div class="content" id="dv_Portal_AssignLearner">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <label id="lblUserHeader" style="font-size: large;font-weight:500;margin-left:-10px;margin-top:20px;">Assign Learners </label>
+            <div class="kt-portlet__head-toolbar">
+             
+            </div>
+
+        </div>
+        <div class="kt-portlet__body">
+            <div class="box-header with-border kt-form kt-form--label-right">
+                <div class="form-group row" id="accouttype">
+                    <label class="col-xl-1 col-lg-1 col-form-label">Account Type</label>
+                    <div class="col-lg-3 ">
+                        <input type="radio" name="accountype" checked @@change="onChange($event)" value="Training Provider" id="account"> <span style="font-size:18px;">Training Provider Account</span>
+                        <br />
+                        <input type="radio" name="accountype" @@change="onChange($event)" value="Awarding Body" id="account"> <span style="font-size:18px;">Awarding Body Account</span>
+
+                    </div>
+                    <div class="col-lg-3">
+                        <label>Account Type</label>
+                        <select class="form-control" @@change="providerChange" id="traingingprovider" v-model="user.Users_Id_TrainingProvider">
+                            <option v-for="item in providers" v-bind:value="item.TrainingProvider_Id" v-text="item.TrainingProvider_Title"></option>
+                        </select>
+                        <select class="form-control" id="awardingbody" @@change="awardingChange" v-model="user.AwardingBodyLearner_Id">
+                            <option v-for="role in awarding" v-bind:value="role.AwardingBodyLearner_Id" v-text="role.AwardingBodyLearner_Title"></option>
+                        </select>
+                    </div>
+                    <div class="col-lg-3 ">
+                        <label>Users</label>
+                        <select class="form-control" id="" v-model="userId" @@change="loadLearner">
+                            <option v-for="user in Users" v-bind:value="user.Users_Id" v-text="user.Users_Username"></option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    @*<div class="row">
+                <div class="col-lg-4">
+                    <select class="form-control" @@change="providerChange" id="traingingprovider" v-model="user.Users_Id_TrainingProvider">
+                        <option v-for="item in providers" v-bind:value="item.TrainingProvider_Id" v-text="item.TrainingProvider_Title"></option>
+                    </select>
+                </div>
+                <div class="col-lg-4">
+
+                </div>
+                <div class="col-lg-4">
+
+                </div>
+            </div>*@
+                    @*<div class="row">
+                <div class="col-lg-4">
+                    <select class="form-control" id="awardingbody" @@change="awardingChange" v-model="user.AwardingBodyLearner_Id">
+                        <option v-for="role in awarding" v-bind:value="role.AwardingBodyLearner_Id" v-text="role.AwardingBodyLearner_Title"></option>
+                    </select>
+                </div>
+                <div class="col-lg-4">
+
+                </div>
+                <div class="col-lg-4">
+
+                </div>
+            </div>*@
+
+                </div>
+                <div class="row">
+                    <div class="col-lg-4" >
+                        <label>Search</label>
+                        <input type="text" v-on:keyup="LearnerSearch" autocomplete="off" placeholder="Search Learner" class="form-control" v-model="search1" />
+                    </div>
+
+                </div>
+                <div class="box-header with-border" style="margin-top:10px;">
+                    @(Html.Kendo().Grid<crm.portal.OscaModel.Learner>()
+                        .Name("LearnerGrid")
+                        .Columns(columns =>
+                        {
+                            columns.Bound(p => p.CandidateStatus_BackColor).Hidden();
+                            columns.Bound(p => p.Learner_ID).Width(70).Title("Learner Id");
+                            columns.Bound(p => p.Learner_FirstName).Title("First Name").Width(160);
+                            columns.Bound(p => p.Learner_Surname).Title("Last Name").Width(160);
+                            columns.Bound(p => p.Learner_Class).Title("Course").Width(100);
+                            columns.Bound(p => p.CandidateStatus).Title("Status").Width(100);
+                            columns.Bound(p => p.IsAssigned).Title("Assigned").ClientTemplate("# if(IsAssigned==1) {# Yes #} else {# No #}#").Width(70);
+                            columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-danger' style='cursor:pointer;'onclick=PerfromUpdate('#:Learner_ID#') title='Update'> <span style='text-align:center;' class='fa fa-pen-alt'></span></a></div>").Width(30).ClientHeaderTemplate(" ");
+
+                            // columns.Bound(p => p.CourseLevelsEnquiry).Title("Course Level Enquiry").Width(150);
+                        })
+                        .Resizable(resize => resize.Columns(true))
+                        .Reorderable(x => x.Columns(true))
+                        .ColumnMenu(c => c.Columns(true))
+                        .Scrollable()
+                        .Sortable()
+                        .Filterable(f => f.Messages(m => m.IsFalse("No")).Messages(m => m.IsTrue("Yes")))
+                        .Sortable(sortable =>
+                        {
+                            sortable.SortMode(GridSortMode.SingleColumn);
+                        })
+                        .Pageable()
+                        .NoRecords()
+                        .Filterable()
+                        .Pageable(pageable => pageable
+                        .Refresh(true)
+                        .PageSizes(true)
+                        .ButtonCount(5))
+                        .DataSource(dataSource =>
+                        dataSource
+                        .WebApi()
+                        .Model(model =>
+                        {
+                            model.Id(p => p.Id);
+                        })
+                        //.Events(events => events.Error("error_handler"))
+                        .Read(read => read.Action("LoadAssignLearner", "UserAdminApi"))
+                        .PageSize(20)
+                        )
+                    )
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+    var _userId = 0;
+    //app.mounted();
+    $(document).ready(function () {
+        
+        _userId = @userId;
+        $("#tickdcourse").hide();
+        $("#employerid").hide();
+        $("#showlearner").hide();
+        //$("#accouttype").hide();
+        $("#traingingprovider").hide();
+        $("#awardingbody").hide();
+
+        $('#completeDate').datepicker({
+            format: 'dd/mm/yyyy',
+            autoclose: true,
+            todayHighlight: true,
+        }).datepicker('setDate', new Date());
+
+        resizeGrid1();
+       
+
+    });
+   
+    function resizeGrid1() {
+        var contentwrapper = $("#kt_aside").innerHeight();
+        var gridElement = $("#usersGrid"),
+            newHeight = gridElement.innerHeight(),
+            otherElements = gridElement.children().not(".k-grid-content"),
+            otherElementsHeight = 0;
+
+        otherElements.each(function () {
+            otherElementsHeight += $(this).outerHeight();
+        });
+        var newHeight = (contentwrapper - otherElementsHeight) - 330;
+        if (newHeight < 325) newHeight = 325;
+        gridElement.children(".k-grid-content").height(newHeight);
+    }
+</script>
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    <script src="~/lib/vue-router/vue-router.min.js"></script>
+    <script src="~/js/Portal/User/AssginLearner.js"></script>
+    @*<script src="~/js/Portal/User/Create.js"></script>*@
+}

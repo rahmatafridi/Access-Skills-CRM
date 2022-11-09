@@ -1,0 +1,27 @@
+﻿<div class="modal fade" id="kt_modal_edit_course_level" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Invite</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="kt-form kt-form--label-right">
+                    <div class="form-group row">
+                        <label class="col-form-label col-sm-2">Course Level:</label>
+                        <div class="col-sm-10">
+                            <select id="ddl_CourseLevel" class="form-control" v-model="AppInvite.api_id_courselevel" v-bind:class="{ 'is-invalid': isSubmitted && $v.AppInvite.api_id_courselevel.$invalid }">
+                                <option v-for="CourseLevel in CourseLevels" v-bind:value="CourseLevel.Opt_Id" v-text="CourseLevel.description"></option>
+                            </select>
+                            <span v-if="isSubmitted && $v.AppInvite.api_id_courselevel.$invalid" class="form-text text-danger">Course level is required</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" v-on:click="EditAppInvite">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

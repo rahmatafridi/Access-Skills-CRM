@@ -1,0 +1,120 @@
+﻿<div class="kt-form kt-form--fit kt-form--label-right">
+    <div class="portlet__foot">
+        <div class="form-group">
+
+
+            <div class="col-lg-12">
+                <div class="form-group row">
+
+
+                    <div class="col-lg-3 col-md-3 col-sm-6">
+                        <label class="">Company House Registration</label>
+                        <input type="text" class="form-control" disabled id="Lead_CompanyHouseReg" v-model="lead.Lead_CompanyHouseReg">
+                    </div>
+
+                    <div class="col-lg-3 col-md-3 col-sm-6">
+                        <label class="">Line Manager Contact Name</label>
+                        <input type="text" class="form-control" disabled id="Lead_CompanyLineManagerContactName" v-model="lead.Lead_CompanyLineManagerContactName">
+                    </div>
+
+                    <div class="col-lg-3 col-md-3 col-sm-6">
+                        <label class="">Name of Decision Maker</label>
+                        <input type="text" class="form-control" disabled id="Lead_CompanyDecisionMakerName" v-model="lead.Lead_CompanyDecisionMakerName">
+                    </div>
+
+                    <div class="col-lg-3 col-md-3 col-sm-6">
+                        <label class="">Employer Email</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend"><span class="input-group-text"><i class="la la-at"></i></span></div>
+                            <input type="email" class="form-control" disabled id="Lead_CompanyEmail" v-model="lead.Lead_CompanyEmail" aria-describedby="basic-addon1">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col-lg-12">
+                <div class="form-group row">
+                    <div class="col-lg-3 col-md-3 col-sm-6">
+                        <label>Address Line 1</label>
+                        <input type="text" class="form-control" disabled id="Lead_Contact_Address1" v-model="lead.Lead_Contact_Address1">
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6">
+                        <label>Address Line 2</label>
+                        <input type="text" class="form-control" disabled id="Lead_Contact_Address2" v-model="lead.Lead_Contact_Address2">
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6">
+                        <label>Address Line 3</label>
+                        <input type="text" class="form-control" disabled id="Lead_Contact_Address3" v-model="lead.Lead_Contact_Address3">
+                    </div>
+
+                    <div class="col-lg-3 col-md-3 col-sm-6">
+                        <label>Postcode</label>
+                        <input type="text" class="form-control" disabled id="Lead_Contact_Company_Postcode" v-model="lead.Lead_Contact_Company_Postcode">
+                    </div>
+                </div>
+                <div class="form-group row">
+
+
+                    <div class="col-lg-3 col-md-3 col-sm-6">
+                        <label class="">County</label>
+                        <input type="text" class="form-control" disabled id="Lead_Contact_County" v-model="lead.Lead_Contact_County" />
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6">
+                        <label class="">Town/City</label>
+                        <input type="text" class="form-control" disabled id="Lead_Contact_TownCity" v-model="lead.Lead_Contact_TownCity">
+                    </div>
+                    @*<div class="col-lg-3 col-md-3 col-sm-6">
+                            <label class="">Country</label>
+                            <select class="form-control" v-model="lead.Lead_Contact_Id_Country">
+                                <option v-for="Country in Countries" v-bind:value="Country.id" v-text="Country.description"></option>
+                            </select>
+                        </div>*@
+                </div>
+                <br />
+                <hr />
+                <div class="form-group row">
+                    <div class="col-lg-3 col-md-3 col-sm-6">
+                        <label class="">Workplace</label>
+                        @*<input type="text" class="form-control" maxlength="50" v-model="lead.Lead_Contact_Company_Name">*@
+                        @(Html.Kendo().DropDownList()
+                .Name("ddl_WorkPlace")
+                .HtmlAttributes(new { @class = "form-control" })
+                .OptionLabel("Select  Workplace")
+                .DataTextField("wp_name")
+                .DataValueField("wp_id")
+                .Filter(FilterType.StartsWith)
+        )
+                    </div>
+
+                    <div class="col-lg-3 col-md-3 col-sm-6">
+                        <label>Address Line 1</label>
+                        <input type="text" class="form-control" disabled id="WorkPlace_Contact_Address1" v-model="leadWorkPlace.WorkPlace_Contact_Address1">
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6">
+                        <label>Address Line 2</label>
+                        <input type="text" class="form-control" disabled id="WorkPlace_Contact_Address2" v-model="leadWorkPlace.WorkPlace_Contact_Address2">
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6">
+                        <label>Town</label>
+                        <input type="text" class="form-control" disabled id="WorkPlace_Contact_Twon" v-model="leadWorkPlace.WorkPlace_Contact_Twon">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-lg-3 col-md-3 col-sm-6">
+                        <label>County</label>
+                        <input type="text" class="form-control" disabled id="WorkPlace_Contact_County" v-model="leadWorkPlace.WorkPlace_Contact_County">
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6">
+                        <label>Postcode</label>
+                        <input type="text" class="form-control" disabled id="WorkPlace_Contact_Postcode" v-model="leadWorkPlace.WorkPlace_Contact_Postcode">
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6">
+                        <label>Employer Email</label>
+                        <input type="text" class="form-control" disabled id="WorkPlace_Contact_Email" v-model="leadWorkPlace.WorkPlace_Contact_Email">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

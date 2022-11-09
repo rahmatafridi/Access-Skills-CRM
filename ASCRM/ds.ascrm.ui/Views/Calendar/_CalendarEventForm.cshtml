@@ -1,0 +1,134 @@
+﻿@{ Layout = string.Empty; }
+
+@model ds.portal.calendar.CalendarEventViewModel
+
+@Html.HiddenFor(x => x.EventID)
+
+<div id="WarningWell" class="alert alert-danger" role="alert" style="display: none;">
+</div>
+<div class="form-group row">
+    <label asp-for="Title" class="col-sm-2 col-form-label"></label>
+    <div class="col-sm-10">
+        <input asp-for="Title" class="form-control" placeholder="Title">
+    </div>
+</div>
+<div class="form-group row">
+    <label asp-for="Description" class="col-sm-2 col-form-label"></label>
+    <div class="col-sm-10">
+        <input asp-for="Description" class="form-control" placeholder="Description">
+    </div>
+</div>
+<div class="form-group row">
+    <label asp-for="Start" class="col-sm-2 col-form-label"></label>
+    <div class="col-sm-10">
+        @(Html.Kendo().DateTimePicker()
+                .Name("Start")
+                .Enable(true)
+                .Format("dd/MM/yyyy HH:mm")
+                .Value(Model.Start)
+                .HtmlAttributes(new { style = "width: 100%", title = "Start" })
+                .DateInput()
+            )
+    </div>
+</div>
+<div class="form-group row">
+    <label asp-for="End" class="col-sm-2 col-form-label"></label>
+    <div class="col-sm-10">
+        @(Html.Kendo().DateTimePicker()
+                .Name("End")
+                .Enable(true)
+                .Format("dd/MM/yyyy HH:mm")
+                .Value(Model.End)
+                .HtmlAttributes(new { style = "width: 100%", title = "End" })
+                .DateInput()
+            )
+    </div>
+</div>
+
+<div class="form-group row">
+    <label asp-for="Reason" class="col-sm-2 col-form-label"></label>
+    <div class="col-sm-10">
+        @(Html.Kendo().DropDownList()
+                  .Name("Reason")
+                  .DataSource(source => source
+                    .Custom()
+                    .Transport(transport => transport
+                        .Read(read =>
+                        {
+                            read.Url("api/CalendarApi/GetReasons");
+                        })
+                     )
+                  )
+                  .Value(Model.Reason)
+                  .HtmlAttributes(new { style = "width: 100%" })
+            )
+    </div>
+</div>
+<div id="booking-group" style="display: none;">
+    <div class="form-group row">
+        <label asp-for="Learner" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <input asp-for="Learner" class="form-control" placeholder="Learner">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-sm-2 col-form-label">Assessor</label>
+        <div class="col-sm-10">
+            @(Html.Kendo().DropDownList()
+                  .Name("UserId")
+                  .HtmlAttributes(new { style = "width: 100%" })
+                  .DataTextField("DisplayName")
+                  .DataValueField("UserId")
+                  .DataSource(source => source
+                    .Custom()
+                    .Transport(transport => transport
+                        .Read(read =>
+                        {
+                            read.Url("api/CalendarApi/GetUsers");
+                        })
+                     )
+                  )
+                  .Value(Model.UserId.ToString())
+            )
+        </div>
+    </div>
+    <div class="form-group row">
+        <label asp-for="Topic" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            @(Html.Kendo().DropDownList()
+                  .Name("Topic")
+                  .HtmlAttributes(new { style = "width: 100%" })
+                  .DataSource(source => source
+                    .Custom()
+                    .Transport(transport => transport
+                        .Read(read =>
+                        {
+                            read.Url("api/CalendarApi/GetTopics");
+                        })
+                     )
+                  )
+                  .Value(Model.Topic)
+            )
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(function () {
+        $("#Reason").change(function () {
+            showOrHideBookingUI();
+        });
+        showOrHideBookingUI();
+    });
+
+    function showOrHideBookingUI(){
+        var value = $("#Reason").val();
+        if (value == 'Booking') {
+            $("#booking-group").show();
+        } else {
+            $("#booking-group").hide();
+        }
+    }
+
+</script>

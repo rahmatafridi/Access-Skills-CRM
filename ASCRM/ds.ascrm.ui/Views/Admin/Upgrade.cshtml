@@ -1,0 +1,64 @@
+﻿
+@{
+    ViewData["Title"] = "SQL Upgrade";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+   
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+    var canAdminUpdate = true;// (permissions == null) ? false : (bool)permissions["MD_Admin_Upgrade"];
+}
+
+<style>
+    
+
+    .button {
+        background-color: #22b9ff;
+        border: none;
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        margin: 0px 5px;
+    }
+
+    .button5 {
+        border-radius: 30%;
+    }
+</style>
+
+<div class="content" id="dv_SQLUpgrade">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <div class="form__actions kt-portlet__foot">
+                <label style="font-size: large;font-weight: 500;margin-top:10px;margin-left:-15px;">SQL Upgrade</label>
+            </div>
+            <div class="kt-portlet__head-toolbar">
+                <button type="button" class="btn btn-sm btn-bold btn-label-brand" onclick="UpgradeSQLUpgrade()"><i class="fa fa-pencil-ruler"></i> Upgrade</button>
+            </div>
+        </div>
+        <div class="kt-portlet__body">
+            <div class="box-header with-border">
+                <ul class="list-group cProductsList" id="sqlVersion">
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    <script src="~/js/Admin/SQLUpgrade/SQLUpgrade.js"></script>
+}
+
+<script>
+    var _canAdminUpdate;
+
+    $(document).ready(function () {
+        GetProductVersion();
+        _canAdminUpdate = @canAdminUpdate.ToString().ToLower();
+        if (!_canAdminUpdate) {
+            window.location.href = '/Error/PermissionDenied';
+        }
+       });
+</script>

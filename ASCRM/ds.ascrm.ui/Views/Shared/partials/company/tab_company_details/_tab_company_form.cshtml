@@ -1,0 +1,253 @@
+﻿<div class="kt-form kt-form--fit kt-form--label-right">
+    <div class="portlet__foot">
+        <div class="row">
+           
+                <div class="col-lg-4">
+
+                    <!--begin::Portlet-->
+                    <div class="kt-portlet kt-portlet--height-fluid">
+                       
+                        <div class="kt-portlet__body">
+                            <div class="kt-portlet__content">
+                                <div class="form-group">
+                                    <label class="">*Company Name</label>
+                                    <input id="companyName" type="text" class="form-control" v-model="company.name">
+                                    <span id="companyNamemsg" style="color:red">Name is Required</span>
+                                </div>
+                                @*<div class="form-group">
+            <label>Reference </label>
+            <input type="text" class="form-control" v-model="company.reference">
+        </div>*@
+                            <div class="form-group">
+                                <label class="">*Address 1</label>
+                                <input type="text" id="companyAddress" class="form-control" v-model="company.address1">
+                                <span id="companyAddressmsg" style="color:red">Address is Required</span>
+
+                            </div>
+
+
+                                <div class="form-group">
+                                    <label class="">Address 2</label>
+                                    <input type="text" class="form-control" v-model="company.address2">
+                                </div>
+                                <div class="form-group">
+                                    <label class="">Address 3</label>
+                                    <input type="text" class="form-control" v-model="company.address3">
+                                </div>
+                                <div class="form-group">
+                                    <label class="">Town</label>
+                                    <input type="text" class="form-control" v-model="company.town">
+                                </div>
+                                <div class="form-group">
+                                    <label class="">County</label>
+                                    <input type="text" class="form-control" v-model="company.county">
+                                </div>
+                                <div class="form-group">
+                                    <label>*Postcode</label>
+                                    <input type="text" id="companyPostcode" class="form-control" v-model="company.postcode">
+                                    <span id="companyPostcodemsg" style="color:red">Postcode is Required</span>
+
+                                </div>
+                                <div class="form-group">
+                                    <label>Company House Registration Number</label>
+                                    <input type="text" class="form-control" v-model="company.company_house_registration_number">
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-10">
+                                        <div class="form-group">
+                                            <label>Website link</label>
+                                            <input type="text" onfocusout="myFunction()" id="webiste" class="form-control" v-model="company.website">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <div class="form-group">
+                                            <button href="#" style="margin-top:24px;" id="btnIcon" class="btn btn-outline-brand m-btn m-btn--icon m-btn--icon-only m-btn--custom m-btn--pill m-btn--air">
+                                                <i class="fa flaticon-medical"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--end::Portlet-->
+                </div>
+            <div class="col-lg-4">
+
+                <!--begin::Portlet-->
+                <div class="kt-portlet kt-portlet--height-fluid">
+                       
+                    <div class="kt-portlet__body">
+                        <div class="kt-portlet__content">
+                            <div class="form-group">
+                                <label> Business Type</label>
+                                @(Html.Kendo().DropDownList()
+                                        .Name("ddl_BusinessType")
+                                        .HtmlAttributes(new { @class = "form-control" })
+                                        .OptionLabel("Select Business Type")
+                                        .BindTo(new string[]
+                                        { "Adult Residential Home", "Community Healthcare Services",
+                                            "Domiciliary Care Agency", "Supported Living Services",
+                                            "Rehabilitation Services","Semi-independent","Foster Care Agency",
+                                            "Children’s Residential Home","School with Residential",
+                                            "CYP Non-Residential","Live-in Carer / Services in your home",
+                                            "Nursing Home","Agency","Extra Care Housing","GP Services","Day Care Centre","Hospices","Clinics" })
+                                        .Filter(FilterType.StartsWith)
+                                        )
+                            </div>
+
+                            <div class="form-group">
+                                <label>CQC/OFSTED Registration  </label>
+                                <input type="text" class="form-control" v-model="company.cqc_registration_number">
+                            </div>
+                            <div class="form-group">
+                                <label> CQC/OFSTED Rating</label>
+                                @(Html.Kendo().DropDownList()
+                                        .Name("ddl_CQCRating")
+                                        .HtmlAttributes(new { @class = "form-control" })
+                                        .OptionLabel("Select  CQC Rating")
+                                         .BindTo(new string[] { "Outstanding", "Good", "Requires Improvement", " Inadequate" })
+                                        .Filter(FilterType.StartsWith)
+                                        )
+                            </div>
+
+                            <div class="form-group">
+                                <label>EDRS Number</label>
+                                <input type="text" class="form-control" v-model="company.edrs_number">
+                            </div>
+                            <div class="form-group">
+                                <label>Levy Employer</label>
+                                @(Html.Kendo().DropDownList()
+                                        .Name("ddl_LevyEmployer")
+                                        .HtmlAttributes(new { @class = "form-control" })
+                                        .OptionLabel("Select Levy Employer")
+                                        .BindTo(new string[] { "Yes", "No" })
+
+                                        .Filter(FilterType.StartsWith)
+                                        )
+                            </div>
+
+
+
+
+                            <div class="form-group">
+                                <label>No of employees </label>
+                                @(Html.Kendo().DropDownList()
+                                        .Name("ddl_NoEmployees")
+                                        .HtmlAttributes(new { @class = "form-control" })
+                                        .OptionLabel("Select No of Employee")
+                                        .BindTo(new string[] { "0-10", "11-50", "51-250","250+" })
+                                        .Filter(FilterType.StartsWith)
+                                        )
+                            </div>
+                            <div class="form-group">
+                                <label> Company Group</label>
+                                @(Html.Kendo().DropDownList()
+                                        .Name("ddl_CompanyGroup")
+                                        .HtmlAttributes(new { @class = "form-control" })
+                                        .OptionLabel("Select Group")
+                                        .DataTextField("name")
+                                        .DataValueField("id")
+                                        .Filter(FilterType.StartsWith)
+                                        )
+                            </div>
+
+                            <div class="form-group">
+                                <label>Insurance Number </label>
+                                <input type="text" class="form-control" v-model="company.insurance_no">
+                            </div>
+                            <div class="form-group">
+                                <label>Expiry Date </label>
+                                <div class="input-group date">
+                                    <input type="text" class="form-control" id="txt_ExpiryDate" v-model="company.expiry_date">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!--end::Portlet-->
+            </div>
+        <div class="col-lg-4">
+
+            <!--begin::Portlet-->
+            <div class="kt-portlet kt-portlet--height-fluid">
+                       
+                <div class="kt-portlet__body">
+                    <div class="kt-portlet__content">
+
+
+                        <div class="form-group">
+                            <label>Sales Advisor</label>
+                            @(Html.Kendo().DropDownList()
+                                    .Name("ddl_SalesAdvisor")
+                                    .HtmlAttributes(new { @class = "form-control" })
+                                    .OptionLabel("Select Sales Advisor")
+                                    .DataTextField("Users_DisplayName")
+                                    .DataValueField("Users_ID")
+                                    .Filter(FilterType.StartsWith)
+                                    )
+                        </div>
+                        <div class="form-group">
+                            <label>Decision Maker Name </label>
+                            <input type="text" class="form-control" v-model="company.name_desision_maker">
+                        </div>
+
+                        <div class="form-group">
+                            <label>*Telephone Number</label>
+                            <input type="text" class="form-control" v-model="company.tel1">
+                            <span id="companyMobilemsg" style="color:red">Mobile is Required</span>
+
+                        </div>
+                        <div class="form-group">
+                            <label>Mobile Number</label>
+                            <input type="text" id="companyMobile" class="form-control" v-model="company.mobile1">
+
+                        </div>
+                        <div class="form-group">
+                            <label>Company Email address </label>
+                            <input type="text" class="form-control" v-model="company.email1">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Employer Email Address</label>
+                            <input type="text" class="form-control" v-model="company.employer_email_address">
+                        </div>
+
+                        <div class="form-group">
+                            <label> Job Title </label>
+                            @(Html.Kendo().DropDownList()
+                                        .Name("ddl_JobTitle")
+                                        .HtmlAttributes(new { @class = "form-control" })
+                                        .OptionLabel("Select Job Title")
+                                        .DataTextField("Opt_Title")
+                                        .DataValueField("Opt_Value")
+                                        .Filter(FilterType.StartsWith)
+                                        )
+                        </div>
+
+
+
+
+
+
+
+                    </div>
+                </div>
+            </div>
+
+            <!--end::Portlet-->
+        </div>
+
+        </div>
+    </div>
+</div>

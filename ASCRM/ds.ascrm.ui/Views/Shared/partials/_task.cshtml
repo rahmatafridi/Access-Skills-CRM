@@ -1,0 +1,112 @@
+﻿
+<div class="modal fade" id="kt_modal_duplicate" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Task</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                @Html.Hidden("task_id")
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-control-label">* Title:</label>
+                    <input id="txtTitle" type="text" class="form-control required" maxlength="99" style="width: 100%;" />
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label">* Notes:</label>
+                    <input id="txtNotes" type="text" class="form-control required" maxlength="99" style="width: 100%;" />
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label">* Date:</label>
+                    @(Html.Kendo().DateTimePicker()
+            .Name("task_datetime")
+            //.Value(DateTime.Now)
+            .HtmlAttributes(new { style = "width: 100%", title = "datetimepicker", @class = "required" })
+            .DateInput(true)
+            .Format("dd/MM/yyyy HH:mm")
+            .TimeFormat("HH:mm")
+            .Min(DateTime.Now)
+            .Interval(30)
+        )
+                </div>
+                <div class="form-group">
+                    <div style="display:inline-block;width: 15%;">
+                        <label class="form-control-label">Is Done:</label>
+                        <div style="margin-bottom: -30px;">
+                            <span class="kt-switch">
+                                <label>
+                                    <input id="chkIsdone" type="checkbox" name="is_done" checked>
+                                    <span></span>
+                                </label>
+                            </span>
+                        </div>
+                    </div>
+                    <div style="display:inline-block;">
+                        <label class="form-control-label">Is Lead:</label>
+                        <div style="margin-bottom: -30px;">
+                            <span class="kt-switch">
+                                <label>
+                                    <input id="chkIsLead" type="checkbox" name="is_Lead" onchange="lead_change()">
+                                    <span></span>
+                                </label>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div id="div_lead" class="form-group" style="margin-top: -15px;margin-bottom: -15px;">
+                    <label class="form-control-label">Lead:</label>
+                    @(Html.Kendo().DropDownList()
+                                  .Name("ddlLead")
+                                  .OptionLabel("Select lead")
+                                  .DataTextField("Lead_ContactName")
+                                  .DataValueField("Lead_Id")
+                                  //.Filter()
+                                  .DataSource(source =>
+                                  {
+                                      source.Read(read =>
+                                        {
+                                            read.Url("/api/TaskApi/GetAllLeads").Type(HttpVerbs.Get);
+                                        });
+                                  })
+                                  .HtmlAttributes(new { style = "width: 100%" })
+                    )
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btnSave" type="button" class="btn btn-primary" onclick="SaveTask()">Save</button>
+            
+                <button id="btnDelete" type="button" class="btn btn-danger" onclick="deleteTask()">Delete</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    /// task module
+    $(document).on('click', '.fc-list-item-title', function (e)
+    {
+        $(this.outerHTML).each(function (i, el) {
+            var inputEl = $(el).children().get(1);
+            console.log(inputEl.innerText);
+            getTaskById(parseInt(inputEl.innerText));
+        });
+    });
+
+    /// diary 
+    $(document).on('click', '.fc-content', function (e)
+    {
+        $(this.outerHTML).each(function (i, el)
+        {
+            var inputEl = 0;
+             inputEl = $(el).children().get(2);
+            if (inputEl === undefined)
+            {
+                inputEl = $(el).children().get(1);
+            }
+            console.log(inputEl.innerText);
+            getTaskById(parseInt(inputEl.innerText));
+        });
+    });
+
+</script>

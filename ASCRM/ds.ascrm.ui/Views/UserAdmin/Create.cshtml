@@ -1,0 +1,184 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+    var canRoleManagerCreateUser = (permissions == null) ? false : (bool)permissions["MD_USER_CREATE"];
+    var canRoleManagerEditUser = (permissions == null) ? false : (bool)permissions["MD_USER_EDIT"];
+    var userId = ViewBag.UserId;
+    var hasAdminRole = (permissions == null) ? false : (bool)permissions["MD_LEAD_MSTR"];
+
+}
+ 
+
+<div class="content" id="dv_Create_User">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <div class="kt-form__actions kt-portlet__foot">
+                @*<button id="btnSave" v-on:click="submitted" class="btn btn-sm btn-success"><span class="fa fa-check"></span> Save</button>
+            <a id="btnCancel" href="UserAdmin/Manage" class="btn btn-sm btn-secondary"><span class="glyphicon glyphicon-remove"></span> Cancel</a>*@
+                <label id="lblUserHeader" style="font-size: large;font-weight: 500;margin-right: 5px">User</label>
+            </div>
+            <div class="kt-portlet__head-toolbar">
+                <a href="~/UserAdmin/Manage" class="btn btn-clean kt-margin-r-10">
+                    <i class="la la-arrow-left"></i>
+                    <span class="kt-hidden-mobile">Cancel</span>
+                </a>
+                <div class="btn-group">
+                    &nbsp;
+
+                    <button type="button" class="btn btn-sm btn-brand" onclick="saveUserAdmin(0)">
+                        <i class="la la-check"></i>
+                        <span class="kt-hidden-mobile">Save</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-brand dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                    <div class="dropdown-menu dropdown-menu-right" style="">
+                        <ul class="kt-nav">
+                            <li class="kt-nav__item">
+                                <a onclick="return saveUserAdmin(0)" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon flaticon2-reload"></i>
+                                    <span class="kt-nav__link-text">Save &amp; Stay</span>
+                                </a>
+                            </li>
+                            <li class="kt-nav__item">
+                                <a onclick="return saveUserAdmin(1)" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon flaticon2-power"></i>
+                                    <span class="kt-nav__link-text">Save &amp; Go back</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="kt-portlet__body">
+            <div class="box-header with-border kt-form kt-form--label-right">
+                <div class="form-group row">
+                    <label class="col-lg-3 col-form-label">Username:</label>
+                    <div class="col-lg-6">
+                        <input type="text" v-model="user.Users_UserName" class="form-control" v-bind:class="{ 'is-invalid': isSubmitted && ($v.user.Users_UserName.$invalid || isExists)}">
+                        <span v-if="isSubmitted && !$v.user.Users_UserName.required" class="form-text text-danger">Username is required</span>
+                        @*<span v-else-if="isSubmitted && !$v.user.Users_UserName.email" class="form-text text-danger">Email is invalid</span>*@
+                        <span v-else-if="isSubmitted && isExists" class="form-text text-danger">Email already exists</span>
+                        <span class="form-text text-muted">Username to access the system. ie: firstname.surname (ideally an email)</span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-lg-3 col-form-label">Role:</label>
+                    <div class="col-lg-6">
+                        <select class="form-control" v-model="user.Users_RoleId" v-bind:class="{ 'is-invalid': isSubmitted && $v.user.Users_RoleId.$invalid }">
+                            <option v-for="role in Roles" v-bind:value="role.security_role_id" v-text="role.name"></option>
+                        </select>
+                        <span v-if="isSubmitted && !$v.user.Users_RoleId.required" class="form-text text-danger">Role is required</span>
+                        <span class="form-text text-muted">Role access for this user</span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-lg-3 col-form-label">Display Name:</label>
+                    <div class="col-lg-6">
+                        <input type="text" v-model="user.Users_DisplayName" class="form-control" v-bind:class="{ 'is-invalid': isSubmitted && $v.user.Users_DisplayName.$invalid }">
+                        <span v-if="isSubmitted && $v.user.Users_DisplayName.$invalid" class="form-text text-danger">Display name is required</span>
+                        <span class="form-text text-muted">User friendly name</span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-lg-3 col-form-label">Email:</label>
+                    <div class="col-lg-6">
+                        <input type="text" v-model="user.Users_Email" class="form-control" v-bind:class="{ 'is-invalid': isSubmitted && $v.user.Users_Email.$invalid }">
+                        <span v-if="isSubmitted && !$v.user.Users_Email.required" class="form-text text-danger">Email is required</span>
+                        <span v-else-if="isSubmitted && !$v.user.Users_Email.email" class="form-text text-danger">Email is invalid</span>
+                        <span class="form-text text-muted">Valid email is required for passwords and notifications</span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-xl-3 col-lg-3 col-form-label">Is Active?</label>
+                    <div class="col-lg-9 col-xl-6">
+                        <span class="kt-switch">
+                            <label>
+                                <input type="checkbox" v-model="user.Users_IsActive" checked="checked" name="email_notification_1">
+                                <span></span>
+                            </label>
+                            <br />
+                            Give or revoke access to the system
+                        </span>
+                    </div>
+                </div>
+                @{
+                    if (hasAdminRole)
+                    {
+                        <div class="form-group row">
+                            <label class="col-xl-3 col-lg-3 col-form-label">Can accept leads?</label>
+                            <div class="col-lg-9 col-xl-6">
+                                <span class="kt-switch">
+                                    <label>
+                                        <input type="checkbox" v-model="user.Users_IsAccepting_Lead" checked="checked" name="email_notification_1">
+                                        <span></span>
+                                    </label>
+                                    <br />
+                                    If selected, leads can be assigned to this user. (Role should be also Sales Advisor)
+                                </span>
+                            </div>
+                        </div>
+                    }
+                }
+                <div class="form-group row">
+                    <label class="col-lg-3 col-form-label">Password:</label>
+                    <div class="col-lg-6">
+                        <input type="password" v-model="user.Users_Password" class="form-control" v-bind:class="{ 'is-invalid': isSubmitted && $v.user.Users_Password.$invalid }">
+                        <span v-if="isSubmitted && !$v.user.Users_Password.required" class="form-text text-danger">Password is required </span>
+                        <span v-else-if="isSubmitted && !$v.user.Users_Password.minLength" class="form-text text-danger">Password must be at least 6 characters </span>
+                        <span class="form-text text-muted">Please enter password</span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-lg-3 col-form-label">Confirm Password:</label>
+                    <div class="col-lg-6">
+                        <input type="password" v-model="user.Users_ConfirmPassword" class="form-control" v-bind:class="{ 'is-invalid': isSubmitted && $v.user.Users_ConfirmPassword.$invalid }">
+                        <span v-if="isSubmitted && !$v.user.Users_ConfirmPassword.required" class="form-text text-danger">Confirm password is required</span>
+                        <span v-else-if="isSubmitted && !$v.user.Users_ConfirmPassword.sameAsPassword" class="form-text text-danger">Passwords must match</span>
+                        <span class="form-text text-muted">Please enter confirm password</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Styles{
+    <link href="~/lib/bootstrap-datepicker/css/bootstrap-datepicker3.css" rel="stylesheet" />
+    <link href="~/lib/bootstrap-timepicker/css/bootstrap-timepicker.css" rel="stylesheet" />
+    <link href="~/Theme/default/demo7/src/assets/sass/style.scss" />
+    <link href="~/Theme/default/demo7/src/assets/sass/global/integration/plugins/_toastr.scss" />
+}
+
+@section Scripts{
+    <script src="~/lib/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
+    <script src="~/lib/bootstrap-timepicker/js/bootstrap-timepicker.js"></script>
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    <script src="~/lib/vue-router/vue-router.min.js"></script>
+    <script src="~/Theme/assets/js/pages/components/extended/toastr.js"></script>
+
+    <script src="~/js/Admin/lead_Users/Create.js"></script>
+}
+
+
+<script>
+
+    var _canRoleManagerCreateUser;
+    var _canRoleManagerEditUser;
+    var _userId = 0;
+    $(document).ready(function () {
+        _canRoleManagerCreateUser = @canRoleManagerCreateUser.ToString().ToLower();
+        _canRoleManagerEditUser = @canRoleManagerEditUser.ToString().ToLower();
+        _userId = @userId;
+        if (!_canRoleManagerCreateUser && !_canRoleManagerEditUser) {
+            window.location.href = '/Error/PermissionDenied';
+        }
+        app.mounted();
+    });
+</script>

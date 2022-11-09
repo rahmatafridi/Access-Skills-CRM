@@ -1,0 +1,279 @@
+﻿
+@{ ViewData["Title"] = "Course Content";
+
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+
+    var canRoleManagerAccessContent = (permissions == null) ? false : (bool)permissions["ACE_CCM"];
+    var canRoleManagerAccessContentCreate = (permissions == null) ? false : (bool)permissions["ACE_CCC"];
+    var canRoleManagerAccessContentDelete = (permissions == null) ? false : (bool)permissions["ACE_CCD"];
+
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var acceptDocumentTypes = ViewBag.acceptDocumentTypes;
+    var isMultipleDocumentUpload = ViewBag.isMultipleDocumentUpload;
+    var maxDocumentUpload = ViewBag.maxDocumentUpload;
+    var maxDocumentFileSize = ViewBag.maxDocumentFileSize;
+}
+<style>
+    .link-text:hover {
+        color: #22b9ff !important;
+    }
+
+    .kt-portlet .kt-portlet__foot {
+        padding: 10px 5px 10px 10px !important;
+    }
+
+    .k-grid-header .k-filterable, .k-grid-header .k-with-icon {
+        padding-right: calc(1px + .5rem + 1.5em + .5rem);
+    }
+</style>
+
+<div class="content" id="dv_Portal_CourseContents">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <label id="lblUserHeader" style="font-size: large;font-weight:500;margin-left:-10px;margin-top:20px;">Course Contents </label>
+            <div class="kt-portlet__head-toolbar">
+
+
+            </div>
+        </div>
+        <section class="content">
+            <div class="kt-portlet__body">
+
+                <div class="box-header with-border">
+                    <div class="row">
+                        <div class="col-lg-1" style="margin-top:7px">
+                            <label>Course</label>
+                        </div>
+                        <div class="col-lg-3" style="margin-left:-60px;">
+                           
+                            <select id="ddl_CourseLevel" class="form-control" v-on:change="CourseChange()" v-model="courseLevelId">
+                                <option v-for="CourseLevel in CourseLevels" v-bind:value="CourseLevel.Course_Id" v-text="CourseLevel.Course_Title"></option>
+                            </select>
+                        </div>
+                        <div class="col-lg-5">
+                            </div>
+                            <div class="col-lg-3" >
+                                <a v-on:click="AddCourseContent" style="margin-left:214px; margin-bottom:10px;" class="btn btn-sm btn-bold btn-label-brand">
+                                    <i class="fa fa-plus"></i> Add Course Content
+                                </a>
+                            </div>
+
+                        </div>
+
+                        @(Html.Kendo().Grid<crm.portal.CrmModel.CourseContent_Portal>()
+                        .Name("gridCourseContent")
+                        .Columns(columns =>
+                        {
+                            columns.Template("<div class='gridactionbuttonscontainer'><a  class='kt-font-danger' style='cursor:pointer;' onclick=PerformDelete('#:CC_Id#') title='Delete'> <span style='text-align:center;' class='fa fa-trash-alt'></span></a>" +
+                             "&nbsp;&nbsp;<a class='kt-font-dark' style='cursor:pointer;' onclick=PerformEdit('#:CC_Id#') title='Edit'><span style='text-align:center;' class='fa fa-pen'></span></a>" +
+                             "&nbsp;&nbsp;<a class='kt-font-dark' style='cursor:pointer;' href='/api/PortalCourseContentApi/DownloadFile?Id=#:CC_Id#' title='Downlaod'><span style='text-align:center;' class='fa fa-download'></span></a>" +
+
+                                "</div>").Width(70).ClientHeaderTemplate(" ");
+                            columns.Bound(p => p.CC_Id).Title("Id").ClientTemplate("<a style='cursor:pointer;' class='link-text'  title='#:CC_Id#'>#:CC_Id#</a>").Width(70);
+                            //columns.Bound(p => p.Lead_DateOfEnquiry_D).Format("{0:dd/MM/yyyy}").Title("Enquiry").Width(120);
+                            columns.Bound(p => p.CC_Name).Title("Name").ClientTemplate("<a style='cursor:pointer;' class='link-text'  title='#:CC_Name#'>#:CC_Name#</a>").Title("Name").Width(180);
+                            columns.Bound(p => p.CC_Description).Title("Description").Width(200);
+                            columns.Bound(p => p.CC_File_Size).Title("Size").Width(200);
+
+                            columns.Bound(p => p.CC_Type).Title("Type").Width(160);
+                            columns.Bound(p => p.CC_SortOrder).Title("Sort Order").Width(160);
+
+                        })
+                        .Resizable(resize => resize.Columns(true))
+                        .Reorderable(x => x.Columns(true))
+                        .ColumnMenu(c => c.Columns(true))
+                        .Scrollable()
+                        .Sortable()
+                        .Filterable(f => f.Messages(m => m.IsFalse("No")).Messages(m => m.IsTrue("Yes")))
+                        .Sortable(sortable =>
+                        {
+                            sortable.SortMode(GridSortMode.SingleColumn);
+                        })
+                        .Pageable()
+                        .NoRecords()
+                        .Filterable()
+                        .Pageable(pageable => pageable
+                        .Refresh(true)
+                        .PageSizes(true)
+                        .ButtonCount(5))
+                        .DataSource(dataSource =>
+                        dataSource
+                        .WebApi()
+                        .Model(model =>
+                        {
+                            model.Id(p => p.CC_Id);
+                        })
+                        //.Events(events => events.Error("error_handler")) ---TODO
+                       .Read(read => read.Action("GetCourseContentGrid", "PortalCourseContentApi", new { id = "0" }))
+                        .PageSize(30)
+                        )
+                    )
+                    </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="modal fade" id="kt_modal_Create" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Create Course Contenet</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="kt-form kt-form--label-right">
+
+                        <div class="form-group row">
+                            <label class="col-form-label col-sm-2">Course</label>
+                            <div class="col-sm-10">
+                                <select id="ddl_CourseLevel" class="form-control" v-model="courseContent.cc_id_course_level">
+                                    <option v-for="CourseLevel in CourseLevels" v-bind:value="CourseLevel.Course_Id" v-text="CourseLevel.Course_Title"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="recipient-name" class="col-form-label col-sm-2">Name</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" v-model="courseContent.cc_name">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="recipient-name" class="col-form-label col-sm-2">Description</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" v-model="courseContent.cc_description">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="recipient-name" class="col-form-label col-sm-2">Sort Order</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" v-model="courseContent.cc_sortorder">
+                            </div>
+                        </div>
+
+
+                        <div class="form-group row">
+                            <label for="recipient-name" class="col-form-label col-sm-2">Select File</label>
+                            <div class="col-sm-10">
+
+                                <input name="files" class="form-control" id="files" type="file" aria-label="files" />
+                            </div>
+
+
+                            <div>
+                                <span id="span_fileUpload" style="margin-left:140px;" class="form-text text-muted"></span>
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" v-on:click="Submit">Submit</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    var _acceptDocumentTypes;
+    var _allowedExtensions = [];
+    var _isMultipleDocumentUpload;
+    var _maxDocumentUpload;
+    var _maxDocumentFileSize;
+    var _canRoleManagerAccessContent;
+    var _canRoleManagerAccessContentCreate;
+    var _canRoleManagerAccessContentDelete;
+    $(document).ready(function () {
+        _canRoleManagerAccessContent = @canRoleManagerAccessContent.ToString().ToLower();
+        _canRoleManagerAccessContentCreate = @canRoleManagerAccessContentCreate.ToString().ToLower();
+        _canRoleMangerAccessContentDelete= @canRoleManagerAccessContentDelete.ToString().ToLower();
+
+          if (!_canRoleManagerAccessContent) {
+            window.location.href = '/Error/PermissionDenied';
+        }
+
+        _acceptDocumentTypes = '@acceptDocumentTypes';
+        _isMultipleDocumentUpload = false;
+        _maxDocumentUpload = @maxDocumentUpload;
+        _maxDocumentFileSize = @maxDocumentFileSize;
+
+    if (_acceptDocumentTypes !== null) {
+        if (_acceptDocumentTypes.includes(',')) {
+            var item = _acceptDocumentTypes.split(',');
+            for (var count = 0; count < item.length; count++) {
+                if (item[count] !== "") {
+                    _allowedExtensions.push('' + item[count] + '');
+                }
+            }
+        }
+        else {
+            _allowedExtensions.push('' + _acceptDocumentTypes + '');
+        }
+    }
+
+    uploadFile();
+
+    $("#span_fileUpload").text("Max file size is " + _maxDocumentFileSize + " MB and allowed file types: " + _allowedExtensions.toString());
+
+    $(".attachDocuments").attr("style", "display:none")
+
+    $("#chkAttachDocuments").change(function () {
+        if ($(this).prop('checked')) {
+            $(".attachDocuments").attr("style", "display:inline");
+        } else {
+            $(".attachDocuments").attr("style", "display:none");
+        }
+    });
+
+    });
+    function uploadFile() {
+        var _size = (_maxDocumentFileSize * 1048576);
+
+        $("#files").kendoUpload({
+            async: {
+                chunkSize: 11000,// bytes
+                autoUpload: true
+            },
+            validation: {
+                allowedExtensions: _allowedExtensions,
+                maxFileSize: _size
+            },
+            select: onSelect,
+            multiple: _isMultipleDocumentUpload
+        });
+
+
+    }
+
+    var _isValidationError = false;
+    function onSelect(e) {
+        if (e.files.length > _maxDocumentUpload) {
+            toastr.error("You can select maximum " + _maxDocumentUpload + " files.", 'Error!');
+            e.preventDefault();
+        }
+
+        var files = e.files;
+        for (var i = 0; i < files.length; i += 1) {
+            var file = files[i];
+            if (file.validationErrors && file.validationErrors.length > 0) {
+                toastr.error('Invaild file format.', 'Error!');
+                e.preventDefault();
+            }
+        }
+    }
+
+
+</script>
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    @*<script src="~/js/Portal/Index.js"></script>*@
+    <script src="~/js/Portal/CourseContents/Manage.js"></script>
+}

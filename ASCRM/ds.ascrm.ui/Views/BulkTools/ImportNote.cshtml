@@ -1,0 +1,357 @@
+﻿
+@{ ViewData["Title"] = "Bulk Import Notes";
+                Layout = "~/Views/Shared/_Layout.cshtml";
+
+                var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+    @using Kendo.Mvc.UI }
+<style>
+    .link-text:hover {
+        color: #22b9ff !important;
+    }
+
+    .k-grid-header .k-filterable, .k-grid-header .k-with-icon {
+        padding-right: calc(1px + .5rem + 1.5em + .5rem);
+    }
+
+    h4, .h4 {
+        font-size: 1em !important;
+    }
+</style>
+<div class="content" id="dv_FileUpload">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <label id="lblUserHeader" style="font-size: large;font-weight:500;margin-left:-10px;margin-top:20px;">Import Notes</label>
+            <div class="kt-portlet__head-toolbar">
+                <div class="form__actions kt-portlet__foot">
+                    @*<a href="~/Lead/Create" class="btn btn-sm btn-bold btn-label-brand">
+                            <i class="fa fa-plus"></i> Create Lead
+                        </a>*@
+                </div>
+
+                <div class="btn-group">
+
+                    @*<button type="button" v-on:click="return uploadLead()" class="btn btn-sm btn-brand">
+                            <i class="la la-check"></i>
+                            <span class="kt-hidden-mobile">Import Lead</span>
+                        </button>
+
+                        &nbsp;*@
+
+                    <button type="button" class="btn btn-sm btn-brand">
+                        <i class="la la-file-image-o"></i>
+                        <span class="kt-hidden-mobile">Options</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-brand dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                    <div class="dropdown-menu dropdown-menu-right" style="">
+                        <ul class="kt-nav">
+                            <li class="kt-nav__item">
+                                <a onclick="return exportPDF()" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon"></i>
+                                    <span class="kt-nav__link-text">PDF</span>
+                                </a>
+                            </li>
+                            <li class="kt-nav__item">
+                                <a onclick="return exportExcel()" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon"></i>
+                                    <span class="kt-nav__link-text">Excel</span>
+                                </a>
+                            </li>
+                            <li class="kt-nav__item">
+                                <a href="BulkTools/DownloadNote" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon"></i>
+                                    <span class="kt-nav__link-text">Download Template</span>
+                                </a>
+                            </li>
+                            <li class="kt-nav__item">
+                                <a onclick="return uploadLead()" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon"></i>
+                                    <span class="kt-nav__link-text">Import Now</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <section class="content">
+            <div class="kt-portlet__body">
+
+                <div class="box-header with-border">
+                    <script id="fileTemplate" type="text/x-kendo-template">
+                        <span class='k-progress'></span>
+                        <div class='file-wrapper' style="width: 100%;margin-bottom: -40px;">
+                            <span class='file-icon #=addExtensionClass(files[0].extension)#'></span>
+                            <h4 class='file-heading file-name-heading'>Name: #=name#</h4>
+                            <h4 class='file-heading file-size-heading'>Size: #=size# bytes</h4>
+                            <strong class="k-upload-status">
+                                <button type='button' class='k-upload-action'></button>
+                                <button type='button' class='k-upload-action'></button>
+                            </strong>
+                        </div>
+                    </script>
+
+                    <div class="demo-section k-content">
+                        @(Html.Kendo().Upload()
+                            .Name("files")
+                            .TemplateId("fileTemplate")
+                            .Async(a => a
+                                .Save("Templates_Save", "LeadFileUpload")
+                                .Remove("Templates_Remove", "LeadFileUpload")
+                                .AutoUpload(true)
+                            )
+                            .Validation(validation => validation.AllowedExtensions(new string[] { ".xlsx", ".xls" }))
+                            .Events(x => x.Complete("onComplete"))
+                            .Events(x => x.Complete("onProgress"))
+                            .Events(x => x.Remove("onRemove"))
+                        )
+                    </div>
+
+                    <div class="box-header with-border">
+                        @(Html.Kendo().Grid<ds.portal.leads.Models.ImportNote>()
+                            .Name("leadNoteImport")
+                            .Columns(columns =>
+                            {
+                                //columns.Bound(p => p.isDuplicate).Title("Duplicate").Filterable(f => f.Enabled(true)).ClientTemplate("#= isDuplicate ? 'Yes' : 'No' #").Width(120);
+                                columns.Bound(p => p.Message).Title("Message").Width(80);
+                                columns.Bound(p => p.LeadId).Title("Lead Id").Width(150);
+                                columns.Bound(p => p.Note).Title("Note").Width(150);
+                              
+                             })
+                            //.ClientRowTemplate("<tr class='#= contact_is_error == 'true' ? '' :'danger' #'></tr>")
+                            .Resizable(resize => resize.Columns(true))
+                            .Reorderable(x => x.Columns(true))
+                            .Scrollable(x => x.Enabled(true))
+                            .ColumnMenu(c => c.Columns(true))
+                            .Sortable()
+                            .Sortable(sortable =>
+                            {
+                                sortable.SortMode(GridSortMode.SingleColumn);
+                            })
+                            .Excel(excel => excel
+                                .FileName("LeadNotes.xlsx")
+                                .Filterable(true)
+                            )
+                            .Pageable()
+                            .NoRecords()
+                            .Filterable(x => x.Mode(GridFilterMode.Menu))
+                            .Pageable(pageable => pageable
+                            .Refresh(false)
+                            .PageSizes(true)
+                            .ButtonCount(5))
+                            .AutoBind(false)
+                            .DataSource(dataSource =>
+                            dataSource
+                            .Ajax()
+                            .ServerOperation(false)
+                            //.Model(model =>
+                            //{
+                            //    model.Id(p => p.Lead_Id);
+                            //})
+                            .Read(read => read.Action("GetLeadFileUpload", "BulkTools"))
+                            .PageSize(1000)
+                            )
+                        )
+                    </div>
+
+                    <script type="text/javascript">
+                        function addExtensionClass(extension) {
+                            switch (extension) {
+                                //case '.jpg':
+                                //case '.img':
+                                //case '.png':
+                                //case '.gif':
+                                //    return "img-file";
+                                //case '.doc':
+                                //case '.docx':
+                                //    return "doc-file";
+                                case '.xls':
+                                case '.xlsx':
+                                    return "xls-file";
+                                //case '.pdf':
+                                //    return "pdf-file";
+                                //case '.zip':
+                                //case '.rar':
+                                //    return "zip-file";
+                                //default:
+                                //    return "default-file";
+                            }
+                        }
+                    </script>
+
+                    <style>
+                        .file-icon {
+                            display: inline-block;
+                            float: left;
+                            width: 48px;
+                            height: 48px;
+                            margin-left: 10px;
+                            margin-top: 13.5px;
+                        }
+
+                        .xls-file {
+                            background-image: url(../shared/web/upload/xls.png);
+                        }
+
+                        #example .file-heading {
+                            font-family: Arial;
+                            font-size: 1.1em;
+                            display: inline-block;
+                            float: left;
+                            width: 60%;
+                            margin: 0 0 0 20px;
+                            height: 25px;
+                            -ms-text-overflow: ellipsis;
+                            -o-text-overflow: ellipsis;
+                            text-overflow: ellipsis;
+                            overflow: hidden;
+                            white-space: nowrap;
+                        }
+
+                        #example .file-name-heading {
+                            font-weight: bold;
+                            margin-top: 20px;
+                        }
+
+                        #example .file-size-heading {
+                            font-weight: normal;
+                            font-style: italic;
+                        }
+
+                        li.k-file div.file-wrapper {
+                            position: relative;
+                            height: 75px;
+                        }
+                    </style>
+                </div>
+            </div>
+        </section>
+    </div>
+
+
+
+
+
+</div>
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    @*<script src="~/js/Admin/Leads/Manage.js"></script>*@
+
+}
+
+<script>
+    //var _canRoleManagerViewLeads;
+    //var _canRoleManagerEditLead;
+    //var _canRoleManagerDeleteLead;
+
+       $(document).ready(function () {
+           @*_canRoleManagerViewLeads = @canRoleManagerViewLeads.ToString().ToLower();
+           _canRoleManagerEditLead = @canRoleManagerEditLead.ToString().ToLower();
+           _canRoleManagerDeleteLead = @canRoleManagerDeleteLead.ToString().ToLower();*@
+
+           //if (!_canRoleManagerViewLeads) {
+           //    window.location.href = '/Error/PermissionDenied';
+           //}
+           //resizeGrid1();
+    });
+
+        function resizeGrid1() {
+            var contentwrapper = $("#kt_aside").innerHeight();
+            var gridElement = $("#leadsGrid"),
+                newHeight = gridElement.innerHeight(),
+                otherElements = gridElement.children().not(".k-grid-content"),
+                otherElementsHeight = 0;
+
+            otherElements.each(function () {
+                otherElementsHeight += $(this).outerHeight();
+            });
+                var newHeight = (contentwrapper - otherElementsHeight) - 330;
+                if (newHeight < 325) newHeight = 325;
+            gridElement.children(".k-grid-content").height(newHeight);
+    }
+
+
+    function onComplete(e) {
+        console.log("Complete");
+    }
+
+    function onProgress(e) {
+        $('#leadNoteImport').data('kendoGrid').dataSource.read();
+        console.log("Upload progress :: " + e.percentComplete + "% :: " + getFileInfo(e));
+    }
+
+    function getFileInfo(e) {
+        return $.map(e.files, function (file) {
+            var info = file.name;
+
+            // File size is not available in all browsers
+            if (file.size > 0) {
+                info += " (" + Math.ceil(file.size / 1024) + " KB)";
+            }
+            return info;
+        }).join(", ");
+    }
+
+    function uploadLead()
+    {
+        leadFileUploads = $("#leadNoteImport").data("kendoGrid").dataSource._data
+        $.ajax({
+            url: "/api/LeadApi/NoteImport",
+            data: JSON.stringify(leadFileUploads),
+            type: "Post",
+            contentType: "application/json",
+            dataType: "json"
+        }).done(function (response) {
+
+            if (response.length > 0) {
+                toastr.error('Some leads could not be imported.', 'Import');
+                $(".k-upload-files.k-reset").find("li").remove();
+
+                $("#leadNoteImport").data("kendoGrid").dataSource.data(response);
+                $('#leadNoteImport').getKendoGrid().refresh();
+
+                //let filter = $(e).data("filter");
+                //var grid = $('#leadsFileUploadGrid').data('kendoGrid');
+                //grid.dataSource.read({  response });
+                //grid.refresh();
+                // $("#leadsFileUploadGrid").data("kendoGrid").dataSource.data([response]);
+                //let dataSource = {
+                //    data: response
+                //};
+                //$("#leadsFileUploadGrid").data("kendoGrid").setDataSource(dataSource);
+                //$('#leadsFileUploadGrid').data('kendoGrid').refresh();
+
+            } else {
+                toastr.success('Leads uploaded successfully.', 'Imported');
+                onRemove();
+                $(".k-upload-files.k-reset").find("li").remove();
+            }
+
+            });
+
+    }
+
+    function onRemove()
+    {
+        $("#leadNoteImport").data("kendoGrid").dataSource.data([]);
+    }
+
+
+    function exportPDF() {
+        var grid = $("#leadNoteImport").data("kendoGrid");
+      //  grid.hideColumn(0);
+        $("#leadNoteImport").getKendoGrid().saveAsPDF();
+     //   grid.showColumn(0);
+    }
+
+    function exportExcel()
+    {
+        var grid = $("#leadNoteImport").data("kendoGrid");
+        grid.setOptions(x => x.PageSize = 1000);
+        $("#leadNoteImport").getKendoGrid().saveAsExcel();
+
+    }
+
+</script>
+

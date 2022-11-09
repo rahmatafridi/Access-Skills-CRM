@@ -1,0 +1,57 @@
+﻿@{ ViewData["Title"] = "My Dairy";
+                Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor" id="kt_content">
+    <div class="kt-subheader   kt-grid__item" id="kt_subheader">
+        <div class="kt-container  kt-container--fluid ">
+            <div class="kt-subheader__main">
+
+                <h3 class="kt-subheader__title"></h3>
+
+                <span class="kt-subheader__separator kt-hidden"></span>
+            </div>
+        </div>
+    </div>
+    <!-- end:: Subheader -->
+    <!-- begin:: Content -->
+    <div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <!--begin::Portlet-->
+                <div class="kt-portlet" id="kt_portlet">
+                    <div class="kt-portlet__head">
+                        <div class="kt-portlet__head-label">
+                            <span class="kt-portlet__head-icon">
+                                <i class="fa fa-calendar"></i>
+                            </span>
+                            <h3 class="kt-portlet__head-title ">
+                                Task List
+                            </h3>
+                        </div>
+                        <div class="kt-portlet__head-toolbar">
+                            @*<a style="cursor:pointer;color: white;" onclick="return CreateTask()" class="btn btn-brand btn-elevate btn-sm">
+                                    <i class="la la-plus"></i>
+                                    Add Event
+                                </a>*@
+                        </div>
+                    </div>
+                    <div class="kt-portlet__body">
+                        <div id="kt_calendar" class="fc fc-ltr fc-unthemed" style="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<partial name="/Views/Shared/partials/_task.cshtml" />
+<link href="~/Theme/assets/plugins/custom/fullcalendar/fullcalendar.bundle.css" rel="stylesheet" />
+
+@section Scripts{
+    <script src="~/js/Admin/MyDiary/MyDiary.js"></script>
+
+}
+
+
+

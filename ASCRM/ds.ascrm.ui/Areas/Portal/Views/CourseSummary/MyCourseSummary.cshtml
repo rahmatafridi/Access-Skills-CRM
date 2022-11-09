@@ -1,0 +1,704 @@
+﻿@using Kendo.Mvc.UI
+@{ 
+    ViewData["Title"] = "Course Contents Summary";
+
+    Layout = "~/Views/Shared/_Layout_Portal.cshtml";
+
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+    var canRoleManagerCourseSummary = (permissions == null) ? false : (bool)permissions["AC_CS"];
+
+
+    var acceptDocumentTypes = ViewBag.acceptDocumentTypes;
+    var isMultipleDocumentUpload = ViewBag.isMultipleDocumentUpload;
+    var maxDocumentUpload = ViewBag.maxDocumentUpload;
+    var maxDocumentFileSize = ViewBag.maxDocumentFileSize;
+    }
+<style>
+    .link-text:hover {
+        color: #22b9ff !important;
+    }
+
+    .kt-portlet .kt-portlet__foot {
+        padding: 10px 5px 10px 10px !important;
+    }
+
+    .k-grid-header .k-filterable, .k-grid-header .k-with-icon {
+        padding-right: calc(1px + .5rem + 1.5em + .5rem);
+    }
+</style>
+<style>
+
+    .panel .btn-group {
+        margin: 15px 0 30px;
+    }
+
+        .panel .btn-group .btn {
+            transition: background-color .3s ease;
+        }
+
+    .table-filter {
+        background-color: #fff;
+        border-bottom: 1px solid #eee;
+        width: 90%;
+        margin: auto;
+    }
+
+        .table-filter tbody tr:hover {
+            cursor: pointer;
+            background-color: #eee;
+        }
+
+        .table-filter tbody tr td {
+            padding: 10px;
+            vertical-align: middle;
+            border-top-color: #fefefe;
+        }
+
+        .table-filter tbody tr.selected td {
+            background-color: #eee;
+        }
+
+        .table-filter tr td:first-child {
+            width: 90%;
+        }
+
+        .table-filter tr td:nth-child(2) {
+            width: 10%;
+        }
+
+        .table-filter tr:nth-of-type(odd) {
+            background-color: #ccc;
+        }
+
+
+
+    /* sub table */
+    .table-user-content tbody tr:hover {
+        /*cursor: pointer;*/
+        background-color: #eee;
+    }
+
+    .table-user-content tbody tr td {
+        padding: 10px;
+        vertical-align: middle;
+        border-top-color: #ccc;
+    }
+
+    .table-user-content tbody tr.selected td {
+        background-color: #eee;
+    }
+
+    .table-user-content tr td:first-child {
+        width: 50%;
+    }
+
+    .table-user-content tr td:nth-child(2) {
+        width: 80%;
+    }
+
+    .table-user-content tr:nth-of-type(odd) {
+        background-color: #fcfcfc;
+    }
+    /* sub table */
+
+
+
+    .ckbox {
+        position: relative;
+    }
+
+        .ckbox input[type="checkbox"] {
+            opacity: 0;
+        }
+
+        .ckbox label {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+            .ckbox label:before {
+                content: '';
+                top: 1px;
+                left: 0;
+                width: 18px;
+                height: 18px;
+                display: block;
+                position: absolute;
+                border-radius: 2px;
+                border: 1px solid #bbb;
+                background-color: #fff;
+            }
+
+        .ckbox input[type="checkbox"]:checked + label:before {
+            border-color: #2BBCDE;
+            background-color: #2BBCDE;
+        }
+
+        .ckbox input[type="checkbox"]:checked + label:after {
+            top: 3px;
+            left: 3.5px;
+            content: '\e013';
+            color: #fff;
+            font-size: 11px;
+            font-family: 'Glyphicons Halflings';
+            position: absolute;
+        }
+
+    .table-filter .star {
+        color: #ccc;
+        text-align: center;
+        display: block;
+    }
+
+        .table-filter .star.star-checked {
+            color: #F0AD4E;
+        }
+
+        .table-filter .star:hover {
+            color: #ccc;
+        }
+
+        .table-filter .star.star-checked:hover {
+            color: #F0AD4E;
+        }
+
+    .table-filter .media-photo {
+        width: 35px;
+    }
+
+    /*.table-filter .media-body {
+            display: block;*/
+    /* Had to use this style to force the div to expand (wasn't necessary with my bootstrap version 3.3.6) */
+    /* }*/
+
+    .table-filter .media-meta {
+        font-size: 12px;
+        font-weight: 500;
+        color: #000;
+    }
+
+    .table-filter .media .title {
+        color: #2BBCDE;
+        font-size: 16px;
+        font-weight: bold;
+        line-height: normal;
+        margin: 0;
+    }
+
+        .table-filter .media .title span {
+            font-size: .8em;
+            margin-right: 20px;
+        }
+
+            .table-filter .media .title span.notstarted {
+                color: #d9534f;
+            }
+
+            .table-filter .media .title span.inprogress {
+                color: #f0ad4e;
+            }
+
+            .table-filter .media .title span.completedtopic {
+                color: #5cb85c;
+            }
+
+    .table-filter .media .summary {
+        font-size: 15px;
+    }
+
+    .clickable {
+        cursor: pointer;
+    }
+
+    .right-col {
+        text-align: center;
+    }
+</style>
+
+<div class="content" id="dv_Portal_CourseContentsSummary">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <label id="lblUserHeader" style="font-size: large;font-weight:500;margin-left:-10px;margin-top:20px;">Course  Summary</label>
+            <div class="kt-portlet__head-toolbar">
+
+
+                <!--<div class="form__actions kt-portlet__foot">-->
+                @*<a href="~/Portal/CourseContent/Create" class="btn btn-sm btn-bold btn-label-brand">
+                        <i class="fa fa-plus"></i> Create Course Content
+                    </a>*@
+                <!--<a v-on:click="AddCourseContent" class="btn btn-sm btn-bold btn-label-brand">
+                        <i class="fa fa-plus"></i> Create Course Content
+                    </a>
+                </div>-->
+
+            </div>
+        </div>
+        <section class="content">
+            <div class="kt-portlet__body">
+
+                <div class="box-header with-border">
+                    <div class="row">
+                        <div class="col-lg-9">
+
+                        </div>
+                        @*<div class="col-lg-3">
+                                <input class="form-control" placeholder="Search Company" style="margin-bottom:10px;" id="search" type="text" autocomplete="off" />
+                            </div>*@
+
+                    </div>
+                    <div class="row">
+
+                        <div class="col-md-12">
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                    <div class="pull-left">
+                                        <div class="btn-group" style="margin-left:70px;">
+                                            <button type="button" class="btn btn-danger btn-filter" data-target="notstarted">Not Started</button>
+                                            <button type="button" class="btn btn-warning btn-filter" data-target="inprogress">In Progress</button>
+                                            <button type="button" class="btn btn-success btn-filter" data-target="completedtopic">Completed</button>
+                                            <button type="button" class="btn btn-default btn-filter" data-target="all">View All</button>
+                                        </div>
+                                    </div>
+                                    <div class="table-container">
+                                        <table class="table table-filter" id="grid">
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+
+                    </div>
+                    <div id="target"></div>
+
+                </div>
+            </div>
+        </section>
+    </div>
+
+
+    <div class="modal fade" id="kt_modal_Create" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Upload File</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="kt-form kt-form--label-right">
+
+                  
+                        <div class="form-group">
+                            <label>File</label>
+                            @*<div></div>*@
+
+                            <input name="files" id="files" type="file" aria-label="files" />
+
+                            <span id="span_fileUpload" class="form-text text-muted"></span>
+                        </div>
+
+
+                        @*<div class="form-group row">
+                            <label for="recipient-name" class="col-form-label col-sm-2">Select File</label>
+                            <div class="col-sm-10">
+
+                                <input name="files" class="form-control" multiple="multiple" id="files" type="file" aria-label="files" />
+                            </div>
+
+
+                            <div>
+                                <span id="span_fileUpload" style="margin-left:140px;" class="form-text text-muted"></span>
+
+                            </div>
+
+                        </div>*@
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" v-on:click="Submit">Submit</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+<script type="text/javascript">
+    function BindGridView() {
+        var duedate_completed_label = '';
+        var filter_label = 'notstarted';
+        var filter_label_caption = 'NOT STARTED';
+        $.ajax({
+            type: "Get",
+            url: "/api/PortalCourseSummaryApi/GetCourseTopics",
+
+            contentType: "application/json",
+            dataType: "json",
+            success: function (data) {
+                console.log(data);
+                for (var i = 0; i < data.length; i++) {
+                    // $("#grid").append("<tr><td>" + data.d[i].TopicName +
+                    //                                "</td><td>" + data.d[i].SSJLP_Id + "</td></tr>");
+
+                    //starting TR MAIN
+                    switch (data[i].AlertColour) {
+                        case 'red_alert_icon_small.gif':
+                            filter_label = 'inprogress';
+                            filter_label_caption = 'IN PROGRESS';
+                            break;
+                        case '':
+                            filter_label = 'completedtopic';
+                            filter_label_caption = 'COMPLETED';
+                            break;
+                        case 'default.png':
+                            filter_label = 'notstarted';
+                            filter_label_caption = 'NOT STARTED';
+                            break;
+                        default:
+                            filter_label = 'notstarted';
+                            filter_label_caption = 'NOT STARTED';
+
+                    }
+                    if (data[i].Checkpointdate != "Due Date: " && data[i].Checkpointdate != "") {
+                        filter_label = 'inprogress';
+                        filter_label_caption = 'IN PROGRESS';
+                        duedate_completed_label = data[i].Checkpointdate;
+
+                    } else {
+                        filter_label = 'notstarted';
+                        filter_label_caption = 'NOT STARTED';
+                        duedate_completed_label = "";
+
+                    }
+                    if (data[i].CompletedDate != "" && data[i].IsCompleted == "Yes") {
+                        filter_label = 'completedtopic';
+                        filter_label_caption = 'COMPLETED';
+                        duedate_completed_label = data[i].CompletedDate;
+
+                    } else {
+                        duedate_completed_label = "";
+                    }
+                    //completion date or due date or nothing if it is not started
+                    //  duedate_completed_label = ""; //data.d[i].Checkpointdate + " | " + data.d[i].CompletedDate
+                    var iMaxFiles = '';
+                    var iMaxFilesIcon = "";
+                    var UploadFile = "";
+                    debugger;
+                    if (data[i].Documents.length > 0) {
+                        iMaxFiles = "View Files (" + data[i].Documents.length + ")";
+                        iMaxFilesIcon = "<i class='glyphicon fa fa-download btn-lg  pull-right'></i>";
+                    }
+                    if (data[i].isWorkSubmit == false && filter_label_caption == "IN PROGRESS") {
+                        UploadFile = "<button class='btn btn-primary' onclick='uploaddoc(" + data[i].SSJLP_Id + ")'>Upload</button>"
+                    } 
+                    if (filter_label_caption == "IN PROGRESS") {
+                        if (UploadFile == "") {
+                            UploadFile = "<h5 style='color:green;'>Uploaded</h5>"
+                        }
+                    }
+                    $("#grid").append("<tr data-status='" + filter_label + "' class='clickable warning dropdown-deliverable selected ' data-for='#details_" + i + "' "
+                        + "> "
+                        + "<td> "
+
+                        + "<div class='media' id="+'#'+ data[i].SSJLP_Id +"> "
+                        + "<div class='media-body'>"
+                        + "<span class='media-meta pull-right'>" + duedate_completed_label + "</span>"
+                        + "<h4 class='title'>  " + "" + ""
+                        + "<span class='pull-right " + filter_label + "'>" + filter_label_caption + "</span>"
+                        + "</h4>"
+                        + "<p class='summary'><strong>" + data[i].TopicName + "</strong></p>"
+                        + "</div>"
+                        + "</div>"
+                        + "</td>"
+                        + "<td>"
+                        + "<div class='hasdocuments pull-right clickable warning dropdown-deliverable' data-for='#details_" + i + "' >"
+                        + "<span class='media-meta pull-right'> " + iMaxFiles
+                        + "</span><br/>"
+                        + iMaxFilesIcon
+                        + "</div>"
+                        + "</td>"
+                        + "<td> "
+                        + "<span class='pull-right'> "
+                        + "</span><br/>"
+                        + UploadFile
+                        + "</td>"
+                        + "</tr>");
+
+                    if (data[i].Documents.length > 0) {
+                        var sTr = "";
+                        for (var j = 0; j < data[i].Documents.length; j++) {
+
+                            sTr = sTr + "<tr>"
+                                + "<td width='40%'>" + data[i].Documents[j].DocTopic + "</td>"
+                                + "<td width='60%'>" + data[i].Documents[j].FileName + "</td>"
+                                + "<td class='right-col ' data-id='" + data[i].Documents[j].DocumentId + "'>Download</td>"
+                                + "</tr>"
+
+
+                        } //end for
+                        $("#grid").append("<tr style='padding: 0'>"
+                            + "<td colspan='2'>"
+                            + "<div class='deliverable-infos' id='details_" + i + "'>"
+                            + "<table class='table table-condensed table-user-content' id='hidden_table_" + i + "'>"
+                            + "<tbody>"
+                            + sTr
+                            + "</tbody>"
+                            + "</table>"
+                            + "</div>"
+                            + "</td>"
+                            + "</tr>");
+
+
+                    }//end if has documents
+
+                    //TR MAIN ENDS
+                }
+            }
+            ,
+            complete: function () {
+                $('.deliverable-infos').hide();
+
+            }
+        })
+    }
+
+    //function uploadFile() {
+    //    //var _size = (_maxDocumentFileSize * 1048576);
+
+    //    $("#files").kendoUpload({
+    //        async: {
+    //            chunkSize: 11000,// bytes
+    //            autoUpload: true
+    //        },
+    //        //validation: {
+    //        //    allowedExtensions: _allowedExtensions,
+    //        //    maxFileSize: _size
+    //        //},
+    //        //select: onSelect,
+    //        multiple: true
+    //    });
+    //}
+    var _canRoleManagerCourseSummary;
+
+        var _acceptDocumentTypes;
+        var _allowedExtensions = [];
+        var _isMultipleDocumentUpload;
+        var _maxDocumentUpload;
+        var _maxDocumentFileSize;
+        var _companyId;
+        var _roleName  ;
+       $(document).ready(function () {
+
+           _canRoleManagerCourseSummary = @canRoleManagerCourseSummary.ToString().ToLower();
+
+
+           if (!_canRoleManagerCourseSummary) {
+            window.location.href = '/Error/PermissionDenied';
+        }
+
+          //  app.mounted();
+
+           _acceptDocumentTypes = '@acceptDocumentTypes';
+           _isMultipleDocumentUpload = true;
+            _maxDocumentUpload = @maxDocumentUpload;
+            _maxDocumentFileSize = @maxDocumentFileSize;
+
+           if (_acceptDocumentTypes !== null)
+           {
+               if (_acceptDocumentTypes.includes(',')) {
+                   var item = _acceptDocumentTypes.split(',');
+                   for (var count = 0; count < item.length; count++) {
+                       if (item[count] !== "") {
+                           _allowedExtensions.push('' + item[count] + '');
+                       }
+                   }
+               }
+               else
+               {
+                   _allowedExtensions.push('' + _acceptDocumentTypes + '');
+               }
+           }
+
+           uploadFile();
+
+           $("#span_fileUpload").text("Max file size is " + _maxDocumentFileSize + " MB and allowed file types: " + _allowedExtensions.toString());
+
+           $(".attachDocuments").attr("style", "display:none")
+
+
+
+
+
+
+       });
+    function uploadFile() {
+        var _size = (_maxDocumentFileSize * 1048576);
+
+        $("#files").kendoUpload({
+            async: {
+                chunkSize: 11000,// bytes
+                autoUpload: true
+            },
+            validation: {
+                allowedExtensions: _allowedExtensions,
+                maxFileSize: _size
+            },
+            select: onSelect,
+            multiple: _isMultipleDocumentUpload
+        });
+
+
+    }
+
+    var _isValidationError = false;
+    function onSelect(e) {
+        if (e.files.length > _maxDocumentUpload) {
+            toastr.error("You can select maximum " + _maxDocumentUpload + " files.", 'Error!');
+            e.preventDefault();
+        }
+
+        var files = e.files;
+        for (var i = 0; i < files.length; i += 1) {
+            var file = files[i];
+            if (file.validationErrors && file.validationErrors.length > 0) {
+                toastr.error('Invaild file format.', 'Error!');
+                e.preventDefault();
+            }
+        }
+    }
+</script>
+
+
+
+<script>
+
+    $(document).ready(function () {
+
+        //$('.star').on('click', function () {
+        //    $(this).toggleClass('star-checked');
+        //});
+        BindGridView();
+
+        $('.ckbox label').on('click', function () {
+            $(this).parents('tr').toggleClass('selected');
+        });
+
+        $('.btn-filter').on('click', function () {
+            var $target = $(this).data('target');
+            if ($target != 'all') {
+                $('.table tr').css('display', 'none');
+                $('.table tr[data-status="' + $target + '"]').fadeIn('slow');
+            } else {
+                $('.table tr').css('display', 'none').fadeIn('slow');
+                $('.table tr[data-status="' + $target + '"]').fadeOut('slow');
+            }
+        });
+
+        $('.downloading').on('click', function () {
+            var $docid = $(this).data('id');
+            alert($docid);
+        });
+
+        $('.deliverable-infos').hide();
+
+    });
+
+
+    //after loading grid
+    $(document).delegate(".dropdown-deliverable", "click", function (e) {
+        //  console.log("dropdown toggled!");
+        e.preventDefault();
+        e.stopPropagation();
+        var dataFor = $(this).data('for');
+        var idFor = $(dataFor);
+        idFor.slideToggle();
+    });
+
+    $(document).delegate(".downloading", "click", function (e) {
+
+        var $docid = $(this).data('id');
+
+        var jsdata = {
+            "docid": $docid
+        }
+        var formData = JSON.stringify(jsdata); //convert your json in string
+
+
+        $.ajax({
+            type: "POST",
+            url: "MyCourseSummary.aspx/OpenDoc",
+            data: formData,
+            contentType: "application/json",
+            dataType: "json",
+            success: function (data) {
+                // alert(data.d);
+                //$("#target").html(data.d);
+                //window.location = "SaveDocument.aspx?i=" + $docid;
+                //var d  = data.d.split('|');
+                //if (d[0] == true ) {
+                //    window.location = "SaveDocument.aspx?f=" + d[1];
+                //} else {
+                //    alert("file not found");
+                //}
+
+                if (data.d.success == true) {
+                    window.location = "SaveDocument.aspx?f=" + data.d.path;
+                } else {
+                    alert("File is not found. Please contact administrator.");
+                    // $.noConflict();
+
+                    // anonymous function.
+                    //(function ($) {
+                    //    $(function () {
+                    //alert
+                    //    });
+                    //})(jQuery);
+                    //$('<div></div>').dialog({
+                    //    modal: true,
+                    //    title: "Error",
+                    //    open: function () {
+                    //        var markup = 'File is not found. Please contact administrator.';
+                    //        $(this).html(markup);
+                    //    },
+                    //    buttons: {
+                    //        Ok: function () {
+                    //            $(this).dialog("close");
+                    //        }
+                    //    }
+                    //}); //end confirm dialog
+
+
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(jqXHR.responseText);
+            }
+        });
+
+    });
+
+        //$(document).load(function () {
+        //    $('.deliverable-infos').hide();
+        //});
+
+</script>
+
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    @*<script src="~/js/Portal/Index.js"></script>*@
+    <script src="~/js/Portal/CourseSummary/Manage.js"></script>
+}

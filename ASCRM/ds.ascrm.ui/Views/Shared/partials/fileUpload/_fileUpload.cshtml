@@ -1,0 +1,46 @@
+﻿
+<input name="files" id="files" type="file" aria-label="files" />
+
+<span id="span_fileUpload" class="form-text text-muted"></span>
+<script>
+    
+    function uploadFile() {
+        var _size = (_maxDocumentFileSize * 1048576);
+
+        $("#files").kendoUpload({
+            async: {
+                chunkSize: 11000,// bytes
+                autoUpload: true
+            },
+            validation: {
+                allowedExtensions: _allowedExtensions,
+                maxFileSize: _size
+            },
+            select: onSelect,
+            multiple: _isMultipleDocumentUpload
+        });
+
+       
+    }
+
+    var _isValidationError = false;
+    function onSelect(e) {
+        if (e.files.length > _maxDocumentUpload) {
+            toastr.error("You can select maximum " + _maxDocumentUpload + " files.", 'Error!');
+            e.preventDefault();
+        }
+
+        var files = e.files;
+        for (var i = 0; i < files.length; i += 1)
+        {
+            var file = files[i];
+            if (file.validationErrors && file.validationErrors.length > 0)
+            {
+                toastr.error('Invaild file format.', 'Error!');
+                e.preventDefault();
+            }
+        }
+    }
+
+
+</script>

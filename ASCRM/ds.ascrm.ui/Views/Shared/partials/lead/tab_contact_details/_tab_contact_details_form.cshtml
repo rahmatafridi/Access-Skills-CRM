@@ -1,0 +1,215 @@
+﻿<div class="form-group row">
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label>* Contact</label>
+        <input id="txtContactName" type="text" v-model="lead.Lead_ContactName" class="form-control" v-bind:class="{'is-invalid': isSubmitted && $v.lead.Lead_ContactName.$invalid }">
+        <span v-if="isSubmitted && $v.lead.Lead_ContactName.$invalid" class="form-text text-danger">Contact name is required</span>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label>First Name</label>
+        <input type="text" v-model="lead.Lead_Contact_FirstName" class="form-control">
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label>Last Name</label>
+        <input type="text" v-model="lead.Lead_Contact_LastName" class="form-control">
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6" id="dv_SalesAdvisor">
+        <label>Sales Advisor</label>
+        @(Html.Kendo().DropDownList()
+                .Name("ddl_SalesAdvisor")
+                .HtmlAttributes(new { @class = "form-control" })
+                .OptionLabel("Select Sales Advisor")
+                .DataTextField("Users_DisplayName")
+                .DataValueField("Users_ID")
+                .Filter(FilterType.StartsWith)
+        )
+    </div>
+</div>
+<div class="form-group row">
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label class="">Phone</label>
+        <div class="input-group">
+            <div class="input-group-prepend"><span class="input-group-text"><i class="la la-phone"></i></span></div>
+            <input type="text" class="form-control" v-model="lead.Lead_Contact_Phone" aria-describedby="basic-addon1">
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label class="">Company Name</label>
+        @*<input type="text" class="form-control" maxlength="50" v-model="lead.Lead_Contact_Company_Name">*@
+        @(Html.Kendo().DropDownList()
+                .Name("ddl_Company")
+                .HtmlAttributes(new { @class = "form-control" })
+                .OptionLabel("Select  Company")
+                .DataTextField("name")
+                .DataValueField("id")
+                .Filter(FilterType.StartsWith)
+        )
+    </div>
+
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label class="">Status</label>
+        <select class="form-control" v-model="lead.Lead_Id_Status">
+            <option v-for="LeadStatus in LeadStatuses" v-bind:value="LeadStatus.id" v-text="LeadStatus.description"></option>
+        </select>
+    </div>
+    <div class="col-lg-3 col-xl-3 col-sm-6">
+        <label class="">Enquiry Date</label>
+        <div class="input-group date">
+            <input type="text" class="form-control" id="txt_DateEnquiry" v-model="lead.Lead_DateOfEnquiry">
+            <div class="input-group-append">
+                <span class="input-group-text">
+                    <i class="la la-calendar"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="form-group row">
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label> Mobile</label>
+        <div class="input-group">
+            <div class="input-group-prepend"><span class="input-group-text"><i class="la la-mobile-phone"></i></span></div>
+            <input type="text" class="form-control" v-model="lead.Lead_Contact_Mobile" aria-describedby="basic-addon1">
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label> Suggested Company Name</label>
+        <input type="text" class="form-control" maxlength="50" v-model="lead.Lead_Contact_Company_Name">
+    </div>
+
+
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label class="">Pathway</label>
+        <select class="form-control" v-model="lead.Lead_Contact_Id_Pathway">
+            <option v-for="Pathway in Pathways" v-bind:value="Pathway.id" v-text="Pathway.description"></option>
+        </select>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label class="">Source of Enquiry</label>
+        @(Html.Kendo().DropDownList()
+            .Name("ddlSourceOfEnquiry")
+            .HtmlAttributes(new { @class = "form-control" })
+            .OptionLabel("Select Source of Enquiry")
+            .DataTextField("description")
+            .DataValueField("id")
+            .Filter(FilterType.StartsWith)
+            )
+    </div>
+
+
+</div>
+<div class="form-group row">
+
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label class="">Email</label>
+        <div class="input-group">
+            <div class="input-group-prepend"><span class="input-group-text"><i class="la la-at"></i></span></div>
+            <input type="email" class="form-control" v-model="lead.Lead_Contact_Email" aria-describedby="basic-addon1">
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label class="">Email 2</label>
+        <input type="email" class="form-control" v-model="lead.Lead_Contact_Email2" aria-describedby="basic-addon1">
+    </div>
+
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label>Course Level Enquiry</label>
+        @(Html.Kendo().MultiSelect()
+                    .Name("ddl_CourseLevelEnquiry")
+                    .DataTextField("description")
+                    .DataValueField("id")
+                    .Filter(FilterType.StartsWith)
+        )
+        @*@(Html.Kendo().DropDownList()
+                .Name("ddl_CourseLevelEnquiry")
+                .HtmlAttributes(new { @class = "form-control" })
+                .DataTextField("description")
+                .DataValueField("id")
+                .Template("<input type='checkbox' name='cb' value='#: data.id #' /> #: data.description #")
+                .Events(e => e.Select("onSelect"))
+                .Filter(FilterType.StartsWith)
+            )*@
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label>Course Level to Apply</label>
+        @(Html.Kendo().DropDownList()
+            .Name("ddl_CourseLevel")
+            .HtmlAttributes(new { @class = "form-control" })
+            .OptionLabel("Select Course Level")
+            .DataTextField("description")
+            .DataValueField("id")
+            .Filter(FilterType.StartsWith)
+            )
+        <span v-if="isSubmitted && $v.lead.Lead_Id_CourseLevel.$invalid" class="form-text text-danger">Course is required</span>
+    </div>
+
+</div>
+<div class="form-group row">
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label class="">Job Title</label>
+        @(Html.Kendo().DropDownList()
+            .Name("ddlJobTitle")
+            .HtmlAttributes(new { @class = "form-control" })
+            .OptionLabel("Select Job Title")
+            .DataTextField("description")
+            .DataValueField("id")
+            .Filter(FilterType.StartsWith)
+            )
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label>Department</label>
+        @(Html.Kendo().DropDownList()
+            .Name("ddlDepartment")
+            .HtmlAttributes(new { @class = "form-control" })
+            .OptionLabel("Select Department")
+            .DataTextField("description")
+            .DataValueField("id")
+            .Filter(FilterType.StartsWith)
+            )
+    </div>
+
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label class="">Last Result</label>
+        @(Html.Kendo().DropDownList()
+                    .Name("ddl_LastResults")
+                    .HtmlAttributes(new { @class = "form-control" })
+                    .OptionLabel("Select Last Result")
+                    .DataTextField("description")
+                    .DataValueField("id")
+                    .Filter(FilterType.StartsWith)
+        )
+    </div>
+    <div class="col-lg-3 col-xl-3 col-sm-6">
+        <div class="col-12">
+            <div class="row">
+
+
+                <div class="col-6">
+                    <label class="col-lg-8 col-md-4 col-sm-6">Is Duplicate</label>
+                    <div class="col-lg-9 col-xl-6">
+                        <span class="kt-switch">
+                            <label>
+                                <input disabled type="checkbox" v-model="lead.Lead_IsDuplicate" readonly checked="checked" name="is_duplicate">
+                                <span></span>
+                            </label>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <label class="col-lg-12 col-md-12 col-sm-6">Is Validate Duplicate</label>
+                    <div class="col-lg-9 col-xl-6">
+                        <span class="kt-switch">
+                            <label>
+                                <input id="chk_IsValidateDuplicate" type="checkbox" v-model="lead.Lead_is_validated_duplicate" checked="checked" name="Lead_is_validated_duplicate">
+                                <span></span>
+                            </label>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*<div class="col-lg-3 col-xl-3 col-sm-6">
+   
+    </div>*@
+</div>

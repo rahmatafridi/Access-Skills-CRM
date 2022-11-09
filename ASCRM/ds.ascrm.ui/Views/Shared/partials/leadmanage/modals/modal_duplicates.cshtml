@@ -1,0 +1,157 @@
+﻿<div class="modal fade" id="kt_modal_duplicate" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;padding-right:15%!important;" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="width:700px;padding: 0.1rem!important">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Duplicate Lead</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container" style="margin-bottom:-30px!important;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="width:20%;">Lead Id</th>
+                                <th style="width:40%;">
+                                    <input type="text" v-model="duplicateLead.Lead_Id" style="width:50%;border: 0;" readonly />
+                                    <button v-on:click="DeleteLead" type="button" title="Delete this lead" style="float:right;height: 1.5rem;width: 1.5rem;" class="btn btn-brand btn-elevate btn-icon danger">
+                                        <i class="la la-remove"></i>
+                                    </button>
+                                </th>
+                                <th style="width:40%;">
+                                    <input type="text" v-model="duplicateLead.Duplicate_Lead_Id" style="width:50%;border: 0;" readonly />
+                                    <button v-on:click="DeleteDuplicateLead" type="button" title="Delete this lead" style="float:right;height: 1.5rem;width: 1.5rem;" class="btn btn-brand btn-elevate btn-icon danger"><i class="la la-remove"></i></button>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="width:20%;">Contact Name</td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicateLead.ContactName == duplicateLead.Duplicate_ContactName" class="text-danger" type="text" v-model="duplicateLead.ContactName" style="width: 100%;border: 0;" readonly />
+                                    <input v-if="duplicateLead.ContactName != duplicateLead.Duplicate_ContactName" type="text" v-model="duplicateLead.ContactName" style="width: 100%;border: 0;" readonly />
+                                </td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicateLead.ContactName == duplicateLead.Duplicate_ContactName" class="text-danger" type="text" v-model="duplicateLead.Duplicate_ContactName" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicateLead.ContactName != duplicateLead.Duplicate_ContactName" type="text" v-model="duplicateLead.Duplicate_ContactName" style="width:100%;border: 0;" readonly />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%;">Mobile</td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicateLead.Mobile == duplicateLead.Duplicate_Mobile" class="text-danger" type="text" v-model="duplicateLead.Mobile" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicateLead.Mobile != duplicateLead.Duplicate_Mobile" type="text" v-model="duplicateLead.Mobile" style="width:100%;border: 0;" readonly />
+                                </td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicateLead.Mobile == duplicateLead.Duplicate_Mobile" class="text-danger" type="text" v-model="duplicateLead.Duplicate_Mobile" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicateLead.Mobile != duplicateLead.Duplicate_Mobile" type="text" v-model="duplicateLead.Duplicate_Mobile" style="width:100%;border: 0;" readonly />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%;">Email</td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicateLead.Email == duplicateLead.Duplicate_Email" class="text-danger" type="text" v-model="duplicateLead.Email" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicateLead.Email != duplicateLead.Duplicate_Email" type="text" v-model="duplicateLead.Email" style="width:100%;border: 0;" readonly />
+                                </td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicateLead.Email == duplicateLead.Duplicate_Email" class="text-danger" type="text" v-model="duplicateLead.Duplicate_Email" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicateLead.Email != duplicateLead.Duplicate_Email" type="text" v-model="duplicateLead.Duplicate_Email" style="width:100%;border: 0;" readonly />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%;">Course Level</td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicateLead.CourseLevel == duplicateLead.Duplicate_CourseLevel" class="text-danger" type="text" v-model="duplicateLead.CourseLevel" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicateLead.CourseLevel != duplicateLead.Duplicate_CourseLevel" type="text" v-model="duplicateLead.CourseLevel" style="width:100%;border: 0;" readonly />
+                                </td>
+                                <td>
+                                    <input v-if="duplicateLead.CourseLevel == duplicateLead.Duplicate_CourseLevel" class="text-danger" type="text" v-model="duplicateLead.Duplicate_CourseLevel" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicateLead.CourseLevel != duplicateLead.Duplicate_CourseLevel" type="text" v-model="duplicateLead.Duplicate_CourseLevel" style="width:100%;border: 0;" readonly />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%;">Company Name</td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicateLead.Company_Name == duplicateLead.Duplicate_Lead_Contact_Company_Name" class="text-danger" type="text" v-model="duplicateLead.Lead_Contact_Company_Name" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicateLead.Company_Name != duplicateLead.Duplicate_Lead_Contact_Company_Name" type="text" v-model="duplicateLead.Lead_Contact_Company_Name" style="width:100%;border: 0;" readonly />
+                                </td>
+                                <td>
+                                    <input v-if="duplicateLead.Company_Name == duplicateLead.Duplicate_Lead_Contact_Company_Name" class="text-danger" type="text" v-model="duplicateLead.Duplicate_Lead_Contact_Company_Name" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicateLead.Company_Name != duplicateLead.Duplicate_Lead_Contact_Company_Name" type="text" v-model="duplicateLead.Duplicate_Lead_Contact_Company_Name" style="width:100%;border: 0;" readonly />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%;">Company Postcode</td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicateLead.Lead_Contact_Company_Postcode == duplicateLead.Duplicate_Lead_Contact_Company_Postcode" class="text-danger" type="text" v-model="duplicateLead.Lead_Contact_Company_Postcode" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicateLead.Lead_Contact_Company_Postcode != duplicateLead.Duplicate_Lead_Contact_Company_Postcode" type="text" v-model="duplicateLead.Lead_Contact_Company_Postcode" style="width:100%;border: 0;" readonly />
+                                </td>
+                                <td>
+                                    <input v-if="duplicateLead.Lead_Contact_Company_Postcode == duplicateLead.Duplicate_Lead_Contact_Company_Postcode" class="text-danger" type="text" v-model="duplicateLead.Duplicate_Lead_Contact_Company_Postcode" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicateLead.Lead_Contact_Company_Postcode != duplicateLead.Duplicate_Lead_Contact_Company_Postcode" type="text" v-model="duplicateLead.Duplicate_Lead_Contact_Company_Postcode" style="width:100%;border: 0;" readonly />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%;">Last Result</td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicateLead.LastResult == duplicateLead.Duplicate_LastResult" class="text-danger" type="text" v-model="duplicateLead.LastResult" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicateLead.LastResult != duplicateLead.Duplicate_LastResult" type="text" v-model="duplicateLead.LastResult" style="width:100%;border: 0;" readonly />
+                                </td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicateLead.LastResult == duplicateLead.Duplicate_LastResult" class="text-danger" type="text" v-model="duplicateLead.Duplicate_LastResult" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicateLead.LastResult != duplicateLead.Duplicate_LastResult" type="text" v-model="duplicateLead.Duplicate_LastResult" style="width:100%;border: 0;" readonly />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%;">Status</td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicateLead.Status == duplicateLead.Duplicate_Status" class="text-danger" type="text" v-model="duplicateLead.Status" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicateLead.Status != duplicateLead.Duplicate_Status" type="text" v-model="duplicateLead.Status" style="width:100%;border: 0;" readonly />
+                                </td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicateLead.Status == duplicateLead.Duplicate_Status" class="text-danger" type="text" v-model="duplicateLead.Duplicate_Status" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicateLead.Status != duplicateLead.Duplicate_Status" type="text" v-model="duplicateLead.Duplicate_Status" style="width:100%;border: 0;" readonly />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:23%;">Enquiry Date</td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicateLead.EnquiryDate == duplicateLead.Duplicate_EnquiryDate" class="text-danger" type="text" v-model="duplicateLead.EnquiryDate" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicateLead.EnquiryDate != duplicateLead.Duplicate_EnquiryDate" type="text" v-model="duplicateLead.EnquiryDate" style="width:100%;border: 0;" readonly />
+                                </td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicateLead.EnquiryDate == duplicateLead.Duplicate_EnquiryDate" class="text-danger" type="text" v-model="duplicateLead.Duplicate_EnquiryDate" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicateLead.EnquiryDate != duplicateLead.Duplicate_EnquiryDate" type="text" v-model="duplicateLead.Duplicate_EnquiryDate" style="width:100%;border: 0;" readonly />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%;">Assigned</td>
+                                <td style="width:40%;">
+                                    <select v-on:change="leadAdvisorChange" class="form-control" id="ddl_SalesAdvisor" v-model="duplicateLead.Sales_Advisor_Id">
+                                        <option v-for="SalesAdvisor in SalesAdvisors" v-bind:value="SalesAdvisor.Users_ID" v-text="SalesAdvisor.Users_UserName"></option>
+                                    </select>
+                                </td>
+                                <td style="width:40%;">
+                                    <select v-on:change="leadDuplicateAdvisorChange" class="form-control" id="ddl_SalesAdvisor1" v-model="duplicateLead.Duplicate_Sales_Advisor_Id">
+                                        <option v-for="SalesAdvisor in SalesAdvisors" v-bind:value="SalesAdvisor.Users_ID" v-text="SalesAdvisor.Users_UserName"></option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%;"></td>
+                                <td style="width:40%;">
+                                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="removeDuplicateLead(0)">Confirm Duplicate</button>
+                                </td>
+                                <td style="width:40%;">
+                                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="removeDuplicateLead(1)">Confirm Duplicate</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

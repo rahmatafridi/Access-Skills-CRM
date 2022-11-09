@@ -1,0 +1,139 @@
+﻿
+@{
+    ViewData["Title"] = "List Management";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+    var canRoleManagerViewList = (permissions == null) ? false : (bool)permissions["MD_LIST_VIEW"];
+    var canRoleManagerCreateList = (permissions == null) ? false : (bool)permissions["MD_LIST_CREATE"];
+    var canRoleManagerEditList = (permissions == null) ? false : (bool)permissions["MD_LIST_EDIT"];
+    var canRoleManagerDeleteList = (permissions == null) ? false : (bool)permissions["MD_LIST_DEL"];
+}
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="dv_Manage_List" class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" style="margin-top: 28px;">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="kt-portlet" id="kt_portlet">
+                    <div class="kt-portlet__head">
+                        <div class="kt-portlet__head-label">
+                            @*<span class="kt-portlet__head-icon">
+                                <i class="kt-menu__link-icon fa fa-calendar-alt"></i>
+                            </span>*@
+                            <h3 class="kt-portlet__head-title">
+                                <label id="lblUserHeader">List Management</label>
+                                <select style="width:280px;margin-left: 167px;margin-top: -37px;margin-bottom: -37px;" class="form-control" v-on:change="ChangeDropdown()" v-model="Selected">
+                                    <option v-for="DropdownHeader in DropdownHeaders" v-bind:value="DropdownHeader.OptHeader_Id" v-text="DropdownHeader.OptHeader_Title" selected="selected"></option>
+                                </select>
+
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="kt-portlet__body">
+
+
+                        <div class="content" >
+                            <div class="kt-portlet">
+                                @*<div class="kt-form__actions kt-portlet__foot">
+                                   
+                                </div>*@
+                                <div class="kt-portlet__body">
+                                    <div class="box-header with-border">
+                                        <table class="table table-bordered table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        Title
+                                                    </th>
+                                                    <th>
+                                                        Value
+                                                    </th>
+                                                    <th>
+                                                        Sort Order
+                                                    </th>
+                                                    <th width="200px">
+                                                        Actions
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr style="background-color: #eff3f6;">
+                                                    <td>
+                                                        <input class="form-control" v-model="Option.Opt_Title" v-bind:class="{ 'is-invalid': (isSubmitted && $v.Option.Opt_Title.$invalid) || isTitleExists }" />
+                                                        <span v-if="isSubmitted && !$v.Option.Opt_Title.required" class="form-text text-danger">Title is required</span>
+                                                        <span v-else-if="isSubmitted && isTitleExists" class="form-text text-danger">Title already exists</span>
+                                                    </td>
+                                                    <td>
+                                                        <input class="form-control" v-model="Option.Opt_Value" v-bind:class="{ 'is-invalid': (isSubmitted && $v.Option.Opt_Value.$invalid) || isValueExists}" />
+                                                        <span v-if="isSubmitted && !$v.Option.Opt_Value.required" class="form-text text-danger">Value is required</span>
+                                                        <span v-else-if="isSubmitted && isValueExists" class="form-text text-danger">Value already exists</span>
+                                                    </td>
+                                                    <td>
+                                                        <input class="form-control" type="number" v-model="Option.Opt_SortOrder" v-bind:class="{ 'is-invalid': isSubmitted && $v.Option.Opt_SortOrder.$invalid }" />
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-success btn-sm" v-on:click="AddEditOption(Option)"><i class="fa fa-plus"></i> <span v-text="buttonText"></span> </button>
+                                                        <button class="btn btn-warning btn-sm" v-on:click="CancelEdit()"><i class="fa fa-step-backward"></i> Cancel </button>
+                                                    </td>
+                                                </tr>
+                                                <tr v-for="dropdownOption in DropdownOptions">
+                                                    <td v-text="dropdownOption.Opt_Title"></td>
+                                                    <th scope="row" v-text="dropdownOption.Opt_Value"></th>
+                                                    <td v-text="dropdownOption.Opt_SortOrder"></td>
+                                                    <td>
+                                                        <button class="btn btn-info btn-sm" v-on:click="EditOption(dropdownOption)"><i class="fa fa-tag"></i> Edit </button>
+                                                        <button class="btn btn-danger btn-sm" v-on:click="Delete(dropdownOption.Opt_Id)"><i class="fa fa-trash"></i> Delete </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    <script src="~/js/Admin/lead_List/ManageList.js"></script>
+}
+
+<script>
+    var _canRoleManagerViewList;
+    var _canRoleManagerCreateList;
+    var _canRoleManagerEditList;
+    var _canRoleManagerDeleteList;
+
+    $(document).ready(function () {
+        _canRoleManagerViewList = @canRoleManagerViewList.ToString().ToLower();
+        _canRoleManagerCreateList = @canRoleManagerCreateList.ToString().ToLower();
+        _canRoleManagerEditList = @canRoleManagerEditList.ToString().ToLower();
+        _canRoleManagerDeleteList = @canRoleManagerDeleteList.ToString().ToLower();
+
+        if (!_canRoleManagerViewList) {
+            window.location.href = '/Error/PermissionDenied';
+        }
+    });
+</script>

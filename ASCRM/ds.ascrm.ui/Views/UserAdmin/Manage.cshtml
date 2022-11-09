@@ -1,0 +1,226 @@
+﻿
+@{
+    ViewData["Title"] = "Manage Users";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+    var canRoleManagerViewUsers = (permissions == null) ? false : (bool)permissions["MD_USER_VIEW"];
+    var canRoleManagerCreateUser = (permissions == null) ? false : (bool)permissions["MD_USER_CREATE"];
+    var canRoleManagerEditUser = (permissions == null) ? false : (bool)permissions["MD_USER_EDIT"];
+    var canRoleManagerDeleteUser = (permissions == null) ? false : (bool)permissions["MD_USER_DEL"];
+    var userId = ViewBag.UserId;
+}
+ 
+
+<div class="content" id="dv_Manage_Users">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <div class="form__actions kt-portlet__foot">
+                <label style="font-size: large;font-weight: 500;margin-top:10px;margin-left:-15px;">Users</label>
+            </div>
+            <div class="kt-portlet__head-toolbar">
+                <div class="form__actions kt-portlet__foot">
+                    <a href="~/UserAdmin/Create" id="add_new_role" class="btn btn-sm btn-bold btn-label-brand"><i class="fa fa-plus"></i> Create User</a>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-brand">
+                        <i class="la la-check"></i>
+                        <span class="kt-hidden-mobile">Export Options</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-brand dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                    <div class="dropdown-menu dropdown-menu-right" style="">
+                        <ul class="kt-nav">
+                            <li class="kt-nav__item">
+                                <a onclick="return exportUserPDF()" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon"></i>
+                                    <span class="kt-nav__link-text">PDF</span>
+                                </a>
+                            </li>
+                            <li class="kt-nav__item">
+                                <a onclick="return exportUserExcel()" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon"></i>
+                                    <span class="kt-nav__link-text">Excel</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <section class="content">
+            <div class="kt-portlet__body">
+                <div class="box-header with-border">
+
+                    @(Html.Kendo().Grid<ds.portal.users.Models.Users>()
+            .Name("usersGrid")
+            .Columns(columns =>
+            {
+                columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-danger' style='cursor:pointer;'onclick=PerformUserDelete('#:Users_ID#') title='Delete'> <span style='text-align:center;' class='fa fa-trash-alt'></span></a>" +
+                                    "</div>").Width(30).ClientHeaderTemplate(" ");
+                columns.Bound(p => p.Users_ID).Title("Id").Width(70);
+                columns.Bound(p => p.Users_UserName).Title("User Name").ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformUserEdit('#:encodeUsersId#') title='#:Users_UserName#'>#:Users_UserName#</a>");
+                columns.Bound(p => p.Users_DisplayName).Title("Display Name").ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformUserEdit('#:encodeUsersId#') title='#:Users_DisplayName#'>#:Users_DisplayName#</a>");
+                columns.Bound(p => p.Users_Email).Title("Email").ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformUserEdit('#:encodeUsersId#') title='#:Users_Email#'>#:Users_Email#</a>");
+                columns.Bound(p => p.Users_IsActive).ClientTemplate("<input class='k-checkbox-label k-no-text' disabled type='checkbox' #= Users_IsActive == 1 ? checked='checked' :'' # />").Title("Active").HtmlAttributes(new { style = "text-align:center" }).Width(90);
+            })
+             
+             .Resizable(resize => resize.Columns(true))
+             .Reorderable(x => x.Columns(true))
+             .ColumnMenu(c => c.Columns(true))
+             //.Scrollable(scr => scr.Height(350))
+            
+                        .Sortable()
+                        .Pageable()
+                        .Filterable()
+                        .NoRecords()
+                        .Pageable(pageable => pageable
+                        .Refresh(true)
+                        .PageSizes(true)
+                        .ButtonCount(5))
+                        .DataSource(dataSource =>
+                        dataSource
+                        .WebApi()
+                        .Model(model =>
+                        {
+                            model.Id(p => p.Users_ID);
+                        })
+                        .Events(events => events.Error("error_handler"))
+                        .Read(read => read.Action("GetAllUsers", "UserAdminApi"))
+                        .PageSize(20)
+                        )
+                    )
+
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<script>
+
+    var _canRoleManagerCreateUser;
+    var _canRoleManagerEditUser;
+    var _canRoleManagerDeleteUser;
+    var _canRoleManagerViewUsers;
+    var _isDeleteUserLogin;
+    var permissionMessage = '';
+    var permissionMsgHeader = '';
+    var _isLimitReached = '';
+    var _userId = '';
+
+    $(document).ready(function () {
+        _canRoleManagerViewUsers = @canRoleManagerViewUsers.ToString().ToLower();
+        _canRoleManagerCreateUser = @canRoleManagerCreateUser.ToString().ToLower();
+        _canRoleManagerEditUser = @canRoleManagerEditUser.ToString().ToLower();
+        _canRoleManagerDeleteUser = @canRoleManagerDeleteUser.ToString().ToLower();
+        _userId = @userId;
+
+        if (!_canRoleManagerViewUsers) {
+            window.location.href = '/Error/PermissionDenied';
+        }
+           resizeGrid1();
+       });
+        function resizeGrid1() {
+            var contentwrapper = $("#kt_aside").innerHeight();
+            var gridElement = $("#usersGrid"),
+                newHeight = gridElement.innerHeight(),
+                otherElements = gridElement.children().not(".k-grid-content"),
+                otherElementsHeight = 0;
+
+            otherElements.each(function () {
+                otherElementsHeight += $(this).outerHeight();
+            });
+                var newHeight = (contentwrapper - otherElementsHeight) - 330;
+                if (newHeight < 325) newHeight = 325;
+            gridElement.children(".k-grid-content").height(newHeight);
+        }
+
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+            $('#usersGrid').data('kendoGrid').dataSource.read();
+            $('#usersGrid').data('kendoGrid').refresh();
+        }
+    }
+
+    function PerformUserEdit(user_Id) {
+        if (!_canRoleManagerEditUser)
+        {
+            toastr.warning('You cannot edit user please contact administrator.', 'Permission denied!');
+        }
+        else {
+            window.location.href = 'UserAdmin/Edit?id=' + user_Id;
+        }
+    }
+
+    function PerformUserDelete(user_Id) {
+        if (!_canRoleManagerDeleteUser) {
+            toastr.warning('You cannot edit user please contact administrator.', 'Permission denied!');
+        }else{
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) =>
+            {
+                if (result.dismiss !== "cancel") {
+                    $.ajax({
+                        url: '/api/UserAdminApi/DeleteUser',
+                        type: "GET",
+                        cache: false,
+                        datatype: "JSON",
+                        data: { "userId": user_Id },
+                        beforeSend: function () {
+                            
+                        },
+                        success: function (result) {
+                            if (result) {
+                                $('#usersGrid').data('kendoGrid').dataSource.read();
+                                $('#usersGrid').data('kendoGrid').refresh();
+                                toastr.success('User has been deleted successfully', 'Deleted!');
+                            }
+                            else
+                            {
+                                toastr.error(result.errMsg, 'Deleted!');
+                            }
+                        },
+                        error: function (xhr)
+                        {
+                            toastr.error(xhr.responseText, 'Deleted!');
+                            return false;
+                        },
+                        complete: function () {
+                            //hideSpinner();
+                        },
+                    });
+                }
+            })
+        }
+    }
+
+    function exportUserPDF() {
+        var grid = $("#usersGrid").data("kendoGrid");
+        grid.hideColumn(0);
+        $("#usersGrid").getKendoGrid().saveAsPDF();
+        grid.showColumn(0);
+    }
+
+    function exportUserExcel() {
+        $("#usersGrid").getKendoGrid().saveAsExcel();
+    }
+
+</script>

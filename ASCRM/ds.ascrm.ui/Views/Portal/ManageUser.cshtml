@@ -1,0 +1,307 @@
+﻿@{
+    ViewData["Title"] = "Manage User";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var role = ViewBag.Role;
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+    var canRoleManagerAccessManageUser = (permissions == null) ? false : (bool)permissions["ACE_UM"];
+    var canRoleManagerAccessUser = (permissions == null) ? false : (bool)permissions["ACE_UC"];
+
+    }
+@Html.Hidden("hrf", Url.Action("Permissions"))
+@Html.Hidden("hf", Url.Action("EditRole"))
+@Html.Hidden("idx", Url.Action("Index"))
+<div class="kt-portlet">
+    <div class="kt-portlet__head">
+        <div class="form__actions kt-portlet__foot">
+            <label style="font-size: large;font-weight:500;margin-left:-10px;margin-top:10px;">Portal Users</label>
+        </div>
+        <div class="kt-portlet__head-toolbar">
+            <a href="~/Portal/CreateUser" id="add_new_role" class="btn btn-sm btn-bold btn-label-brand">
+                <i class="fa fa-plus"></i> Create User
+            </a>
+            &nbsp;
+            <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-brand">
+                    <i class="la la-check"></i>
+                    <span class="kt-hidden-mobile">Export Options</span>
+                </button>
+                <button type="button" class="btn btn-sm btn-brand dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                <div class="dropdown-menu dropdown-menu-right" style="">
+                    <ul class="kt-nav">
+                        <li class="kt-nav__item">
+                            <a onclick="return exportPDF()" class="kt-nav__link">
+                                <i class="kt-nav__link-icon"></i>
+                                <span class="kt-nav__link-text">PDF</span>
+                            </a>
+                        </li>
+                        <li class="kt-nav__item">
+                            <a onclick="return exportExcel()" class="kt-nav__link">
+                                <i class="kt-nav__link-icon"></i>
+                                <span class="kt-nav__link-text">Excel</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="kt-portlet__body">
+        <ul class="nav nav-tabs" role="tablist">
+       
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#kt_tabs_1_2">
+                    <i class="fa fa-user-check"></i> Portal Users 
+                </a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            
+            <div class="tab-pane active" id="kt_tabs_1_2" role="tabpanel">
+                @(Html.Kendo().Grid<crm.portal.CrmModel.PortalUserModel>()
+                                    .Name("gridUsersInRole")
+                                    .Columns(columns =>
+                                    {
+                                        columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-primary' style='cursor:pointer;'onclick=PerformUserEdit('#:encodeUsersId#') title='Edit'> <span style='text-align:center;' class='fa fa-pen'></span></a></div>").Width(30).ClientHeaderTemplate(" ");
+
+                                        columns.Bound(c => c.security_role_id).Width(50).Hidden();
+                                        columns.Bound(c => c.id).Width(50).Hidden().Filterable(false);
+
+                                        columns.Bound(c => c.username).Width("30%").Filterable(ftb => ftb.Cell(cell => cell.Operator("contains"))).HtmlAttributes(new { style = "font-weight:bold" });
+                                        columns.Bound(c => c.displayname).Title("Name").Width("30%").Filterable(ftb => ftb.Cell(cell => cell.Operator("contains"))).HtmlAttributes(new { style = "font-weight:bolder" });
+                                        columns.Bound(c => c.role_name).Title("Role Name").Width("30%").Filterable(ftb => ftb.Cell(cell => cell.Operator("contains"))).HtmlAttributes(new { style = "font-weight:bolder" });
+                                    })
+                                    .HtmlAttributes(new { style = "height: 100%;" })
+                                     .Resizable(resize => resize.Columns(true))
+                                    .Reorderable(x => x.Columns(true))
+                                    .ColumnMenu(c => c.Columns(true))
+                                    .Scrollable(scr => scr.Height(450))
+                                    .Filterable(ftb => ftb.Mode(GridFilterMode.Row))
+                                    .Groupable()
+                                    .EnableCustomBinding(true)
+                                    // .BindTo(Model)
+                                    .Sortable()
+                                    .Pageable(pageable => pageable
+                                    .Refresh(true)
+                                    .PageSizes(true)
+                                    .ButtonCount(5))
+                                    .DataSource(dataSource =>
+                                    dataSource
+                                    .WebApi()
+                                    .Read(read => read.Action("GetListUsersForPortal", "PortalApi"))
+                                    .Group(g => g.Add(c => c.role_name))
+                                    .Events(events => events.Error("error_handler"))
+                                    .Model(model => model.Id(p => p.id))
+                                    .PageSize(30)
+                                    )
+                )
+            </div>
+        </div>
+    </div>
+</div>
+@******************* Tab 1 - role permissions scripts *********************@
+<script type="text/javascript">
+    $("#addnew").click(function () {
+            location.href = $(this).data("request-url");
+    });
+    var _canRoleManagerAccessManageUser;
+
+    var _canRoleManagerAccessUser;
+
+
+    function PerformUserEdit(user_Id) {
+        //if (!_canRoleManagerAccessUser) {
+        //    toastr.warning('You cannot edit user please contact administrator.', 'Permission denied!');
+        //}
+        //else {
+            window.location.href = 'Portal/EditUser?id=' + user_Id;
+       // }
+    }
+
+    function PerformViewPermissions(id)
+    {
+        //if (!_canRoleManagerEditPermissions && !_canRoleManagerViewPermissions) {
+        //    toastr.error('You cannot edit please contact administrator', 'Permission denied!');
+        //}
+        //else {
+            location.href = $("#hrf").val() + "/" + id;
+       /* }*/
+    }
+
+    function PerformDelete(id) {
+        //if (!_canRoleManagerDeleteRole) {
+        //    toastr.error('You cannot create please contact administrator', 'Permission denied!');
+        //    return false;
+        //    }
+        //    else {
+            Swal.fire({
+                title: 'Delete?',
+                text: "Are you sure you want to delete?",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.dismiss !== "cancel") {
+                    $.ajax({
+                        url: '/api/RoleAdminApi/DeleteRole',
+                        type: "GET",
+                        cache: false,
+                        datatype: "JSON",
+                        data: { "roleid": id },
+                        beforeSend: function () {
+                            //displaySpinner();
+                        },
+                        success: function (result) {
+                            if (result) {
+                                $('#grid').data('kendoGrid').dataSource.read();
+                                $('#grid').data('kendoGrid').refresh();
+
+                                toastr.success('Role has been deleted successfully.', 'Deleted!');
+                            }
+                            else {
+                                toastr.error(result.errMsg, 'Error Deleted!');
+                            }
+                        },
+                        error: function (xhr) {
+                            toastr.error(xhr.responseText, 'Error Deleted!');
+                            return false;
+                        },
+                        complete: function () {
+                            //shideSpinner();
+                        },
+                    });
+                }
+            })
+           /* }*/
+    }
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+
+            alert(message);
+
+            $('#grid').data('kendoGrid').dataSource.read();
+            $('#grid').data('kendoGrid').refresh();
+        }
+    }
+
+    function sync_handler(e) {
+        //this.read();
+        $('#grid').data('kendoGrid').dataSource.read();
+        $('#grid').data('kendoGrid').refresh();
+    }
+
+    var _canRoleManagerViewRoles;
+    var _canRoleManagerCreateRole;
+    var _canRoleManagerEditRole;
+    var _canRoleManagerDeleteRole;
+    var _canRoleManagerEditPermissions;
+    var _canRoleManagerViewPermissions;
+
+    $(document).ready(function () {
+
+        _canRoleManagerAccessManageUser = @canRoleManagerAccessManageUser.ToString().ToLower();
+        _canRoleManagerAccessUser =@canRoleManagerAccessUser.ToString().ToLower();
+
+        if (!_canRoleManagerAccessManageUser) {
+            window.location.href = '/Error/PermissionDenied';
+        }
+
+
+        @*_canRoleManagerViewRoles = @canRoleManagerViewRoles.ToString().ToLower();
+        _canRoleManagerCreateRole = @canRoleManagerCreateRole.ToString().ToLower();
+        _canRoleManagerEditRole = @canRoleManagerEditRole.ToString().ToLower();
+        _canRoleManagerDeleteRole = @canRoleManagerDeleteRole.ToString().ToLower();
+        _canRoleManagerEditPermissions = @canRoleManagerEditPermissions.ToString().ToLower();
+        _canRoleManagerViewPermissions = @canRoleManagerViewPermissions.ToString().ToLower();
+
+        if (!_canRoleManagerCreateRole && !_canRoleManagerEditRole && !_canRoleManagerDeleteRole && !_canRoleManagerViewRoles) {
+            window.location.href = '/Error/PermissionDenied';
+        }*@
+    });
+
+</script>
+<script>
+
+    $('#add_new_role').click(function () {
+        //if (!_canRoleManagerCreateRole) {
+        //    toastr.error('You cannot create please contact administrator', 'Permission denied!');
+        //    return false;
+        //}
+    });
+
+</script>
+
+<script>
+    $(document).ready(function () {
+        resizeGrid1();
+        resizeGrid2();
+    });
+
+    function resizeGrid1() {
+        var contentwrapper = $("#kt_aside").innerHeight();
+        var gridElement = $("#grid"),
+            newHeight = gridElement.innerHeight(),
+            otherElements = gridElement.children().not(".k-grid-content"),
+            otherElementsHeight = 0;
+
+        otherElements.each(function () {
+            otherElementsHeight += $(this).outerHeight();
+        });
+        var newHeight = (contentwrapper - otherElementsHeight) - 395;
+        if (newHeight < 325) newHeight = 325;
+        gridElement.children(".k-grid-content").height(newHeight);
+    }
+
+
+    function resizeGrid2() {
+        var contentwrapper = $("#kt_aside").innerHeight();
+        var gridElement = $("#gridUsersInRole"),
+            newHeight = gridElement.innerHeight(),
+            otherElements = gridElement.children().not(".k-grid-content"),
+            otherElementsHeight = 0;
+
+        otherElements.each(function () {
+            otherElementsHeight += $(this).outerHeight();
+        });
+
+        var newHeight = (contentwrapper - otherElementsHeight) - 395;
+        if (newHeight < 325) newHeight = 325;
+        gridElement.children(".k-grid-content").height(newHeight);
+    }
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+            $('#grid').data('kendoGrid').dataSource.read();
+            $('#grid').data('kendoGrid').refresh();
+        }
+    }
+
+    function exportPDF() {
+        var grid = $("#grid").data("kendoGrid");
+        grid.hideColumn(0);
+        $("#grid").getKendoGrid().saveAsPDF();
+        grid.showColumn(0);
+    }
+
+    function exportExcel() {
+        $("#grid").getKendoGrid().saveAsExcel();
+    }
+</script>

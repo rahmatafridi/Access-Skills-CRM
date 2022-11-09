@@ -1,0 +1,186 @@
+﻿@{
+    
+   var permissions1 = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+   var hasAdminRole1 = (permissions1 == null) ? false : (bool)permissions1["LEAD_ADMIN"];
+ 
+}
+
+<div class="modal fade" id="kt_modal_duplicates" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;padding-right:15%!important;" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="width:700px;padding: 0.1rem!important">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Duplicate Leads</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container" style="margin-bottom:-30px!important;">
+                    <table class="table">
+
+                        <thead>
+                            <tr>
+                                <th style="width:20%;">Lead Id</th>
+                                <th style="width:40%;">
+                                    <input type="text" v-model="duplicates.lead1_lead_id" style="width:50%;border: 0;" readonly />
+                                    <button v-on:click="DeleteLead" type="button" title="Delete this lead"
+                                            style="float:right;height: 1.5rem;width: 1.5rem;"
+                                            class="btn btn-brand btn-elevate btn-icon danger"
+                                            data-toggle="kt-tooltip" data-placement="top"
+                                            data-original-title="Delete this lead">
+                                        <i class="la la-remove"></i>
+                                    </button>
+                                </th>
+                                <th style="width:40%;">
+                                    <input type="text" v-model="duplicates.lead2_lead_id" style="width:50%;border: 0;" readonly />
+                                    <button v-on:click="DeleteDuplicateLead" type="button"
+                                            title="Delete this lead"
+                                            style="float:right;height: 1.5rem;width: 1.5rem;"
+                                            class="btn btn-brand btn-elevate btn-icon danger"
+                                            data-toggle="kt-tooltip" data-placement="top"
+                                            data-original-title="Delete this lead">
+                                        <i class="la la-remove"></i>
+                                    </button>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="width:20%;">Contact Name</td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicates.lead1_contact_name == duplicates.lead2_contact_name" class="text-danger" type="text" v-model="duplicates.lead1_contact_name" style="width: 100%;border: 0;" readonly />
+                                    <input v-if="duplicates.lead1_contact_name != duplicates.lead2_contact_name" type="text" v-model="duplicates.lead1_contact_name" style="width: 100%;border: 0;" readonly />
+                                </td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicates.lead1_contact_name == duplicates.lead2_contact_name" class="text-danger" type="text" v-model="duplicates.lead2_contact_name" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicates.lead1_contact_name != duplicates.lead2_contact_name" type="text" v-model="duplicates.lead2_contact_name" style="width:100%;border: 0;" readonly />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%;">Mobile</td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicates.lead1_mobile == duplicates.lead2_mobile" class="text-danger" type="text" v-model="duplicates.lead1_mobile" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicates.lead1_mobile != duplicates.lead2_mobile" type="text" v-model="duplicates.lead1_mobile" style="width:100%;border: 0;" readonly />
+                                </td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicates.lead1_mobile == duplicates.lead2_mobile" class="text-danger" type="text" v-model="duplicates.lead2_mobile" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicates.lead1_mobile != duplicates.lead2_mobile" type="text" v-model="duplicates.lead2_mobile" style="width:100%;border: 0;" readonly />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%;">Email</td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicates.lead1_email == duplicates.lead2_email" class="text-danger" type="text" v-model="duplicates.lead1_email" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicates.lead1_email != duplicates.lead2_email" type="text" v-model="duplicates.lead1_email" style="width:100%;border: 0;" readonly />
+                                </td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicates.lead1_email == duplicates.lead2_email" class="text-danger" type="text" v-model="duplicates.lead2_email" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicates.lead1_email != duplicates.lead2_email" type="text" v-model="duplicates.lead2_email" style="width:100%;border: 0;" readonly />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%;">Course Level</td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicates.lead1_course_level == duplicates.lead2_course_level" class="text-danger" type="text" v-model="duplicates.lead1_course_level" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicates.lead1_course_level != duplicates.lead2_course_level" type="text" v-model="duplicates.lead1_course_level" style="width:100%;border: 0;" readonly />
+                                </td>
+                                <td>
+                                    <input v-if="duplicates.lead1_course_level == duplicates.lead2_course_level" class="text-danger" type="text" v-model="duplicates.lead2_course_level" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicates.lead1_course_level != duplicates.lead2_course_level" type="text" v-model="duplicates.lead2_course_level" style="width:100%;border: 0;" readonly />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%;">Company Name</td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicates.lead1_company == duplicates.lead2_company" class="text-danger" type="text" v-model="duplicates.lead1_company" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicates.lead1_company != duplicates.lead2_company" type="text" v-model="duplicates.lead1_company" style="width:100%;border: 0;" readonly />
+                                </td>
+                                <td>
+                                    <input v-if="duplicates.lead1_company == duplicates.lead2_company" class="text-danger" type="text" v-model="duplicates.lead2_company" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicates.lead1_company != duplicates.lead2_company" type="text" v-model="duplicates.lead2_company" style="width:100%;border: 0;" readonly />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%;">Company Postcode</td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicates.lead1_postcode == duplicates.lead2_postcode" class="text-danger" type="text" v-model="duplicates.lead1_postcode" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicates.lead1_postcode != duplicates.lead2_postcode" type="text" v-model="duplicates.lead1_postcode" style="width:100%;border: 0;" readonly />
+                                </td>
+                                <td>
+                                    <input v-if="duplicates.lead1_postcode == duplicates.lead2_postcode" class="text-danger" type="text" v-model="duplicates.lead2_postcode" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicates.lead1_postcode != duplicates.lead2_postcode" type="text" v-model="duplicates.lead2_postcode" style="width:100%;border: 0;" readonly />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%;">Last Result</td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicates.lead1_lastresult == duplicates.lead2_lastresult" class="text-danger" type="text" v-model="duplicates.lead1_lastresult" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicates.lead1_lastresult != duplicates.lead2_lastresult" type="text" v-model="duplicates.lead1_lastresult" style="width:100%;border: 0;" readonly />
+                                </td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicates.lead1_lastresult == duplicates.lead2_lastresult" class="text-danger" type="text" v-model="duplicates.lead2_lastresult" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicates.lead1_lastresult != duplicates.lead2_lastresult" type="text" v-model="duplicates.lead2_lastresult" style="width:100%;border: 0;" readonly />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:20%;">Status</td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicates.lead1_status == duplicates.lead2_status" class="text-danger" type="text" v-model="duplicates.lead1_status" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicates.lead1_status != duplicates.lead2_status" type="text" v-model="duplicates.lead1_status" style="width:100%;border: 0;" readonly />
+                                </td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicates.lead1_status == duplicates.lead2_status" class="text-danger" type="text" v-model="duplicates.lead2_status" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicates.lead1_status != duplicates.lead2_status" type="text" v-model="duplicates.lead2_status" style="width:100%;border: 0;" readonly />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width:23%;">Enquiry Date</td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicates.lead1_enquirydate == duplicates.lead2_enquirydate" class="text-danger" type="text" v-model="duplicates.lead1_enquirydate" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicates.lead1_enquirydate != duplicates.lead2_enquirydate" type="text" v-model="duplicates.lead1_enquirydate" style="width:100%;border: 0;" readonly />
+                                </td>
+                                <td style="width:40%;">
+                                    <input v-if="duplicates.lead1_enquirydate == duplicates.lead2_enquirydate" class="text-danger" type="text" v-model="duplicates.lead2_enquirydate" style="width:100%;border: 0;" readonly />
+                                    <input v-if="duplicates.lead1_enquirydate != duplicates.lead2_enquirydate" type="text" v-model="duplicates.lead2_enquirydate" style="width:100%;border: 0;" readonly />
+                                </td>
+                            </tr>
+
+                            @if (hasAdminRole1)
+                {
+                            @*<tr>
+                                <td style="width:20%;">Assigned</td>
+                                <td style="width:40%;">
+                                    <select v-on:change="leadAdvisorChange" class="form-control" id="ddl_SalesAdvisor" v-model="duplicates.lead1_sales_advisor_id">
+                                        <option v-for="SalesAdvisor in SalesAdvisors" v-bind:value="SalesAdvisor.Users_ID" v-text="SalesAdvisor.Users_UserName"></option>
+                                    </select>
+                                </td>
+
+                                <td style="width:40%;">
+                                    <select v-on:change="leadDuplicateAdvisorChange" class="form-control" id="ddl_SalesAdvisor1" v-model="duplicates.lead2_sales_advisor_id">
+                                        <option v-for="SalesAdvisor in SalesAdvisors" v-bind:value="SalesAdvisor.Users_ID" v-text="SalesAdvisor.Users_UserName"></option>
+                                    </select>
+                                </td>
+                            </tr>*@
+}
+                            @*
+        <tr>
+            <td style="width:20%;"></td>
+            <td style="width:40%;">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="removeDuplicateLead(0)">Confirm Duplicate</button>
+            </td>
+            <td style="width:40%;">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="removeDuplicateLead(1)">Confirm Duplicate</button>
+            </td>
+        </tr>*@
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                @if (hasAdminRole1)
+                {
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="app.removeFromDuplicates(1)">These are NOT duplicates</button>
+                }
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

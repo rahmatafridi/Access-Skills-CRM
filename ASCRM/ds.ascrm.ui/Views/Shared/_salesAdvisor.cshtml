@@ -1,0 +1,35 @@
+﻿@(Html.Kendo().DropDownListFor(m => m)
+            .DataValueField("Lead_Id_SalesAdvisor")
+            .DataTextField("Users_UserName")
+            .BindTo((System.Collections.IEnumerable)ViewData["categories"])
+)
+
+@*@(
+        Html.Kendo().DropDownList()
+            .Name("Type")
+            .DataTextField("Users_UserName")
+            .DataValueField("Users_ID")
+            .OptionLabel("Select Type...")
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                        {
+                            read.Url("/api/LeadApi/GetAllSalesAdvisorUsers").Type(HttpVerbs.Get);
+                        });
+            })
+    )*@
+
+@*@(
+    Html.Kendo().DropDownList()
+        .Name("Unit")
+        .DataTextField("Users_UserName")
+        .DataValueField("Users_ID")
+        .OptionLabel("Select Type...")
+        .DataSource(source =>
+        {
+            source.Read(read =>
+            {
+                read.Url("/api/LeadApi/GetAllSalesAdvisorUsers").Type(HttpVerbs.Get);
+            });
+        })
+    )*@

@@ -1,0 +1,352 @@
+﻿
+@{ Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+    var canRoleManagerEditApplictionOption = (permissions == null) ? false : (bool)permissions["ED_APP_OP"];
+    var canRoleManagerCreateApplictionOption = (permissions == null) ? false : (bool)permissions["CR_APP_OP"];
+    var canRoleManagerViewApplictionOption = (permissions == null) ? false : (bool)permissions["VE_APP_OP"];
+    var canRoleManagerDeleteApplictionOption = (permissions == null) ? false : (bool)permissions["DL_APP_OP"];
+
+
+
+    var question_Id = ViewBag.questionId;
+    var acceptDocumentTypes = ViewBag.acceptDocumentTypes;
+    var isMultipleDocumentUpload = ViewBag.isMultipleDocumentUpload;
+    var maxDocumentUpload = ViewBag.maxDocumentUpload;
+    var maxDocumentFileSize = ViewBag.maxDocumentFileSize;
+
+    var isOwner = ViewBag.Owner; }
+
+<style>
+
+    .form-group {
+        margin-bottom: 1rem !important;
+    }
+
+    .link-text:hover {
+        color: #22b9ff !important;
+    }
+
+    .kt-portlet .kt-portlet__foot {
+        padding: 18px 10px 10px 0px !important;
+    }
+
+    .k-dropdown-wrap > .k-input, .k-dropdown .k-dropdown-wrap .k-select, .k-list, .k-reset {
+        background-color: white;
+    }
+</style>
+
+<input type="hidden" id="hfd_roleName" value="@ViewBag.RoleName" />
+<input type="hidden" id="hfd_userId" value="@ViewBag.UserId" />
+<input type="hidden" id="hfd_owner" value="@ViewBag.Owner" />
+
+<div class="content" id="dv_Create_Question">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <div class="kt-form__actions kt-portlet__foot">
+                <label id="lblEditHeader" style="font-size: large;font-weight: 500;margin-right: 5px">Add Question</label>
+            </div>
+            <div class="kt-portlet__head-toolbar">
+                <a href="/ApplicationQuestions/Manage" class="btn btn-clean kt-margin-r-10 btn-sm btn-outline-info">
+                    <i class="la la-arrow-left"></i>
+                    <span class="kt-hidden-mobile">Cancel</span>
+                </a>
+                <div class="btn-group">
+
+                    &nbsp;
+                    <button type="button" v-on:click="submitted()" class="btn btn-sm btn-brand">
+                        <i class="la la-check"></i>
+                        <span class="kt-hidden-mobile">Save</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-brand dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                    <div class="dropdown-menu dropdown-menu-right" style="">
+                        <ul class="kt-nav">
+                            <li class="kt-nav__item">
+                                <a v-on:click="submitted()" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon flaticon2-reload"></i>
+                                    <span class="kt-nav__link-text">Save &amp; Stay</span>
+                                </a>
+                            </li>
+                            <li class="kt-nav__item">
+                                <a v-on:click="submitted()" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon flaticon2-power"></i>
+                                    <span class="kt-nav__link-text">Save &amp; Go back</span>
+                                </a>
+                            </li>
+                            <li class="kt-nav__item">
+                                <a v-on:click="submitted()" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon flaticon2-edit-interface-symbol-of-pencil-tool"></i>
+                                    <span class="kt-nav__link-text">Save &amp; Sign out</span>
+                                </a>
+                            </li>
+                            <li class="kt-nav__item">
+                                <a v-on:click="submitted()" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon flaticon2-add-1"></i>
+                                    <span class="kt-nav__link-text">Save &amp; Add new</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+        <section class="content">
+            <div class="kt-portlet__body">
+                <div class="row form-group">
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label> Course Level</label>
+                            @(Html.Kendo().DropDownList()
+                                        .Name("ddl_CourseLevel")
+                                        .HtmlAttributes(new { @class = "form-control" })
+                                        .OptionLabel("Select Course")
+                                        .DataTextField("CL_Title")
+                                        .DataValueField("CL_Id")
+                                        .Filter(FilterType.StartsWith)
+                                        )
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-6">
+                        <label>Question Title</label>
+                        <input type="text" class="form-control" v-model="question.q_title">
+                        <input type="text" class="form-control" id="qnumber" v-model="question.q_number">
+
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label> Question Type</label>
+
+
+                            <select class="form-control" v-on:change="ChangeQType()" v-model="question.q_type">
+                                <option value="0">Select Type</option>
+
+                                <option v-for="type in QuestionType" v-bind:value="type.Id" v-text="type.Name"></option>
+
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-lg-3" id="dd_answer">
+                        <div class="form-group">
+                            <label> Answer</label>
+                            @(Html.Kendo().DropDownList()
+                                        .Name("ddl_Options")
+                                        .HtmlAttributes(new { @class = "form-control" })
+                                        .OptionLabel("Select Answer")
+                                        .DataTextField("OptHeader_Title")
+                                        .DataValueField("OptHeader_Id")
+                                        .Filter(FilterType.StartsWith)
+                                        )
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3" id="dd_step">
+                        <div class="form-group">
+                            <label> Application Step</label>
+                            @(Html.Kendo().DropDownList()
+                                        .Name("ddl_Step")
+                                        .HtmlAttributes(new { @class = "form-control" })
+                                        .OptionLabel("Select Step")
+                                        .DataTextField("as_title")
+                                        .DataValueField("as_id")
+                                        .Filter(FilterType.StartsWith)
+                                        )
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-3">
+                        <div class="form-group" id="dd_section">
+                            <label> Section</label>
+                            @(Html.Kendo().DropDownList()
+                                        .Name("ddl_Section")
+                                        .HtmlAttributes(new { @class = "form-control" })
+                                        .OptionLabel("Select Section")
+                                        .DataTextField("ase_title")
+                                        .DataValueField("ase_id")
+                                        .Filter(FilterType.StartsWith)
+                                        )
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group " id="dd_depend">
+                            <label> Depend</label>
+                            @(Html.Kendo().DropDownList()
+                                        .Name("ddl_depend")
+                                        .HtmlAttributes(new { @class = "form-control" })
+                                        .OptionLabel("Select depend")
+                                        .DataTextField("q_title")
+                                        .DataValueField("q_id")
+                                        .Filter(FilterType.StartsWith)
+                                        )
+                        </div>
+                    </div>
+                    <div class="col-lg-3" id="YesNoDepend">
+                        <div class="form-group">
+                            <label>Yes No Dependent</label>
+                            <select class="form-control" v-model="question.q_depend_yesno">
+                                <option value="">Select</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                            @*<input type="text" class="form-control" v-model="question.q_depend_yesno">*@
+
+                        </div>
+                    </div>
+                    <div class="col-lg-3" id="isfuture">
+
+
+                        <label>Is Future</label>
+                        <div>
+                            <span class="kt-switch">
+                                <label>
+                                    <input id="chk_IsFuture" type="checkbox" v-model="question.q_isfuture" checked="checked" name="q_isfuture">
+                                    <span></span>
+                                </label>
+                            </span>
+                        </div>
+                    </div>
+
+
+                </div>
+
+
+                <div class="row form-group">
+                    @*<div class="col-lg-3 minmax">
+                            <label>Min Length</label>
+                            <input type="number" class="form-control" v-model="question.q_minlength">
+                        </div>
+                        <div class="col-lg-3 minmax">
+                            <label>Max Length</label>
+                            <input type="number" class="form-control" v-model="question.q_maxlength">
+                        </div>*@
+                    <div class="col-lg-3">
+                        <label>Office Use</label>
+                        <select class="form-control" v-model="question.q_is_admin">
+                            <option value="0">NO</option>
+                            <option value="1">YES</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-3">
+                        <label>Validations</label>
+                        <select class="form-control" v-model="question.q_validation_id">
+                            <option v-bind:value="0">Select</option>
+                            <option v-for="item in Validation" v-bind:value="item.v_id" v-text="item.q_type_name"></option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-lg-3">
+                        <label>Class</label>
+                        <input type="text" class="form-control" v-model="question.q_class">
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="row">
+
+
+                            <div class="col-lg-6">
+                                <div>
+                                    <label>Sort Order</label>
+                                    <input type="number" class="form-control" v-model="question.q_sortorder">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+
+
+                                <label>Is Required</label>
+                                <div>
+                                    <span class="kt-switch">
+                                        <label>
+                                            <input id="chk_IsActive" type="checkbox" v-model="question.q_is_mandatory" checked="checked" name="q_is_mandatory">
+                                            <span></span>
+                                        </label>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3">
+                        <label>Is part of Enrolment? </label>
+                        <select class="form-control" v-model="question.q_is_enrolled">
+                            <option value="0">NO</option>
+                            <option value="1">YES</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-3">
+                        <label>Is part of Confirmation? </label>
+                        <select class="form-control" v-model="question.q_is_confirm">
+                            <option value="0">NO</option>
+                            <option value="1">YES</option>
+                        </select>
+                    </div>
+                
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-lg-12" id="htmlediter">
+                        <div>
+                            @*<textarea name="CKD"></textarea>*@
+                            <textarea rows="4" class="form-control input-lg summernote" name="message" id="message"></textarea>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+@*<partial name="~/Views/Shared/partials/lead/history/_portlet_history.cshtml" />*@
+
+
+@section Scripts{
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+    @*<script src="https://cdn.ckeditor.com/4.13.0/standard/ckeditor.js"></script>*@
+
+    <script src="~/lib/vue/vue.js" type="application/javascript"></script>
+    <script src="~/lib/vue-router/vue-router.min.js" type="application/javascript"></script>
+    <script src="~/js/Admin/Applications/Questions/Create.js"></script>
+    <script>
+
+        $('.summernote').summernote({
+            placeholder: '',
+            tabsize: 2,
+            height: 100
+        });
+    </script>
+
+    <script>
+        //CKEDITOR.replace('CKD', {
+        //    height: "100px"
+        //});
+        
+       /* alert(mydata);*/
+        var _questionId;
+        var _ckdData;
+        $(document).ready(function () {
+
+            //$(".minmax").hide();
+            $("#qnumber").hide();
+            //$("#dd_depend").hide();
+            _ckdData = $("#message").val();
+            if(@question_Id )
+                _questionId = @question_Id;
+            app.Populate();
+          //  app.mounted();
+
+
+
+        });
+    </script>
+}
+

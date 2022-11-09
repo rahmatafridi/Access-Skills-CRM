@@ -1,0 +1,29 @@
+﻿<div class="modal fade" id="kt_modal_SalesAdvisor" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;padding-right:15%!important;" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="width:700px;padding: 0.1rem!important">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Sales Advisor</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container" style="margin-bottom:-30px!important;">
+
+
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label">Assigned to:</label>
+                        <div class="col-lg-6">
+                            <select v-on:change="salesAdvisorChange" class="form-control" id="ddl_SalesAdvisor" v-model="duplicateLead.Sales_Advisor_Id">
+                                <option v-for="SalesAdvisor in SalesAdvisors" v-bind:value="SalesAdvisor.Users_ID" v-text="SalesAdvisor.Users_UserName"></option>
+                            </select>
+                            <span class="form-text text-muted">To change select a different advisor</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

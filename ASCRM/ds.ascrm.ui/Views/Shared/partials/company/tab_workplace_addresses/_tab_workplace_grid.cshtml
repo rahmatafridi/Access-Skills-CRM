@@ -1,0 +1,161 @@
+﻿ <!--begin::Form-->
+@{ 
+    var companyIdd = ViewBag.Company_Id;
+
+}
+<div class="kt-portlet__head">
+    <div class="kt-portlet__head-label">
+        <button type="button" class="btn btn-bold btn-label-brand btn-sm btnhide" v-on:click="NewWorkPlace"><i class="fa fa-plus"></i> Add WorkPlace</button>
+    </div>
+    <div style="margin-top:14px;">
+        <input class="form-control" style="width:270px;" type="text" id="workplaceSearch" />
+    </div>
+</div>
+<div class="kt-form kt-form--fit kt-form--label-right">
+    <div class="portlet__foot">
+        <div class="form-group">
+            <div class="col-lg-12">
+                @(Html.Kendo().Grid<ds.portal.companies.Models.CompanyWorkplaces>()
+                    .Name("grid")
+                    .Columns(columns =>
+                    {
+                        columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-brand' style='cursor:pointer;' onclick=PerformWorkPlaceEdit('#:wp_id#') title='Edit'><span style='text-align:center;' class='fa fa-pen'></span></a>" +
+                                         "&nbsp;&nbsp;<a class='kt-font-danger' style='cursor:pointer;'onclick=PerformWorkPlaceDelete('#:wp_id#') title='Delete'> <span style='text-align:center;' class='fa fa-trash-alt'></span></a>" +
+                                         "&nbsp;&nbsp;<a class='kt-font-primary' style='cursor:pointer;'onclick=PerformWorkPlaceContactAdd('#:wp_id#') title='Add Contact'> <span style='text-align:center;' class='fa fa-plus'></span></a></div>").Width(55).ClientHeaderTemplate(" ");
+                        columns.Bound(p => p.company_name).Title("Company Name").Width("100px");
+                        columns.Bound(p => p.business_type).Title("Business Type").Width("150px");
+
+                        columns.Bound(p => p.wp_name).Title("Manager Name").Width("100px");
+                        columns.Bound(p => p.employee_email).Title("Email Address").Width("150px");
+                        columns.Bound(p => p.phone_number).Title("Phone Number").Width("120px");
+                        columns.Bound(p => p.job_Title).Title("Job Title").Width("100px");
+                        columns.Bound(p => p.town).Title("Town/City").Width("100px");
+                        columns.Bound(p => p.post_code).Title("Postcode").Width("100px");
+
+                    })
+                    .Sortable()
+                    .Pageable()
+                    .Scrollable()
+                    .ClientDetailTemplateId("template")
+                    .HtmlAttributes(new { style = "height:430px;" })
+                    .DataSource(dataSource => dataSource
+                        .WebApi()
+                            .Model(model =>
+                            {
+                                model.Id(p => p.wp_id);
+                            })
+                            .Read(read => read.Action("GetAllCompanyWorkPlace", "CompanyApi", new { company_Id = ViewBag.Company_Id }))
+                          )
+                    .Events(events => events.DataBound("dataBound"))
+                    )
+
+                <script id="template" type="text/kendo-tmpl">
+
+                    @(Html.Kendo().Grid<ds.portal.companies.Models.CompanyContact>()
+                    .Name("grid_#=wp_id#")
+                                                .Columns(columns =>
+                                                {
+
+                                                    //columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-danger' style='cursor:pointer;'onclick=PerformWorkPlaceDelete('#=contact_name#') title='Delete'> <span style='text-align:center;' class='fa fa-trash-alt'></span></a></div>").Width(55).ClientHeaderTemplate(" ");
+                                                    columns.Bound(p => p.title).Title("Title").Width("200px");;
+                                                    columns.Bound(p => p.contact_name).Title("Contact Name").Width("200px");
+                                                    columns.Bound(p => p.job_title).Title("Job Title").Width("200px");
+                                                    columns.Bound(p => p.email1).Title("Email").Width("200px");
+
+                                                    columns.Bound(p => p.mobile1).Title("Mobile").Width("180px");
+                                                    columns.Bound(p => p.website).Title("Website").Width("180px");
+
+                                                })
+
+                                                .DataSource(dataSource => dataSource
+                                                    .WebApi()
+                                                    .PageSize(10)
+                                                    .Read(read => read.Action("GetAllWorkplaceContacts", "CompanyApi", new { company_Id = ViewBag.Company_Id , wp_idd = "#=wp_id#" }))
+                                                )
+                                                //.Scrollable()
+                                                .Pageable()
+                                                .Sortable()
+                                                .ToClientTemplate()
+                        )
+                </script>
+            </div>
+        </div>
+
+    </div>
+    <script>
+        function dataBound() {
+                /*this.expandRow(this.tbody.find("tr.k-master-row").first())*/;
+        }
+    </script>
+
+</div>
+<!--end::Form-->
+<script>
+    var comp_id =@companyIdd;
+    $(document).ready(function () {
+        $("#workplaceSearch").keyup(function () {
+            $("#grid").data("kendoGrid").refresh();
+            debugger; // eslint-disable-line
+
+            var id = $(this).val();
+            if (id != "") {
+                $.ajax({
+                    url: "/api/CompanyApi/CompanyWorkPlaceSearch",
+                    data: { name: id, company_id: comp_id },
+                    type: "GET",
+                    contentType: "application/json",
+                    dataType: "json",
+                    async: false
+                }).done(function (response) {
+                    $("#grid").data("kendoGrid").dataSource.data([]);
+
+
+                    let grid = $("#grid").data("kendoGrid");
+
+                    for (var i = 0; i < response.Data.length; i++) {
+
+                        grid.dataSource.add({
+                            wp_id: response.Data[i].wp_id, company_name: response.Data[i].company_name, business_type: response.Data[i].business_type, wp_name: response.Data[i].wp_name, employee_email: response.Data[i].employee_email
+                            , phone_number: response.Data[i].phone_number, job_Title: response.Data[i].job_Title, town: response.Data[i].town, post_code: response.Data[i].post_code
+                        });
+
+                    }
+
+
+                });
+            }
+            else {
+                $("#grid").data("kendoGrid").dataSource.read();
+
+
+                //$.ajax({
+                //    url: "/api/CompanyApi/SearchInCompany",
+                //    data: { name: 'All' },
+                //    type: "GET",
+                //    contentType: "application/json",
+                //    dataType: "json",
+                //    async: false
+                //}).done(function (response) {
+
+
+                //    let grid = $("#gridCompanies").data("kendoGrid");
+                //    console.log(response);
+
+                //    for (var i = 0; i < response.Data.length; i++) {
+
+                //        grid.dataSource.add({
+                //            encodedId: response.Data[i].encodedId, id: response.Data[i].id, name: response.Data[i].name, address1: response.Data[i].address1, postcode: response.Data[i].postcode
+                //            , tel1: response.Data[i].tel1, email1: response.Data[i].email1
+                //        });
+
+                //    }
+
+
+                //});
+                //$("#gridCompanies").data("kendoGrid").refresh();
+
+            }
+
+        });
+    });
+</script>

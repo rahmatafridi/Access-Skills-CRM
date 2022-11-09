@@ -1,0 +1,275 @@
+﻿@using Kendo.Mvc.UI
+@{ ViewData["Title"] = "My Tab 2";
+
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+    var canRoleManagerAccessTab2 = (permissions == null) ? false : (bool)permissions["AC_TAB2"];
+    Layout = "~/Views/Shared/_Layout_Portal.cshtml";
+}
+<style>
+    .link-text:hover {
+        color: #22b9ff !important;
+    }
+
+    .kt-portlet .kt-portlet__foot {
+        padding: 10px 5px 10px 10px !important;
+    }
+
+    .k-grid-header .k-filterable, .k-grid-header .k-with-icon {
+        padding-right: calc(1px + .5rem + 1.5em + .5rem);
+    }
+    .wapper {
+       
+        background-color: #ffffff;
+        position: relative;
+        width: 707px;
+        height: 100px;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        left: 10px;
+        top: 10px;
+    }
+    .signaturewrapper {
+        background-color: #808080;
+        width: 730px;
+        height: 120px;
+    }
+</style>
+
+<div class="content" id="dv_Portal_MyTap2">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <label id="lblUserHeader" style="font-size: large;font-weight:500;margin-left:-10px;margin-top:20px;">
+                My Training Assessment Plan (Part 2)
+            </label>
+            <div class="kt-portlet__head-toolbar">
+
+
+
+
+            </div>
+        </div>
+        <section class="content">
+            <div class="kt-portlet__body">
+
+                <div class="box-header with-border">
+                    <div class="row">
+                        <div class="col-lg-9">
+
+                        </div>
+                        @*<div class="col-lg-3">
+                                <input class="form-control" placeholder="Search Company" style="margin-bottom:10px;" id="search" type="text" autocomplete="off" />
+                            </div>*@
+
+                    </div>
+
+                    <div class="">
+                        <div class="kt-portlet kt-portlet--height-fluid">
+
+                            <div>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>TAP #</th>
+                                            <th>Date</th>
+                                            <th>Due date	</th>
+                                            <th>View Document</th>
+                                            <th>Action</th>
+                                        </tr>
+
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="item in documents">
+                                            <td>{{item.TAP_Id}}</td>
+
+                                            <td>{{item.TAP_CreatedDate}}</td>
+                                            <td>{{item.TAP_ReviewDate}}</td>
+                                            <td>
+                                                <a ><span class="fa fa-file fa-lg" v-on:click="DownladDoc(item.TAP_Id)"></span></a>
+                                                <a ><span class="fas fa-file-pdf fa-lg" v-on:click="DownladPdf(item.TAP_Id)"></span></a>
+                                            </td>
+                                            <td>
+                                                <button class='sm btn btn-primary' style='cursor:pointer;' v-on:click="Sign(item.TAP_Id)">Sign Now</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Signature</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class=" col-md-12">
+                            <div class="form-group">
+                                <div class="col-md-12">
+
+                                    <label for="message-text" class="col-form-label">Learner Comment: </label>
+                                    <div>
+                                        @*<input type="text"  Rows="4" class="form-control" placeholder="Please type your comment..." />*@
+                                        <textarea v-model="learnerComment" rows="4" class="form-control" placeholder="Please type your comment..." ></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-12">
+
+                                    <div class="col-lg-12">
+                                        <div class="row">
+                                            <div class="col-lg-8">
+                                                <input style="margin-bottom: 10px; margin-left: -8px;" type="text" @@keyup="txtPrintName($event)" id="printName" :value="printName" class="form-control input-sm" placeholder="type your full name...">
+
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <span style="margin-bottom:10px;float:right;" id="btnClearPrintName" class="btn btn-primary">Clear Print Name</span>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div >
+                                        <div id="panel_signature">
+                                            <!-- Please sign in the box: -->
+
+                                            <div style="margin-bottom: -11px;">
+                                                <div class="signaturewrapper">
+                                                    <div class="wapper">
+                                                        <canvas id="signaturepad" class="signature-pad" width="600" height="100"></canvas>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <br />
+                                                    <input type="hidden" id="sketch_data" name="sketch_data" />
+                                                    <input type="hidden" id="hid_printname" name="hid_printname" />
+                                                    <input type="hidden" id="hid_dt" name="hid_dt" />
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                       
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" v-on:click="SaveSign" >Submit</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    
+</div>
+
+<style type="text/css">
+    .signature_wrapper {
+        background-color: #808080;
+        width: 520px;
+        height: 120px;
+    }
+
+    .wrapper {
+        background-color: #ffffff;
+        position: relative;
+        width: 500px;
+        height: 100px;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        left: 10px;
+        top: 10px;
+    }
+
+    img {
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+
+    .signature-pad {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 400px;
+        height: 100px;
+    }
+</style>
+<script>
+    var _canRoleManagerAccessTab2;
+
+        $(document).ready(function () {
+
+            _canRoleManagerAccessTab2 = @canRoleManagerAccessTab2.ToString().ToLower();
+
+
+            if (!_canRoleManagerAccessTab2) {
+                window.location.href = '/Error/PermissionDenied';
+            }
+        })
+
+</script>
+<script>
+
+    $(document).ready(function () {
+        $("#btnClearPrintName").click(function () {
+            //var btnClearPrint = document.getElementById('txtPrintName');
+            $("#printName").val("");
+
+            var canvas = document.getElementById('signaturepad'),
+                context = canvas.getContext('2d');
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+        });
+
+        $("#printName").keyup(function (event) {
+            var stt = $(this).val();
+            var lng = stt.length;
+            var fnt = 30;
+            //max 20!
+            if (lng < 20) { fnt = 30; }
+            else if (lng < 30) { fnt = 20; }
+            else { fnt = 15; }
+
+            var canvas = document.getElementById('signaturepad');
+            var context = canvas.getContext('2d');
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            var fntsize = fnt + 'pt';
+            context.font = 'italic ' + fntsize + ' Sacramento, cursive ';
+            context.fillText(stt, 50, 60);
+        });
+
+    })
+</script>
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    @*<script src="~/js/Portal/Index.js"></script>*@
+    <script src="~/js/Portal/MyTap2/Manage.js"></script>
+}

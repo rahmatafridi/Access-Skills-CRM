@@ -1,0 +1,135 @@
+Use portal
+GO
+
+
+
+
+
+
+IF EXISTS (SELECT * FROM sysobjects WHERE id = object_id(N'[dbo].[SP_LEAD_INSERT]') AND OBJECTPROPERTY(id, N'IsProcedure') = 1)
+
+ 
+
+BEGIN
+
+ 
+
+DROP PROCEDURE dbo.SP_Lead_INSERT
+
+END
+GO
+
+CREATE  PROCEDURE [dbo].[SP_Lead_Insert]
+	-- Add the parameters for the stored procedure here
+	@LeadName varchar(50) = NULL,	
+	@LeadEmail		varchar(100) = NULL,
+	@Phone varchar(20) = NULL,
+	@JobTitle varchar(250) = NULL,
+	@CourseName varchar(250) = NULL
+	-- , @CourseId int = NULL
+	, @Subject varchar(250) = NULL
+	,@Message varchar(300) = NULL
+	,@Lead_Id_LastResult int NULL, @DepartmentId int NULL,@Salutation varchar(20) NULL
+
+	
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+	--===========================INSERT STARTS=====================================
+	 -- check lead is already created
+	 declare @leadId int = 0
+	 declare @originalLeadId int = 0
+	 declare @leadcourseId int = 0
+	 declare @courseId int = 0
+	 declare @jobHeaderId int =0
+	 declare @jobTitleId int = 0 
+	 -- select @leadId = Lead_Id from Lead where LeadName =@LeadName
+	 declare @lead_Id_SalesAdvisor int 
+	 
+EXEC @lead_Id_SalesAdvisor=SP_mdLead_SalesAdvisors_GetAvailableIdRota_2
+
+
+
+
+	 SELECT top 1 @leadId = Lead_Id from Lead WHERE Lead_Email= @LeadEmail AND  Lead_Contact_Mobile = @Phone
+	 AND ISNULL(Lead_IsDuplicate,0) = 0
+
+	 --SELECT @courseId FROM  Courses WHERE Course_Title = @CourseName
+	 SELECT @courseId FROM  tblCourseLevel WHERE CL_Title = @CourseName
+	 IF @courseId =0
+	 BEGIN
+	   --INSERT INTO Courses (Course_Title,Course_Id_Sector,Course_IsActive,Course_WeightOrder) VALUES(@CourseName,1,1,2)
+	   INSERT INTO [dbo].[tblCourseLevel] ([CL_Title]) VALUES (@CourseName)
+	   SELECT @courseId = SCOPE_IDENTITY()
+	 END
+
+
+	 SELECT @jobHeaderId = OptHeader_Id FROM DDL_OptionsHeaders WHERE OptHeader_Title ='JobTitle'
+	 SELECT @jobTitleId = Opt_Id  FROM DDL_Options WHERE Opt_Value = @jobHeaderId AND Opt_Title = @JobTitle
+
+	 IF @jobTitleId = 0 
+	 BEGIN
+	 INSERT INTO DDL_Options (Opt_Value,Opt_Title) VALUES(@jobHeaderId,@JobTitle)
+	 SELECT @jobTitleId = SCOPE_IDENTITY()
+	 END
+	 -- 
+	DECLARE @returnValue int =0
+	-- if leadid = 0 it means new lead so craete it
+	IF @leadId = 0
+	BEGIN
+
+	BEGIN TRY			
+		
+		--INSERT INTO LEAD (Lead_ContactName,Lead_Email,Lead_Contact_Mobile,Lead_Contact_Id_JobTitle,Lead_CourseTitle,Lead_Contact_WebSubject,Lead_Contact_WebMessage,JobTitleId,Lead_Id_Course,Lead_Id_LastResult,Lead_Contact_Id_Department,Lead_Contact_Salutation)
+		-- VALUES(@LeadName,@LeadEmail,@Phone,@JobTitle,@CourseName,@Subject,@Message,@jobTitleId,@courseId,@Lead_Id_LastResult,@DepartmentId,@Salutation)	
+		--
+		
+		INSERT INTO LEAD (Lead_ContactName,Lead_Email,Lead_Contact_Mobile,Lead_Contact_WebSubject,Lead_Contact_WebMessage,Lead_Contact_Id_JobTitle,Lead_Id_CourseLevel,Lead_Id_LastResult,Lead_Contact_Id_Department,Lead_Contact_Salutation,Lead_Id_SalesAdvisor,Lead_IsDuplicate)
+		 VALUES(@LeadName,@LeadEmail,@Phone,@Subject,@Message,@jobTitleId,@courseId,@Lead_Id_LastResult,@DepartmentId,@Salutation,@lead_Id_SalesAdvisor,0)	
+		
+		
+		SELECT @leadId = SCOPE_IDENTITY()
+		
+		SET @returnValue = 1
+		
+	END TRY
+	BEGIN CATCH
+		SET @returnValue = 0;
+		
+	END CATCH	
+	
+	--===========================INSERT ENDS======================================
+
+	END
+
+	ELSE
+	BEGIN
+
+	  --UPDATE Lead
+	  --SET Lead_ContactName = @LeadName , Lead_Email =@LeadEmail, Lead_Contact_Mobile=@Phone,Lead_Contact_Id_JobTitle=@JobTitle
+	  --,Lead_Id_Course = @courseId , Lead_Contact_WebMessage = @Message , Lead_Contact_WebSubject = @Subject
+	  --, Lead_Id_SalesAdvisor = @lead_Id_SalesAdvisor , Lead_IsDuplicate = 1
+	  --WHERE Lead_Id = @leadId
+
+	   --UPDATE Lead SET  Lead_IsDuplicate = 1 WHERE Lead_Id = @leadId
+	   SELECT @originalLeadId = @leadId
+	   -- Now insert again in Lead
+	  INSERT INTO LEAD (Lead_ContactName,Lead_Email,Lead_Contact_Mobile,Lead_Contact_WebSubject,Lead_Contact_WebMessage,Lead_Contact_Id_JobTitle,Lead_Id_CourseLevel,Lead_Id_LastResult,Lead_Contact_Id_Department,Lead_Contact_Salutation,Lead_Id_SalesAdvisor,Lead_IsDuplicate)
+		 VALUES(@LeadName,@LeadEmail,@Phone,@Subject,@Message,@jobTitleId,@courseId,@Lead_Id_LastResult,@DepartmentId,@Salutation,@lead_Id_SalesAdvisor,1)	
+		
+		SELECT @leadId = SCOPE_IDENTITY()
+		-- Now add duplicate lead Id and original Iead Id
+	INSERT INTO tblmdlead_DuplicateLead(LD_Id_Lead,LD_Id_DuplicateLead) VALUES(@originalLeadId,@leadId)
+		
+		
+
+
+	END
+
+	SELECT @returnValue
+	
+END
+GO
+

@@ -1,0 +1,44 @@
+﻿<div class="modal fade" id="kt_modal_Duplicate" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="note">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Possible duplicate company record(s)</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+             <div>
+                 <table class="table table-bordered">
+                     <thead>
+                         <tr>
+                             @*<th style="width:45px;"></th>*@
+                             <th>Company Name</th>
+                             <th>Address</th>
+                             <th>Postcode</th>
+                             @*<th>Telephone</th>*@
+                         </tr>
+                     </thead>
+                     <tbody>
+                         <tr v-for="company in companyDuplicateList">
+                             @*<td >
+                                 <span v-if="company.type === 'C' " class="kt-badge kt-badge--inline kt-badge--success">{{company.type}}</span>
+                                 <span v-if="company.type === 'WP' " class="kt-badge kt-badge--inline kt-badge--warning">{{company.type}}</span>
+                             </td>*@
+                            
+                             <td>{{company.name}}</td>
+                             <td>{{company.address1}}</td>
+                             <td>{{company.postcode}}</td>
+                             @*<td>{{company.telephone}}</td>*@
+                         </tr>
+                     </tbody>
+                 </table>
+             </div>
+            </div>
+            <div class="modal-footer">
+                @*<h3 style="margin-right:177px;">are  you sure to submit</h3>*@
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="submit" v-on:click="submitCompanyAfterDulicate" class="btn btn-primary" >Save</button>
+
+            </div>
+        </div>
+    </div>
+</div>

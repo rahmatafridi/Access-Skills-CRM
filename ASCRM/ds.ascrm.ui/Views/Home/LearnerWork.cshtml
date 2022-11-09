@@ -1,0 +1,1015 @@
+﻿
+@{ ViewData["Title"] = "Learner Work";
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+    var canRoleManagerWorkSubmitted = (permissions == null) ? false : (bool)permissions["ACE_WSM"];
+    var canRoleManagerWorkSubmittedDelete = (permissions == null) ? false : (bool)permissions["ACE_WSd"];
+    var canRoleManagerWorkSubmittedReject = (permissions == null) ? false : (bool)permissions["ACE_WSR"];
+    var canRoleManagerWorkSubmittedAssign = (permissions == null) ? false : (bool)permissions["ACE_AAS"];
+    var canRoleManagerWorkSubmittedApprove = (permissions == null) ? false : (bool)permissions["ACE_WSA"];
+    Layout = "~/Views/Shared/_Layout.cshtml"; }
+<style>
+    .kt-portlet .kt-portlet__foot {
+        padding: 10px 5px 10px 10px !important;
+    }
+</style>
+<style>
+    .link-text:hover {
+        color: #22b9ff !important;
+    }
+
+    .kt-portlet .kt-portlet__foot {
+        padding: 10px 5px 10px 10px !important;
+    }
+
+    .k-grid-header .k-filterable, .k-grid-header .k-with-icon {
+        padding-right: calc(1px + .5rem + 1.5em + .5rem);
+    }
+
+    .wapper {
+        background-color: #ffffff;
+        position: relative;
+        width: 707px;
+        height: 100px;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        left: 10px;
+        top: 10px;
+    }
+
+    .signaturewrapper {
+        background-color: #808080;
+        width: 730px;
+        height: 120px;
+    }
+</style>
+
+
+<div class="content" id="dv_Manage_LearnerWork">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <div class="kt-form__actions kt-portlet__foot">
+                <label style="font-size: large;font-weight: 500;margin-top:10px;margin-left:-15px;">Work Submitted</label>
+            </div>
+
+
+        </div>
+        <div class="kt-portlet__body">
+
+            <div class="box-header with-border">
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="#kt_tabs_1_1" onclick="RefreshSubmitted">
+                            <i class="fa fa-id-card"></i> Learner Submission
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_2" onclick="ReadyToCheck">
+                            <i class="fa fa-address-card"></i> Outstanding Marking
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_5" onclick="Valided">
+                            <i class="fa fa-address-card"></i> Feedback Received
+                        </a>
+                    </li>
+                    @*<li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_3" onclick="RefreshRejected">
+                    <i class="fa fa-address-card"></i> Rejected
+                </a>
+            </li>*@
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#kt_tabs_1_4" onclick="Approved">
+                            <i class="fa fa-address-card"></i> Feedback Processed
+                        </a>
+                    </li>
+
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="kt_tabs_1_1" role="tabpanel">
+                        <div class="row">
+                            <div class="col-lg-9">
+
+                            </div>
+                            <div class="col-lg-3" style="margin-bottom: 10px; margin-top: -18px;">
+                                <input type="text" autocomplete="off" placeholder="Search" class="form-control" id="searchsubmit" />
+                            </div>
+                        </div>
+                        @(Html.Kendo().Grid<crm.portal.CrmModel.UploadWork>()
+                            .Name("grid_submitted")
+                            .Columns(columns =>
+                            {
+                                columns.Template("<div class='kt-font-primary'><a class='kt-font-brand' style='cursor:pointer;' onclick=PerformApprove('#:id#') title='Complete'><span style='text-align:center;' class='fa fa-check''></span></a>" +
+                                  "&nbsp;&nbsp;<a class='kt-font-dark' style='cursor:pointer;' onclick=PerformAssign('#:id#','#:learner_id#') title='Assign'><span style='text-align:center;' class='fa fa-clone'></span></a>" +
+                                 "&nbsp;&nbsp;<a class='kt-font-warning' style='cursor:pointer;' onclick=PerformReject('#:id#') title='Reject'><span style='text-align:center;' class='fa fa-user-alt-slash'></span></a>" +
+
+                                 "</div>").Width(100).ClientHeaderTemplate(" ");
+                                columns.Bound(x => x.id).Hidden();
+                                columns.Bound(p => p.created_on).Format("{0:dd/MM/yyyy}").Title("Date");
+                                columns.Bound(p => p.learner_id).Title("Learner Id");
+                                columns.Bound(p => p.LearnerName).Title("Learner Name");
+                                columns.Bound(p => p.Topic).Title("Topic");
+                                columns.Bound(p=>p.learner_submit_count).Title("Total Submit");
+
+                                columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-brand' style='cursor:pointer;' onclick=PerformFiles('#:id#') title='Files'><span style='text-align:center;' class='fa fa-file'></span></a>" +
+                                 "</div>").Width(100).ClientHeaderTemplate("Files");
+                                //columns.Bound(p => p.due_date).Format("{0:dd/MM/yyyy}").Title("Due Date");
+                                columns.Bound(p => p.Status).Title("Status");
+                            })
+                            .Resizable(resize => resize.Columns(true))
+                            .Reorderable(x => x.Columns(true))
+                            .ColumnMenu(c => c.Columns(true))
+                            .Sortable()
+                            .Pageable()
+                            .Filterable()
+                            .NoRecords()
+                            .Pageable(pageable => pageable
+                            .Refresh(true)
+                            .PageSizes(true)
+                            .ButtonCount(5))
+                            .DataSource(dataSource =>
+                            dataSource
+                            .WebApi()
+                            .Model(model =>
+                            {
+                                model.Id(p => p.id);
+                            })
+                            .Events(events => events.Error("error_handler"))
+                            .Read(read => read.Action("GetLearnerWork", "WorkUploadApi", new { type = "Submitted" }))
+                            .PageSize(20)
+                            )
+                        )
+                    </div>
+                    <div class="tab-pane " id="kt_tabs_1_2" role="tabpanel">
+                        <div class="row">
+                            <div class="col-lg-9">
+
+                            </div>
+                            <div class="col-lg-3" style="margin-bottom: 10px; margin-top: -18px;">
+                                <input type="text" autocomplete="off" placeholder="Search" class="form-control" id="searchcheck" />
+                            </div>
+                        </div>
+                        @(Html.Kendo().Grid<crm.portal.CrmModel.UploadWork>()
+                            .Name("grid_readytochecked")
+                            .Columns(columns =>
+                            {
+                                columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-brand' style='cursor:pointer;' title='Complete'><span style='text-align:center;' class='fa fa-checked'></span></a>" +
+                                  "&nbsp;&nbsp;<a class='kt-font-dark' style='cursor:pointer;' onclick=PerformAssign('#:id#','#:learner_id#') title='Re-Assign'><span style='text-align:center;' class='fa fa-clone'></span></a>" +
+                                 "&nbsp;&nbsp;<a class='kt-font-warning' style='cursor:pointer;' onclick=PerformReject('#:id#') title='Reject'><span style='text-align:center;' class='fa fa-user-alt-slash'></span></a>" +
+
+                                 "</div>").Width(100).ClientHeaderTemplate(" ");
+                                columns.Bound(x => x.id).Hidden();
+
+                                columns.Bound(p => p.created_on).Format("{0:dd/MM/yyyy}").Title("Date");
+                                columns.Bound(p => p.learner_id).Title("Learner Id");
+                                columns.Bound(p => p.LearnerName).Title("Learner Name");
+                                columns.Bound(p => p.Topic).Title("Topic");
+                                columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-brand' style='cursor:pointer;' onclick=PerformFiles('#:id#') title='Files'><span style='text-align:center;' class='fa fa-file'></span></a>" +
+
+                                 "</div>").Width(100).ClientHeaderTemplate("Files");
+
+                                columns.Bound(p => p.due_date).ClientTemplate("#= kendo.toString(kendo.parseDate(due_date), 'dd/MM/yyyy') #").Title("Due Date"); ;
+                                //columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-brand' style='cursor:pointer;' formatDateEN('#:due_date#') title='Files'><span style='text-align:center;' ></span></a>" +
+                                // "</div>").Width(100).ClientHeaderTemplate("Due Date");
+
+                                columns.Bound(p => p.Status).Title("Status");
+                            })
+                            .Resizable(resize => resize.Columns(true))
+                            .Reorderable(x => x.Columns(true))
+                            .ColumnMenu(c => c.Columns(true))
+                            .Sortable()
+                            .Pageable()
+                            .Filterable()
+                            .NoRecords()
+                            .Pageable(pageable => pageable
+                            .Refresh(true)
+                            .PageSizes(true)
+                            .ButtonCount(5))
+                            .DataSource(dataSource =>
+                            dataSource
+                            .WebApi()
+                            .Model(model =>
+                            {
+                                model.Id(p => p.id);
+                            })
+                            .Events(events => events.Error("error_handler"))
+                            .Read(read => read.Action("GetLearnerWork", "WorkUploadApi", new { type = "ReadyToChecked" }))
+                            .PageSize(20)
+                            )
+                        )
+                    </div>
+                    <div class="tab-pane " id="kt_tabs_1_5" role="tabpanel">
+
+                        <div class="row">
+                            <div class="col-lg-9">
+
+                            </div>
+                            <div class="col-lg-3" style="margin-bottom: 10px; margin-top: -18px;">
+                                <input type="text" autocomplete="off" placeholder="Search" class="form-control" id="searchvalidate" />
+                            </div>
+                        </div>
+
+
+                        @(Html.Kendo().Grid<crm.portal.CrmModel.UploadWork>()
+            .Name("grid_validated")
+            .Columns(columns =>
+            {
+
+                columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-brand' style='cursor:pointer;' title='Complete'><span style='text-align:center;' class='fa fa-checked'></span></a>" +
+                                  "&nbsp;&nbsp;<a class='kt-font-dark' style='cursor:pointer;' onclick=PerformApprove('#:id#','#:learner_id#') title='Approve'><span style='text-align:center;' class='fa fa-check'></span></a>" +
+                                 "&nbsp;&nbsp;<a class='kt-font-warning' style='cursor:pointer;' onclick=PerformReject('#:id#') title='Reject'><span style='text-align:center;' class='fa fa-user-alt-slash'></span></a>" +
+
+                                 "</div>").Width(100).ClientHeaderTemplate(" ");
+
+
+                //columns.Template("<div class='kt-font-primary'><a class='kt-font-brand' style='cursor:pointer;' onclick=PerformApprove('#:id#','#:learner_id') title='Complete'><span style='text-align:center;' class='fa fa-check''></span></a>" +
+                //   "&nbsp;&nbsp;<a class='kt-font-warning' style='cursor:pointer;' onclick=PerformReject('#:id#') title='Reject'><span style='text-align:center;' class='fa fa-user-alt-slash'></span></a>" +
+
+                //   "</div>").Width(100).ClientHeaderTemplate(" ");
+                columns.Bound(x => x.id).Hidden();
+
+                columns.Bound(p => p.created_on).Format("{0:dd/MM/yyyy}").Title("Date");
+                columns.Bound(p => p.learner_id).Title("Learner Id");
+                columns.Bound(p => p.LearnerName).Title("Learner Name");
+                columns.Bound(p => p.Topic).Title("Topic");
+
+                columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-brand' style='cursor:pointer;' onclick=PerformFiles('#:id#') title='Files'><span style='text-align:center;' class='fa fa-file'></span></a>" +
+                 "&nbsp;&nbsp;<a class='kt-font-brand' style='cursor:pointer;' onclick=HistoryFileView('#:learner_id#','#:topic_id#') title='History Files'><span style='text-align:center;' class='fa fa-eye'></span></a>" +
+
+                    "</div>").Width(100).ClientHeaderTemplate("Files");
+
+                columns.Bound(p => p.due_date).ClientTemplate("#= kendo.toString(kendo.parseDate(due_date), 'dd/MM/yyyy') #").Title("Due Date");
+                columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-brand' style='cursor:pointer;' onclick=ApproveFileEdit('#:learner_id#','#:topic_id#','#:id#') title='Amend Feedback'><span style='text-align:center;' class='fa fa-file'></span></a>" +
+
+                    "&nbsp;&nbsp;<a class='kt-font-brand' style='cursor:pointer;' onclick=ApproveFileView('#:learner_id#','#:topic_id#') title='View Latest Feedback'><span style='text-align:center;' class='fa fa-eye'></span></a>" +
+                     "&nbsp;&nbsp;<a class='kt-font-brand' style='cursor:pointer;' onclick=SendFile('#:learner_id#','#:topic_id#') title='Send feedback to learner'><span style='text-align:center;' class='fa fa-envelope'></span></a>" +
+
+                "</div>").Width(100).ClientHeaderTemplate("Feedback");
+
+                columns.Bound(p => p.Status).Title("Status");
+            })
+            .Resizable(resize => resize.Columns(true))
+            .Reorderable(x => x.Columns(true))
+            .ColumnMenu(c => c.Columns(true))
+            .Sortable()
+            .Pageable()
+            .Filterable()
+            .NoRecords()
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .PageSizes(true)
+            .ButtonCount(5))
+            .DataSource(dataSource =>
+            dataSource
+            .WebApi()
+            .Model(model =>
+            {
+                model.Id(p => p.id);
+            })
+            .Events(events => events.Error("error_handler"))
+            .Read(read => read.Action("GetLearnerWork", "WorkUploadApi", new { type = "Validated" }))
+            .PageSize(20)
+            )
+        )
+                    </div>
+                    <div class="tab-pane " id="kt_tabs_1_4" role="tabpanel">
+                        <div class="row">
+                            <div class="col-lg-9">
+
+                            </div>
+                            <div class="col-lg-3" style="margin-bottom:10px; margin-top:-18px;">
+                                <input type="text" autocomplete="off" placeholder="Search" class="form-control" id="searchapprove" />
+                            </div>
+                        </div>
+                        @(Html.Kendo().Grid<crm.portal.CrmModel.UploadWork>()
+                            .Name("grid_approved")
+                            .Columns(columns =>
+                            {
+                                columns.Bound(x => x.id).Hidden();
+                                columns.Bound(p => p.created_on).Format("{0:dd/MM/yyyy}").Title("Date");
+                                columns.Bound(p => p.learner_id).Title("Learner Id");
+                                columns.Bound(p => p.LearnerName).Title("Learner Name");
+                                columns.Bound(p => p.Topic).Title("Topic");
+                                columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-brand' style='cursor:pointer;' onclick=PerformFiles('#:id#')  title='Files'><span style='text-align:center;' class='fa fa-file'></span></a>" +
+                                 "</div>").Width(100).ClientHeaderTemplate("Files");
+
+                                columns.Bound(p => p.completed_date).Format("{0:dd/MM/yyyy}").Title("Completed Date");
+                            })
+                            .Resizable(resize => resize.Columns(true))
+                            .Reorderable(x => x.Columns(true))
+                            .ColumnMenu(c => c.Columns(true))
+                            .Sortable()
+                            .Pageable()
+                            .Filterable()
+                            .NoRecords()
+                            .Pageable(pageable => pageable
+                            .Refresh(true)
+                            .PageSizes(true)
+                            .ButtonCount(5))
+                            .DataSource(dataSource =>
+                            dataSource
+                            .WebApi()
+                            .Model(model =>
+                            {
+                                model.Id(p => p.id);
+                            })
+                            .Events(events => events.Error("error_handler"))
+                            .Read(read => read.Action("GetLearnerWork", "WorkUploadApi", new { type = "Approved" }))
+                            .PageSize(20)
+                            )
+                        )
+                    </div>
+
+                </div>
+
+                <div class="modal fade" id="kt_modal_assign" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+                    <div class="modal-dialog modal-md" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Assign To Assessor</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="kt-form kt-form--label-right">
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <label>Assessor</label>
+                                            <select class="form-control" v-model="assesserId" @@change="assesserChange($event)">
+                                                <option v-for="item in Acceccers" :value="item.Users_Id">{{item.Users_Username}}</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <label>Due Date</label>
+                                            <input class="form-control" id="completeDate" v-model="dueDate" />
+                                        </div>
+                                    </div>
+
+
+                                    <div>
+                                        <label>Note</label>
+                                        <textarea class="form-control" v-model="notes" rows="4"></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" v-on:click="assignAccesser()">Submit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="kt_modal_reject_reason" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Reject</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="kt-form kt-form--label-right">
+                                    <div class="form-group row">
+                                        <label class="col-form-label col-sm-4">Reason for rejection:</label>
+                                        <div class="col-sm-8">
+                                            <textarea class="form-control" v-model="rejected_reason"> </textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" v-on:click="workReject()">Submit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="kt_modal_files" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Files</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="kt-form kt-form--label-right">
+                                    <div class="row">
+                                        <table class="table">
+                                            <tr>
+                                                <th></th>
+                                                <th>File Name</th>
+                                                <th>File Type</th>
+                                                <th>File Size</th>
+                                            </tr>
+                                            <tr v-for="file in files">
+                                                <td>
+                                                    <a class='kt-font-brand' v-on:click="downlaodFile(file.file_path)" style='cursor:pointer;' title='Download'><span style='text-align:center;' class='fa fa-download'></span></a>
+                                                    <a class='kt-font-danger' v-on:click="deleteFile(file.id)" style='cursor:pointer;' title='Delete'><span style='text-align:center;' class=' fa fa-trash-alt'></span></a>
+                                                </td>
+                                                <td> {{file.file_name}}</td>
+                                                <td>{{file.file_ext}}</td>
+                                                <td>{{file.file_size}}</td>
+
+
+                                            </tr>
+                                        </table>
+
+                                    </div>
+
+
+
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="modal fade" id="kt_modal_history" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">History Files</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="kt-form kt-form--label-right">
+                                    <div class="row">
+                                        <table class="table">
+                                            <tr>
+                                                <th></th>
+                                                <th>Course</th>
+                                                <th>Level</th>
+                                                <th>Date</th>
+                                                <th>UserName</th>
+                                            </tr>
+                                            <tr v-for="file in fileHistory">
+                                                <td>
+                                                    <a class='kt-font-brand' v-on:click="DownloadViewHistory(file.tap_filedata,file.tap_learner_id)" style='cursor:pointer;' title='Download'><span style='text-align:center;' class='fa fa-eye'></span></a>
+                                                    @*<a class='kt-font-danger' v-on:click="deleteFile(file.id)" style='cursor:pointer;' title='Delete'><span style='text-align:center;' class=' fa fa-trash-alt'></span></a>*@
+                                                </td>
+                                                <td> {{file.tap_title}}</td>
+                                                <td>{{file.tap_level}}</td>
+                                                <td>{{formatDateEN(file.tap_date)}}</td>
+                                                <td></td>
+
+                                            </tr>
+                                        </table>
+
+                                    </div>
+
+
+
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="modal fade" id="kt_modal_approve" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+                    <div class="modal-dialog modal-md" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Complete</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="kt-form kt-form--label-right">
+                                    <div class="form-group row">
+                                        <label class="col-form-label ">Notes</label>
+                                        <div class="col-sm-12">
+                                            <textarea class="form-control" v-model="notes"> </textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" v-on:click="approve">Submit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="kt_modal_approve1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Activity Completed</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <ul class="nav nav-tabs" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" data-toggle="tab" href="#kt_tabs_A_1">
+                                            <i class="fa fa-id-card"></i> Feedback
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-toggle="tab" href="#kt_tabs_A_2">
+                                            <i class="fa fa-address-card"></i> Note
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-toggle="tab" href="#kt_tabs_A_3">
+                                            <i class="fa fa-address-card"></i> Signature
+                                        </a>
+                                    </li>
+
+                                </ul>
+
+                                <div class="kt-form kt-form--label-right">
+                                    <div class="tab-content">
+                                        <div class="tab-pane active" id="kt_tabs_A_1" role="tabpanel">
+                                            <div class="">
+                                                <div class="col-lg-12">
+                                                    <label>Assessment criteria and content of activity </label>
+                                                    <div>
+                                                        <textarea v-model="Assesser.traningAssessment.tap_content_activty" class="form-control"></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-12">
+                                                    <label>Core Skills </label>
+                                                    <div>
+                                                        <textarea v-model="Assesser.traningAssessment.tap_core_skil" class="form-control"></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-12">
+                                                    <label>Referencing and bibliography </label>
+                                                    <div>
+                                                        <textarea v-model="Assesser.traningAssessment.tap_referencing" class="form-control"></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-12">
+                                                    <label>Further development</label>
+                                                    <div>
+                                                        <textarea v-model="Assesser.traningAssessment.tap_development" class="form-control"></textarea>
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane " id="kt_tabs_A_2" role="tabpanel">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <label>Assessment criteria identified on the activity brief has been met? </label>
+                                                    <div>
+                                                        <input type="radio" name="assementcheck" id="assessmentcheck1" checked value="yes" @@change="assessmentchange($event)" /> Yes
+                                                        <input type="radio" name="assementcheck" id="assessmentcheck2" value="no" @@change="assessmentchange($event)" /> No
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-12">
+                                                    <div id="resubmissiondata">
+                                                        <label>If No, resubmission within:</label>
+                                                        <div>
+                                                            <input type="radio" name="resubmission" id="resubmission1" value="7" /> 7 Days
+                                                            <input type="radio" name="resubmission" id="resubmission2" value="14" /> 14 Days
+                                                        </div>
+
+
+                                                    </div>
+
+                                                </div>
+                                                <div class="col-sm-12">
+                                                    <label class="col-form-label ">Notes</label>
+                                                    <textarea class="form-control" v-model="notes"> </textarea>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="tab-pane " id="kt_tabs_A_3" role="tabpanel">
+                                            <div class="form-group">
+                                                <div class="col-md-12">
+
+                                                    <div class="col-lg-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-8">
+                                                                <input style="margin-bottom: 10px; margin-left: -8px;" type="text" @@keyup="txtPrintName($event)" id="printName" :value="printName" class="form-control input-sm" placeholder="type your full name...">
+
+                                                            </div>
+                                                            <div class="col-lg-4">
+                                                                <span style="margin-bottom:10px;float:right;" id="btnClearPrintName" class="btn btn-primary">Clear Print Name</span>
+
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div>
+                                                        <div id="panel_signature">
+                                                            <!-- Please sign in the box: -->
+
+                                                            <div style="margin-bottom: -11px;">
+                                                                <div class="signaturewrapper">
+                                                                    <div class="wapper">
+                                                                        <canvas id="signaturepad" class="signature-pad" width="600" height="100"></canvas>
+                                                                    </div>
+                                                                </div>
+                                                                <div>
+                                                                    <br />
+                                                                    <input type="hidden" id="sketch_data" name="sketch_data" />
+                                                                    <input type="hidden" id="hid_printname" name="hid_printname" />
+                                                                    <input type="hidden" id="hid_dt" name="hid_dt" />
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" v-on:click="approveUpdate">Submit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="modal fade" id="kt_modal_fileView" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+                    <div class="modal-dialog modal-md" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">File</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <iframe :src="ruta" height="500px"></iframe>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+
+    <script src="~/js/Admin/Home/LearnerWork.js"></script>
+    <script>
+
+        $(document).ready(function () {
+            $("#btnClearPrintName").click(function () {
+                //var btnClearPrint = document.getElementById('txtPrintName');
+                $("#printName").val("");
+
+                var canvas = document.getElementById('signaturepad'),
+                    context = canvas.getContext('2d');
+                context.clearRect(0, 0, canvas.width, canvas.height);
+
+            });
+
+            $("#printName").keyup(function (event) {
+                var stt = $(this).val();
+                var lng = stt.length;
+                var fnt = 30;
+                //max 20!
+                if (lng < 20) { fnt = 30; }
+                else if (lng < 30) { fnt = 20; }
+                else { fnt = 15; }
+
+                var canvas = document.getElementById('signaturepad');
+                var context = canvas.getContext('2d');
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                var fntsize = fnt + 'pt';
+                context.font = 'italic ' + fntsize + ' Sacramento, cursive ';
+                context.fillText(stt, 50, 60);
+            });
+
+        })
+    </script>
+    <script>
+        var _canRoleManagerWorkSubmitted;
+       var _canRoleManagerWorkSubmittedDelete;
+       var _canRoleManagerWorkSubmittedReject;
+       var _canRoleManagerWorkSubmittedAssign;
+        var _canRoleManagerWorkSubmittedApprove;
+        $('#editor').summernote({
+            height: 250,                 // set editor height
+            minHeight: null,             // set minimum height of editor
+            maxHeight: null,             // set maximum height of editor
+        });
+
+        $(document).ready(function () {
+            $("#resubmissiondata").hide();
+
+            _canRoleManagerWorkSubmittedApprove =@canRoleManagerWorkSubmittedApprove.ToString().ToLower();
+            _canRoleManagerWorkSubmitted = @canRoleManagerWorkSubmitted.ToString().ToLower();
+            _canRoleManagerWorkSubmittedDelete =@canRoleManagerWorkSubmittedDelete.ToString().ToLower();
+            _canRoleManagerWorkSubmittedReject =@canRoleManagerWorkSubmittedReject.ToString().ToLower();
+            _canRoleManagerWorkSubmittedAssign =@canRoleManagerWorkSubmittedAssign.ToString().ToLower();
+           if (!_canRoleManagerWorkSubmitted) {
+               window.location.href = '/Error/PermissionDenied';
+           }
+
+
+            var date = new Date();
+            date.setDate(date.getDate() + 14);
+
+            $('#completeDate').datepicker({
+                format: 'dd/mm/yyyy',
+                autoclose: true,
+                todayHighlight: true,
+
+            }).datepicker('setDate', date);
+            function resizeGrid1() {
+                var contentwrapper = $("#kt_aside").innerHeight();
+                var gridElement = $("#grid_submitted"),
+                    newHeight = gridElement.innerHeight(),
+                    otherElements = gridElement.children().not(".k-grid-content"),
+                    otherElementsHeight = 0;
+
+                otherElements.each(function () {
+                    otherElementsHeight += $(this).outerHeight();
+                });
+                var newHeight = (contentwrapper - otherElementsHeight) - 330;
+                if (newHeight < 325) newHeight = 325;
+                gridElement.children(".k-grid-content").height(newHeight);
+            }
+
+        })
+        function RefreshSubmitted() {
+            $('#grid_submitted').data('kendoGrid').dataSource.read();
+            $('#grid_submitted').data('kendoGrid').refresh();
+        }
+        //function RefreshRejected() {
+        //    $('#grid_rejected').data('kendoGrid').dataSource.read();
+        //    $('#grid_rejected').data('kendoGrid').refresh();
+        //}
+        function ReadyToCheck() {
+            $('#grid_readytocheck').data('kendoGrid').dataSource.read();
+            $('#grid_readytocheck').data('kendoGrid').refresh();
+        }
+        function Approved() {
+            $('#grid_approved').data('kendoGrid').dataSource.read();
+            $('#grid_approved').data('kendoGrid').refresh();
+        }
+        function Valided() {
+            $('#grid_validated').data('kendoGrid').dataSource.read();
+            $('#grid_validated').data('kendoGrid').refresh();
+        }
+        function formatDateEN(date) {
+            const options = { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }
+            return new Date(date).toLocaleDateString('en-GB')
+        }
+        $("#searchsubmit").keyup(function () {
+
+            $("#grid_submitted").data("kendoGrid").refresh();
+            var type = "Submitted";
+            var id = $(this).val();
+            if (id != "") {
+                $.ajax({
+                    url: "/api/WorkUploadApi/SearchWork",
+                    data: { type: type, name: id },
+                    type: "GET",
+                    contentType: "application/json",
+                    dataType: "json",
+                    async: false
+                }).done(function (response) {
+                    $("#grid_submitted").data("kendoGrid").dataSource.data([]);
+
+
+                    let grid = $("#grid_submitted").data("kendoGrid");
+
+                    for (var i = 0; i < response.Data.length; i++) {
+
+                        grid.dataSource.add({
+                            id: response.Data[i].id, created_on: formatDateEN(response.Data[i].created_on),
+                            learner_id: response.Data[i].learner_id
+                            , LearnerName: response.Data[i].LearnerName,
+                            Topic: response.Data[i].Topic
+                            , due_date: response.Data[i].due_date, Status: response.Data[i].Status
+
+
+                        });
+
+                    }
+
+
+                });
+            }
+            else {
+                $("#grid_submitted").data("kendoGrid").dataSource.read();
+
+
+
+
+            }
+
+        });
+
+        $("#searchcheck").keyup(function () {
+            $("#grid_readytochecked").data("kendoGrid").refresh();
+            var type = "ReadyToChecked";
+
+            var id = $(this).val();
+            if (id != "") {
+                $.ajax({
+                    url: "/api/WorkUploadApi/SearchWork",
+                    data: { type: type, name: id },
+                    type: "GET",
+                    contentType: "application/json",
+                    dataType: "json",
+                    async: false
+                }).done(function (response) {
+                    $("#grid_readytochecked").data("kendoGrid").dataSource.data([]);
+
+
+                    let grid = $("#grid_readytochecked").data("kendoGrid");
+
+                    for (var i = 0; i < response.Data.length; i++) {
+
+                        grid.dataSource.add({
+                            id: response.Data[i].id, created_on: formatDateEN(response.Data[i].created_on),
+                            learner_id: response.Data[i].learner_id
+                            , LearnerName: response.Data[i].LearnerName,
+                            Topic: response.Data[i].Topic
+                            , due_date: response.Data[i].due_date, Status: response.Data[i].Status
+
+
+                        });
+
+                    }
+
+
+                });
+            }
+            else {
+                $("#grid_readytochecked").data("kendoGrid").dataSource.read();
+
+
+
+
+            }
+
+        });
+
+        $("#searchapprove").keyup(function () {
+
+            $("#grid_approved").data("kendoGrid").refresh();
+            var type = "Approved";
+            var id = $(this).val();
+            if (id != "") {
+                $.ajax({
+                    url: "/api/WorkUploadApi/SearchWork",
+                    data: { type: type, name: id },
+                    type: "GET",
+                    contentType: "application/json",
+                    dataType: "json",
+                    async: false
+                }).done(function (response) {
+                    $("#grid_approved").data("kendoGrid").dataSource.data([]);
+
+
+                    let grid = $("#grid_approved").data("kendoGrid");
+
+                    for (var i = 0; i < response.Data.length; i++) {
+
+                        grid.dataSource.add({
+                            id: response.Data[i].id, created_on: formatDateEN(response.Data[i].created_on),
+                            learner_id: response.Data[i].learner_id
+                            , LearnerName: response.Data[i].LearnerName,
+                            Topic: response.Data[i].Topic
+                            , due_date: response.Data[i].due_date, Status: response.Data[i].Status
+
+
+                        });
+
+                    }
+
+
+                });
+            }
+            else {
+                $("#grid_approved").data("kendoGrid").dataSource.read();
+
+
+
+
+            }
+
+        });
+        $("#searchvalidate").keyup(function () {
+
+            $("#grid_validated").data("kendoGrid").refresh();
+            var type = "Validated";
+            var id = $(this).val();
+            if (id != "") {
+                $.ajax({
+                    url: "/api/WorkUploadApi/SearchWork",
+                    data: { type: type, name: id },
+                    type: "GET",
+                    contentType: "application/json",
+                    dataType: "json",
+                    async: false
+                }).done(function (response) {
+                    $("#grid_validated").data("kendoGrid").dataSource.data([]);
+
+
+                    let grid = $("#grid_validated").data("kendoGrid");
+
+                    for (var i = 0; i < response.Data.length; i++) {
+
+                        grid.dataSource.add({
+                            id: response.Data[i].id, created_on: formatDateEN(response.Data[i].created_on),
+                            learner_id: response.Data[i].learner_id
+                            , LearnerName: response.Data[i].LearnerName,
+                            Topic: response.Data[i].Topic,
+                            Status: response.Data[i].Status
+                            , due_date: response.Data[i].due_date, Status: response.Data[i].Status
+
+
+                        });
+
+                    }
+
+
+                });
+            }
+            else {
+                $("#grid_validated").data("kendoGrid").dataSource.read();
+
+
+
+
+            }
+
+        });
+        $("#searchreject").keyup(function () {
+
+            $("#grid_rejected").data("kendoGrid").refresh();
+            var type = "Rejected";
+            var id = $(this).val();
+            if (id != "") {
+                $.ajax({
+                    url: "/api/WorkUploadApi/SearchWork",
+                    data: { type: type, name: id },
+                    type: "GET",
+                    contentType: "application/json",
+                    dataType: "json",
+                    async: false
+                }).done(function (response) {
+                    $("#grid_rejected").data("kendoGrid").dataSource.data([]);
+
+
+                    let grid = $("#grid_rejected").data("kendoGrid");
+
+                    for (var i = 0; i < response.Data.length; i++) {
+
+                        grid.dataSource.add({
+                            updated_on: formatDateEN(response.Data[i].updated_on),
+                            learner_id: response.Data[i].learner_id
+                            , LearnerName: response.Data[i].LearnerName,
+                            Topic: response.Data[i].Topic
+                            , user_name: response.Data[i].user_name, rejected_reason: response.Data[i].rejected_reason
+
+
+                        });
+
+                    }
+
+
+                });
+            }
+            else {
+                $("#grid_rejected").data("kendoGrid").dataSource.read();
+
+
+
+
+            }
+
+        });
+
+
+    </script>
+
+}
+

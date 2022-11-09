@@ -1,0 +1,220 @@
+﻿
+@{ ViewData["Title"] = "Manage Documents";
+                Layout = "~/Views/Shared/_Layout.cshtml";
+
+                var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+                var canRoleManagerViewDocument = (permissions == null) ? false : (bool)permissions["MD_DOCUMENT_VIEW"];
+                var canRoleManagerCreateDocument = (permissions == null) ? false : (bool)permissions["MD_DOCUMENT_CREATE"];
+                var canRoleManagerDownloadDocument = (permissions == null) ? false : (bool)permissions["MD_DOCUMENT_DOWNLOAD"];
+                var canRoleManagerDeleteDocument = (permissions == null) ? false : (bool)permissions["MD_DOCUMENT_DEL"];
+
+                var acceptDocumentTypes = ViewBag.acceptDocumentTypes;
+                var isMultipleDocumentUpload = ViewBag.isMultipleDocumentUpload;
+                var maxDocumentUpload = ViewBag.maxDocumentUpload;
+                var maxDocumentFileSize = ViewBag.maxDocumentFileSize; }
+
+<div class="content" id="dv_Manage_DefaultDocuments">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <div class="form__actions kt-portlet__foot">
+                <label style="font-size: large;font-weight: 500;margin-top:10px;margin-left:-15px;">Default Documents</label>
+            </div>
+            <div class="kt-portlet__head-toolbar">
+                <button type="button" class="btn btn-sm btn-bold btn-label-brand" v-on:click="NewDocument"><i class="fa fa-plus"></i> Add Document</button>
+                &nbsp;
+                <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-brand">
+                        <i class="la la-check"></i>
+                        <span class="kt-hidden-mobile">Export Options</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-brand dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                    <div class="dropdown-menu dropdown-menu-right" style="">
+                        <ul class="kt-nav">
+                            <li class="kt-nav__item">
+                                <a onclick="return exportDocumentPDF()" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon"></i>
+                                    <span class="kt-nav__link-text">PDF</span>
+                                </a>
+                            </li>
+                            <li class="kt-nav__item">
+                                <a onclick="return exportDocumentExcel()" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon"></i>
+                                    <span class="kt-nav__link-text">Excel</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="kt-portlet__body">
+            <div class="box-header with-border">
+
+                @(Html.Kendo().Grid<ds.portal.documents.Models.DefaultDocument>()
+                    .Name("DocumentsGrid")
+                    .Columns(columns =>
+                    {
+                        columns.Template("<div class='gridactionbuttonscontainer'>" +
+                                //"<a class='kt-font-brand' style='cursor:pointer;' onclick=PerformNoteEdit('#:DefaultDoc_Id#') title='Edit'><span style='text-align:center;' class='fa fa-pen'></span></a> &nbsp;&nbsp;" +
+                                "<a class='kt-font-brand' style='cursor:pointer;' href='api/DocumentApi/DownloadFile?document_Id=#:DefaultDoc_Id#' title='Download'><span style = 'text-align:center;' class='fa fa-file-download'></span></a>" +
+                                //"<a class='kt-font-brand' style='cursor:pointer;' onclick=PerformDocumentDownload('" + "#:DefaultDoc_FilePath#" + "') title='Download'><span style = 'text-align:center;' class='fa fa-file-download'></span></a>" +
+                                "&nbsp;&nbsp;<a class='kt-font-danger' style='cursor:pointer;'onclick=PerformDocumentDelete('#:DefaultDoc_Id#') title='Delete'> <span style='text-align:center;' class='fa fa-trash-alt'></span></a></div>").Width(55).ClientHeaderTemplate(" ");
+                        columns.Bound(p => p.DefaultDoc_Name).Title("Name");
+                        columns.Bound(p => p.DefaultDoc_Category).Title("Category");
+                        columns.Bound(p => p.DefaultDoc_Description).Title("Description");
+                        columns.Bound(p => p.DefaultDoc_CreatedByUserName).Title("By").Width("200px");
+                        columns.Bound(p => p.DefaultDoc_DateCreated).Format("{0:dd/MM/yyyy HH:mm}").Title("Date").Width("180px");
+                    })
+                    .HtmlAttributes(new { style = "height: 100%;" })
+                    .Resizable(resize => resize.Columns(true))
+             .Reorderable(x => x.Columns(true))
+             .ColumnMenu(c => c.Columns(true))
+                    .Sortable()
+                    .Pageable()
+                    .Filterable()
+                    .NoRecords()
+                    .Pageable(pageable => pageable
+                    .Refresh(true)
+                    .PageSizes(true)
+                    .ButtonCount(5))
+                    .DataSource(dataSource =>
+                    dataSource
+                    .WebApi()
+                    .Model(model =>
+                    {
+                        model.Id(p => p.DefaultDoc_Id);
+                    })
+                    .Events(events => events.Error("error_handler"))
+                    .Read(read => read.Action("GetAllDefaultDocuments", "DocumentApi"))
+                    .PageSize(20)
+                    )
+                )
+
+                <div class="modal fade" id="kt_modal_document" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Document Upload</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="recipient-name" class="form-control-label">Name:</label>
+                                    <input type="text" class="form-control" v-model="Document.DefaultDoc_Name" v-bind:class="{ 'is-invalid': isDocumentSubmitted && $v.Document.DefaultDoc_Name.$invalid }">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-control-label">Category:</label>
+                                    <select class="form-control" v-model="Document.DefaultDoc_Id_Category" v-bind:class="{ 'is-invalid': isDocumentSubmitted && $v.Document.DefaultDoc_Id_Category.$invalid }">
+                                        <option v-for="documentCat in DocumentCategories" v-bind:value="documentCat.id" v-text="documentCat.description"></option>
+                                    </select>
+                                    @*<span v-if="isDocumentSubmitted && $v.Document.DefaultDoc_Id_Category.$invalid" class="form-text text-danger">Category is required</span>*@
+                                </div>
+                                <div class="form-group">
+                                    <label>File</label>
+                                    @*<div></div>*@
+                                    <div class="custom-file">
+                                        <partial name="~/Views/Shared/partials/fileUpload/_fileUpload.cshtml" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="message-text" class="form-control-label">Description:</label>
+                                    <textarea class="form-control" v-model="Document.DefaultDoc_Description" v-bind:class="{ 'is-invalid': isDocumentSubmitted && $v.Document.DefaultDoc_Description.$invalid }"></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" v-on:click="submitDocument">Upload</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    <script src="~/js/Admin/Document/ManageDefaultDocs.js"></script>
+
+}
+
+<script>
+    var _canRoleManagerViewDocument;
+    var _canRoleManagerCreateDocument;
+    var _canRoleManagerDownloadDocument;
+    var _canRoleManagerDeleteDocument;
+
+    var _acceptDocumentTypes;
+    var _allowedExtensions = [];
+    var _isMultipleDocumentUpload;
+    var _maxDocumentUpload;
+    var _maxDocumentFileSize;
+
+    $(document).ready(function () {
+            _canRoleManagerViewDocument = @canRoleManagerViewDocument.ToString().ToLower();
+            _canRoleManagerCreateDocument = @canRoleManagerCreateDocument.ToString().ToLower();
+            _canRoleManagerDownloadDocument = @canRoleManagerDownloadDocument.ToString().ToLower();
+            _canRoleManagerDeleteDocument = @canRoleManagerDeleteDocument.ToString().ToLower();
+
+           _acceptDocumentTypes = '@acceptDocumentTypes';
+           _isMultipleDocumentUpload = (@isMultipleDocumentUpload == 1) ? true : false;
+           _maxDocumentUpload = @maxDocumentUpload;
+           _maxDocumentFileSize = @maxDocumentFileSize;
+
+           if (_acceptDocumentTypes !== null)
+           {
+               if (_acceptDocumentTypes.includes(',')) {
+                   var item = _acceptDocumentTypes.split(',');
+                   for (var count = 0; count < item.length; count++) {
+                       if (item[count] !== "") {
+                           _allowedExtensions.push('' + item[count] + '');
+                       }
+                   }
+               }
+               else
+               {
+                   _allowedExtensions.push('' + _acceptDocumentTypes + '');
+               }
+           }
+
+           uploadFile();
+
+           $("#span_fileUpload").text("Max file size is " + _maxDocumentFileSize + " MB and max number of files is " + _maxDocumentUpload + " and file type " + _allowedExtensions.toString());
+
+
+        if (!_canRoleManagerViewDocument) {
+            window.location.href = '/Error/PermissionDenied';
+        }
+        resizeGrid1();
+       });
+        function resizeGrid1() {
+            var contentwrapper = $("#kt_aside").innerHeight();
+            var gridElement = $("#DocumentsGrid"),
+                newHeight = gridElement.innerHeight(),
+                otherElements = gridElement.children().not(".k-grid-content"),
+                otherElementsHeight = 0;
+
+            otherElements.each(function () {
+                otherElementsHeight += $(this).outerHeight();
+            });
+                var newHeight = (contentwrapper - otherElementsHeight) - 330;
+                if (newHeight < 325) newHeight = 325;
+            gridElement.children(".k-grid-content").height(newHeight);
+    }
+
+    function exportDocumentPDF() {
+        var grid = $("#DocumentsGrid").data("kendoGrid");
+        grid.hideColumn(0);
+        $("#DocumentsGrid").getKendoGrid().saveAsPDF();
+        grid.showColumn(0);
+    }
+
+    function exportDocumentExcel() {
+        $("#DocumentsGrid").getKendoGrid().saveAsExcel();
+    }
+</script>

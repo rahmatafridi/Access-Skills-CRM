@@ -1,0 +1,410 @@
+﻿@{ ViewData["Title"] = "Dashboard";
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+    var canRoleManagerEditLead = (permissions == null) ? false : (bool)permissions["MD_LEAD_EDIT"];
+    var hasAdminRole = (permissions == null) ? false : (bool)permissions["MD_LEAD_MSTR"]; }
+
+<style>
+    .link-text:hover {
+        color: #22b9ff !important;
+    }
+
+    #leadsGrid, #ActivitiesGrid {
+        margin: 0;
+        padding: 0;
+        /*border-width: 0;*/
+        height: 100%;
+    }
+</style>
+
+<div id="dv_Dashboard_Main" class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid">
+    <br />
+    <div class="kt-portlet__head-label">
+        <h3 class="kt-portlet__head-title">
+            Access Skills CRM
+        </h3>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-xl-4 col-lg-6 order-lg-1 order-xl-1">
+
+            <div class="kt-portlet kt-portlet--height-fluid">
+                <div class="kt-portlet__head">
+                    <div class="kt-portlet__head-label">
+                        <h3 class="kt-portlet__head-title">
+                            Leads
+                            <span id="lblLeadTotal" class="kt-widget20__number kt-font-brand"></span>
+                        </h3>
+                    </div>
+                </div>
+                <div class="kt-portlet__body kt-portlet__body--fluid">
+                    <div class="kt-widget12">
+                        <div class="kt-widget14__content">
+                            <div class="kt-widget14__chart" style="margin-left: -240px;">
+                                <div class="kt-widget14__stat"></div>
+                                <canvas id="kt_chart_profit_share_status" style="height: 140px; width: 140px;"></canvas>
+                            </div>
+
+                            <div id="cntrls" class="kt-widget14__legends" style="float: right;margin-right:130px;margin-top:-120px; padding-bottom: 10px;">
+
+                                @*<div class="kt-widget14__legend">
+                                        <span id="lblStatusNew" class="kt-badge kt-badge--brand kt-badge--inline" style="font-weight: 600"></span>
+                                    </div>
+                                    <div class="kt-widget14__legend">
+                                        <span id="lblStatusCompleted" class="kt-badge kt-badge--success kt-badge--inline" style="font-weight: 600"></span>
+                                    </div>
+                                    <div class="kt-widget14__legend">
+                                        <span id="lblStatusInProgress" class="kt-badge kt-badge--warning kt-badge--inline" style="font-weight: 600"></span>
+                                    </div>
+                                    <div class="kt-widget14__legend">
+                                        <span id="lblStatusDeleted" class="kt-badge kt-badge--danger kt-badge--inline" style="font-weight: 600;background: rgb(253, 57, 149);"></span>
+                                    </div>*@
+                            </div>
+                        </div>
+                        <div class="kt-widget12__chart" style="height:250px;">
+                            <canvas id="kt_chart_order_statistics1"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4 col-lg-6 order-lg-1 order-xl-1">
+            <div class="kt-portlet kt-portlet--height-fluid">
+                <div class="kt-portlet__head">
+                    <div class="kt-portlet__head-label">
+                        <h3 class="kt-portlet__head-title">
+                            My Leads
+                            <span class="kt-widget20__number kt-font-brand"></span>
+                        </h3>
+                    </div>
+                </div>
+                <div class="kt-portlet__body">
+                    @(Html.Kendo().Grid<ds.portal.dashboard.Models.MyLeadsModel>()
+                        .Name("leadsGrid")
+                        .Columns(columns =>
+                        {
+                            columns.Bound(p => p.ContactName).ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformLeadEdit('#:encodeLeadId#') title='#:ContactName#'>#:ContactName#</a>").Title("Contact");
+                           // columns.Bound(p => p.CourseTitle).Title("Course").ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformLeadEdit('#:encodeLeadId#') title='#:CourseTitle#'>#:CourseTitle#</a>");
+                            columns.Bound(p => p.Status).ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformLeadEdit('#:encodeLeadId#') title='#:CourseTitle#'><span class='kt-badge kt-badge--inline kt-badge--pill #= Lead_Status_Class #'>#= Status #</span></a>").HtmlAttributes(new { style = "text-align:center" }).Title("Status");
+                            columns.Bound(p => p.DateOfEnquiry).Format("{0:dd/MM/yyyy}").Title("Enquiry Date").ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformLeadEdit('#:encodeLeadId#') title='#:DateOfEnquiry#'>#:DateOfEnquiry#</a>");
+                        })
+                        .HtmlAttributes(new { style = "height: 100%;" })
+                        .Scrollable(scr => scr.Height(350))
+                        .Sortable()
+                        .NoRecords()
+                        .Pageable()
+                        .Filterable()
+                        .Resizable(resize => resize.Columns(true))
+                        .Reorderable(x => x.Columns(true))
+                        .ColumnMenu(c => c.Columns(true))
+                        .Pageable(pageable => pageable
+                        .Refresh(true)
+                        .PageSizes(true)
+                        .ButtonCount(5))
+                        .DataSource(dataSource =>
+                        dataSource
+                        .WebApi()
+                        .Events(events => events.Error("error_handler"))
+                        .Read(read => read.Action("GetMyLeadsForDashboard", "DashboardApi"))
+                        .PageSize(6)
+                        )
+                    )
+
+
+                </div>
+            </div>
+
+        </div>
+        <div class="col-xl-4 col-lg-6 order-lg-1 order-xl-1">
+            <div class="kt-portlet kt-portlet--height-fluid">
+                <div class="kt-portlet__head">
+                    <div class="kt-portlet__head-label">
+                        <h3 class="kt-portlet__head-title">
+                            Last Results
+                            <span class="kt-widget20__number kt-font-brand"></span>
+                        </h3>
+                    </div>
+                </div>
+                <div class="kt-portlet__body">
+                    @(Html.Kendo().Grid<ds.portal.dashboard.Models.LastResultModel>()
+                        .Name("LastResultsGrid")
+                        .Columns(columns =>
+                        {
+                            columns.Bound(p => p.LastResult).ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=show_last_result_leads('#:Id#') title='#:LastResult#'>#:LastResult#</a>").Title("Last Results");
+                            columns.Bound(p => p.Count).Title("Total");
+                        })
+                        .HtmlAttributes(new { style = "height: 100%;" })
+                        .Scrollable(scr => scr.Height(350))
+                        .Sortable()
+                        .Pageable()
+                        .NoRecords()
+                        .Filterable()
+                        .Resizable(resize => resize.Columns(true))
+                        .Reorderable(x => x.Columns(true))
+                        .ColumnMenu(c => c.Columns(true))
+                        .Pageable(pageable => pageable
+                        .Refresh(true)
+                        .PageSizes(true)
+                        .ButtonCount(5))
+                        .DataSource(dataSource =>
+                        dataSource
+                        .WebApi()
+                        .Model(model =>
+                        {
+                            model.Id(p => p.Count);
+                        })
+                        .Events(events => events.Error("error_handler"))
+                        .Read(read => read.Action("GetLastResults", "DashboardApi"))
+                        .PageSize(8)
+                        )
+                    )
+                </div>
+            </div>
+
+        </div>
+        <div class="col-xl-4 col-lg-6 order-lg-1 order-xl-1">
+            <div class="kt-portlet kt-portlet--height-fluid">
+                <div class="kt-portlet__head">
+                    <div class="kt-portlet__head-label">
+                        <h3 class="kt-portlet__head-title">
+                            Agreed Payment Scheme
+                            <span class="kt-widget20__number kt-font-brand"></span>
+                        </h3>
+                    </div>
+                </div>
+                <div class="kt-portlet__body">
+                    @(Html.Kendo().Grid<ds.portal.dashboard.Models.AgreedPaymentsModel>()
+                        .Name("AgreedPaymentsGrid")
+                        //.Columns(columns =>
+                        //{
+                        //    columns.Bound(p => p.TrainingProvider).Title("Agreed Payment");
+                        //    columns.Bound(p => p.Count).Title("Total");
+                        //})
+
+                        .Columns(columns =>
+                        {
+                            columns.Bound(p => p.AgreedPaymentScheme).ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=show_agreed_payment_scheme_leads('#:Id#') title='#:AgreedPaymentScheme#'>#:AgreedPaymentScheme#</a>").Title("Agreed Payment");
+                            columns.Bound(p => p.Count).Title("Total");
+                        })
+                        //.Columns(columns =>
+                        //{
+                        //    columns.Bound(p => p.ContactName).ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformLeadEdit('#:encodeLeadId#') title='#:ContactName#'>#:ContactName#</a>").Title("Contact");
+                        //    // columns.Bound(p => p.CourseTitle).Title("Course").ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformLeadEdit('#:encodeLeadId#') title='#:CourseTitle#'>#:CourseTitle#</a>");
+                        //    columns.Bound(p => p.Status).ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformLeadEdit('#:encodeLeadId#') title='#:CourseTitle#'><span class='kt-badge kt-badge--inline kt-badge--pill #= Status_Id == 1 ? 'kt-badge--brand' : Status_Id == 2 ? 'kt-badge--warning' : Status_Id == 3 ? 'kt-badge--success' : ''  #'>#= Status #</span></a>").HtmlAttributes(new { style = "text-align:center" }).Title("Status");
+                        //    columns.Bound(p => p.DateOfEnquiry).Format("{0:dd/MM/yyyy}").Title("Enquiry Date").ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformLeadEdit('#:encodeLeadId#') title='#:DateOfEnquiry#'>#:DateOfEnquiry#</a>");
+                        //})
+
+                        .HtmlAttributes(new { style = "height: 100%;" })
+                        .Scrollable(scr => scr.Height(350))
+                        .Sortable()
+                        .Pageable()
+                        .NoRecords()
+                        .Filterable()
+                        .Resizable(resize => resize.Columns(true))
+                        .Reorderable(x => x.Columns(true))
+                        .ColumnMenu(c => c.Columns(true))
+                        .Pageable(pageable => pageable
+                        .Refresh(true)
+                        .PageSizes(true)
+                        .ButtonCount(5))
+                        .DataSource(dataSource =>
+                        dataSource
+                        .WebApi()
+                        .Model(model =>
+                        {
+                            model.Id(p => p.Count);
+                        })
+                        .Events(events => events.Error("error_handler"))
+                        .Read(read => read.Action("GetAgreedPaymentSchemes", "DashboardApi"))
+                        .PageSize(8)
+                        )
+                    )
+                </div>
+            </div>
+
+        </div>
+        @{ if (hasAdminRole)
+            {
+<div class="col-xl-4 col-lg-6 order-lg-1 order-xl-1">
+    <div class="kt-portlet kt-portlet--height-fluid">
+        <div class="kt-portlet__head">
+            <div class="kt-portlet__head-label">
+                <h3 class="kt-portlet__head-title">
+                    Sales Advisor Leads
+                    <span class="kt-widget20__number kt-font-brand"></span>
+                </h3>
+            </div>
+        </div>
+        <div id="dv_Dashboard_SalesStatus" class="kt-portlet__body" style="max-height: 460px;overflow: auto;margin-top:-20px;">
+        </div>
+    </div>
+</div>
+                <div class="col-xl-4 col-lg-6 order-lg-1 order-xl-1">
+                    <div class="kt-portlet kt-portlet--height-fluid">
+                        <div class="kt-portlet__head">
+                            <div class="kt-portlet__head-label">
+                                <h3 class="kt-portlet__head-title">
+                                    Today's Tasks
+                                </h3>
+                            </div>
+                        </div>
+                        <div class="kt-portlet__body" style="max-height:260px;overflow: auto;">
+                            <!--Begin::Timeline 3 -->
+                            <div class="kt-timeline-v2">
+                                <div id="divTasks" class="kt-timeline-v2__items  kt-padding-top-25 kt-padding-bottom-30">
+
+                                </div>
+                            </div>
+                            <!--End::Timeline 3 -->
+                        </div>
+                    </div>
+                </div> } }
+        <div class="col-xl-4 col-lg-6 order-lg-1 order-xl-1">
+            <div class="kt-portlet kt-portlet--height-fluid">
+                <div class="kt-portlet__head">
+                    <div class="kt-portlet__head-label" style="width:100%;">
+                        <h3 class="kt-portlet__head-title">
+                            Contact Attempts
+                            <span class="kt-widget20__number kt-font-brand"></span>
+                        </h3>
+                    </div>
+                    <div style="margin-top: 18px;">
+                        @(Html.Kendo().DropDownList()
+                            .Name("ddlContactAttempt")
+                            .DataTextField("Text")
+                            .DataValueField("Value")
+                            .OptionLabel("Select Contacts")
+                            .Events(e => e.Change("change"))
+                            //.HtmlAttributes(new { style = "width:100%" })
+                            .BindTo(new List<SelectListItem>() {
+                                    new SelectListItem() {
+                                        Text = "Contact Attempt 1",
+                                        Value = "Contact Attempt 1"
+                                    },
+                                    new SelectListItem() {
+                                        Text = "Contact Attempt 2",
+                                        Value = "Contact Attempt 2"
+                                    },
+                                    new SelectListItem() {
+                                        Text = "Contact Attempt 3",
+                                        Value = "Contact Attempt 3"
+                                    }
+                                    //,
+                                    //new SelectListItem() {
+                                    //    Text = "Contact Attempt 4",
+                                    //    Value = "Contact Attempt 4"
+                                    //}
+                                    //,
+                                    //new SelectListItem() {
+                                    //    Text = "Contact Attempt 5",
+                                    //    Value = "Contact Attempt 5"
+                                    //}
+                            })
+                            .Value("1")
+                        )
+                    </div>
+                </div>
+
+                <div class="kt-portlet__body">
+
+                    @(Html.Kendo().Grid<ds.portal.dashboard.Models.MyLeadsModel>()
+                        .Name("contactAttemptsGrid")
+                        .Columns(columns =>
+                        {
+                            columns.Bound(p => p.ContactName).ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformLeadEdit('#:encodeLeadId#') title='#:ContactName#'>#:ContactName#</a>").Title("Contact");
+                            columns.Bound(p => p.CourseTitle).Title("Course").ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformLeadEdit('#:encodeLeadId#') title='#:CourseTitle#'>#:CourseTitle#</a>");
+                            columns.Bound(p => p.Status).ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformLeadEdit('#:encodeLeadId#') title='#:CourseTitle#'><span class='kt-badge kt-badge--inline kt-badge--pill #= Lead_Status_Class #'>#= Status #</span></a>").HtmlAttributes(new { style = "text-align:center" }).Title("Status");
+                            columns.Bound(p => p.DateOfEnquiry).Format("{0:dd/MM/yyyy}").Title("Enquiry Date").ClientTemplate("<a style='cursor:pointer;' class='link-text' onclick=PerformLeadEdit('#:encodeLeadId#') title='#:DateOfEnquiry#'>#:DateOfEnquiry#</a>");
+                        })
+                        .HtmlAttributes(new { style = "height: 100%;" })
+                        .Scrollable(scr => scr.Height(350))
+                        .Sortable()
+                        .NoRecords()
+                        .Pageable()
+                        .Filterable()
+                        .AutoBind(false)
+                        .Resizable(resize => resize.Columns(true))
+                        .Reorderable(x => x.Columns(true))
+                        .ColumnMenu(c => c.Columns(true))
+                        .Pageable(pageable => pageable
+                        .Refresh(true)
+                        .PageSizes(true)
+                        .ButtonCount(5))
+                        .DataSource(dataSource =>
+                        dataSource
+                        .WebApi()
+                        .Events(events => events.Error("error_handler"))
+                        .Read(read => read.Action("GetContactAttempts", "DashboardApi").Data("returnData"))
+                        .PageSize(6)
+                        )
+                    )
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div>
+    @*<a style='cursor:pointer;' class='link-text' onclick=show_agreed_payment_scheme_leads(566) title='test'>show</a>*@
+
+</div>
+<partial name="/Views/Shared/partials/_modal_agreedpaymentscheme_leads.cshtml" />
+<partial name="/Views/Shared/partials/_modal_lastresults_leads.cshtml" />
+
+
+<link href="~/Theme/assets/plugins/custom/fullcalendar/fullcalendar.bundle.css" rel="stylesheet" />
+<script type="application/javascript" src="~/lib/vue/vue.js"></script>
+<script type="application/javascript" src="~/lib/vue/vuelidate.min.js"></script>
+<script type="application/javascript" src="~/lib/vue/validators.min.js"></script>
+<script type="application/javascript" src="~/js/Admin/Dashboard/Dashboard.js"></script>
+<script type="application/javascript" src="~/js/Admin/Dashboard/DashboardChart.js"></script>
+
+<script>
+
+var _canRoleManagerEditLead;
+$(document).ready(function () {
+$("#kt_modal_AcceptCookie").modal("show");
+_canRoleManagerEditLead = @canRoleManagerEditLead.ToString().ToLower();
+resizeGrid1();
+});
+
+function resizeGrid1() {
+    var contentwrapper = $(".sidebar").innerHeight();
+    var gridElement = $("#leadsGrid"),
+        newHeight = gridElement.innerHeight(),
+        otherElements = gridElement.children().not(".k-grid-content"),
+        otherElementsHeight = 0;
+    otherElements.each(function () {
+        otherElementsHeight += $(this).outerHeight();
+    });
+
+    gridElement.children(".k-grid-content").height(contentwrapper - otherElementsHeight);
+    }
+
+function change()
+{
+    //debugger;
+    $.ajax({
+        url: "/api/DashboardApi/GetContactAttempts",
+        type: "GET",
+        contentType: "application/json",
+        data:
+        {
+            lastResult: $('#ddlContactAttempt').val()
+        },
+        dataType: "json",
+    }).done(function (response) {
+        $("#contactAttemptsGrid").data("kendoGrid").dataSource.data(response);
+        $('#contactAttemptsGrid').getKendoGrid().refresh();
+        }).fail(function (xhr) {
+            toastr.error(xhr.responseText, 'Error!');
+    });
+};
+
+    function returnData() {
+        return {
+            lastResult: $('#ddlContactAttempt').val()
+        }
+    }
+
+</script>
+

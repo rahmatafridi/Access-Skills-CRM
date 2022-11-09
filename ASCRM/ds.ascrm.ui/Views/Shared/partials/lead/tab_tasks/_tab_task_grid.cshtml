@@ -1,0 +1,90 @@
+﻿  <!--begin::Form-->
+<div class="kt-form kt-form--fit kt-form--label-right">
+    <div class="portlet__foot">
+        <div class="form-group">
+            <div class="col-lg-12">
+                @(Html.Kendo().Grid<ds.portal.leads.Models.TaskViewModel>()
+                                .Name("TaskGrid")
+                                .Columns(columns =>
+                                {
+                                    //columns.Template("<div class='gridactionbuttonscontainer'>" +
+                                    //        "<a class='kt-font-brand' style='cursor:pointer;' onclick=PerformTASKEdit('#:Task_Id#') title='Edit'><span style = 'text-align:center;' class='fa fa-eye'></span></a>" +
+                                    //        "&nbsp;&nbsp;<a class='kt-font-danger' style='cursor:pointer;'onclick=PerformTaskDelete('#:Task_Id#') title='Delete'> <span style='text-align:center;' class='fa fa-trash-alt'></span></a></div>").Width(60).ClientHeaderTemplate(" ");
+                                    columns.Template("<div class='gridactionbuttonscontainer'>" +
+                                            "<a class='kt-font-danger' style='cursor:pointer;'onclick=PerformTaskDelete('#:task_id#') title='Delete'> <span style='text-align:center;' class='fa fa-trash-alt'></span></a></div>").Width(30).ClientHeaderTemplate(" ");
+
+                                    //columns.Template("" +
+                                    //"#= task_is_done == 1 ? 'Yes' : "
+                                    //+ "'<a style=\'cursor:pointer\' class=\'btn btn-primary\' onclick=\'return duplicateOnclick(#= task_id#,#=task_id_user#)\'>xxxxxx <a/>"
+                                    //+ " #"
+                                    //+ "").Title("Done?").HtmlAttributes(new { style = "text-align:center" }).Width(100);
+
+                                    //columns.Bound(p => p.task_is_done).ClientTemplate("\\#if('#=task_is_done#'=='false') {\\<input type='button' value='OK' />\\}\\#");
+                                     columns.Bound(p => p.task_is_done).ClientTemplate("#=showLink(task_id,task_id_user,task_is_done)#").Title(" ").HtmlAttributes(new { style = "text-align:center" }).Width(100);
+
+
+                                    columns.Bound(p => p.task_is_done).ClientTemplate("#= task_is_done == 1 ? 'Yes' :'Not Done' #").Title("Done?").HtmlAttributes(new { style = "text-align:center" }).Width(100);
+
+                                    columns.Bound(p => p.task_activity).Title("Activity");
+                                    columns.Bound(p => p.task_scheduled_with).Title("Scheduled With");
+                                    columns.Bound(p => p.task_start).Format("{0:dd/MM/yyyy HH:mm}").Title("Date").Width("180px");
+
+
+                                    columns.Bound(p => p.task_created_by_username).Title("By");
+
+                                    //columns.Bound(p => p.Task_Date_str).Title("Date2").Width("180px");
+                                    // columns.Bound(p => p.Task_Note).Title("Notes");
+                                    // columns.Bound(p => p.Task_Id_SalesAdvisor).Title("By").Width("200px");
+                                    // columns.Bound(p => p.Task_Created).Title("By").Width("200px");
+
+                                })
+                                .HtmlAttributes(new { style = "height: 100%;" })
+                                .Scrollable(scr => scr.Height(300))
+                                    .Resizable(resize => resize.Columns(true))
+                                .Reorderable(x => x.Columns(true))
+                                .ColumnMenu(c => c.Columns(true))
+                                .NoRecords()
+                                .Sortable()
+                                .Pageable()
+                                .Filterable()
+                                .Pageable(pageable => pageable
+                                .Refresh(true)
+                                .PageSizes(true)
+                                .ButtonCount(5))
+                                .DataSource(dataSource =>
+                                dataSource
+                                .WebApi()
+                                .Model(model =>
+                                {
+                                    model.Id(p => p.task_id);
+                                })
+                                .Events(events => events.Error("error_handler"))
+                                .Read(read => read.Action("GetAllLeadTask", "LeadApi", new { lead_Id = ViewBag.Lead_Id }))
+                                .PageSize(20)
+                                )
+                )
+
+
+
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::Form-->
+
+<script>
+
+    function showLink(task_id,task_id_user,task_is_done) {
+        var returnLink = "";
+
+        if (task_is_done) {
+            returnLink = " "       
+        }
+        else {
+            returnLink = "<a style='cursor:pointer' class='btn btn-sm btn-brand' onclick='return PerformTaskDone("+task_id+","+ task_id_user + ")'>Done<a/>"
+        }
+         
+        return returnLink;
+    }
+
+</script>

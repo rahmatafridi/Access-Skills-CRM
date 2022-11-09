@@ -1,0 +1,99 @@
+﻿
+@{    
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+    var canRoleManagerCreateRole = (permissions == null) ? false : (bool)permissions["MD_ROLE_CREATE"];
+    var canRoleManagerEditRole = (permissions == null) ? false : (bool)permissions["MD_ROLE_EDIT"];
+    var roleId = ViewBag.RoleId;
+}
+ 
+<div class="content" id="dv_Create_Role">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <div class="kt-form__actions kt-portlet__foot">
+                @*<button id="btnSave" v-on:click="submitted" class="btn btn-sm btn-success"><span class="fa fa-check"></span> Save</button>*@
+                @*<a href="~/RoleAdmin/Index" class="btn btn-sm btn-secondary"><i class="glyphicon glyphicon-remove"></i> Cancel</a>*@
+                <label id="lblRoleHeader" style="font-size: large;font-weight: 500;margin-right: 5px">Role</label>
+            </div>
+            <div class="kt-portlet__head-toolbar">
+                <a href="~/RoleAdmin/Index" class="btn btn-clean kt-margin-r-10">
+                    <i class="la la-arrow-left"></i>
+                    <span class="kt-hidden-mobile">Cancel</span>
+                </a>
+
+                <div class="btn-group">
+                    &nbsp;
+
+                    <button type="button" class="btn btn-sm btn-brand" onclick="return saveRole(0)">
+                        <i class="la la-check"></i>
+                        <span class="kt-hidden-mobile">Save</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-brand dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                    <div class="dropdown-menu dropdown-menu-right" style="">
+                        <ul class="kt-nav">
+                            <li class="kt-nav__item">
+                                <a onclick="return saveRole(0)" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon flaticon2-reload"></i>
+                                    <span class="kt-nav__link-text">Save &amp; Stay</span>
+                                </a>
+                            </li>
+                            <li class="kt-nav__item">
+                                <a onclick="return saveRole(1)" class="kt-nav__link">
+                                    <i class="kt-nav__link-icon flaticon2-power"></i>
+                                    <span class="kt-nav__link-text">Save &amp; Go back</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <section class="content">
+            <div class="kt-portlet__body">
+                <div class="box-header with-border">
+                    <div class="form-group row">
+                        <div class="col-lg-4">
+                            <label>Role Name</label>
+                            <input type="text" v-model="role.name" class="form-control" v-bind:class="{ 'is-invalid': isSubmitted && $v.role.name.$invalid }">
+                            <span v-if="isSubmitted && $v.role.name.$invalid" class="form-text text-danger">Role name is required</span>
+                            <span class="form-text text-muted">Please enter role name</span>
+                        </div>
+                        <div class="col-lg-4 ">
+                            <label class="">Role Description</label>
+                            <input type="text" v-model="role.description" class="form-control">
+                            <span class="form-text text-muted">Please enter role description</span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    <script src="~/lib/vue-router/vue-router.min.js"></script>
+    <script src="~/js/Admin/RoleAdmin/CreateRole.js"></script>
+}
+
+<script>
+    var _canRoleManagerCreateRole;
+    var _canRoleManagerEditRole;
+    var _roleId;
+    $(document).ready(function () {
+        _canRoleManagerCreateRole = @canRoleManagerCreateRole.ToString().ToLower();
+        _canRoleManagerEditRole = @canRoleManagerEditRole.ToString().ToLower();
+        _roleId = @roleId;
+
+        if (!_canRoleManagerCreateRole && !_canRoleManagerEditRole) {
+            window.location.href = '/Error/PermissionDenied';
+        }
+        app.mounted();
+    });
+
+</script>

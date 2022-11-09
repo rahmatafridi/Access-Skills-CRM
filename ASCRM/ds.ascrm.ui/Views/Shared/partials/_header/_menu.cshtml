@@ -1,0 +1,69 @@
+
+@{
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+}
+<!-- begin: Header Menu -->
+<button class="kt-header-menu-wrapper-close" id="kt_header_menu_mobile_close_btn"><i class="la la-close"></i></button>
+<div style="margin-top:15px;" class="kt-header-menu-wrapper kt-grid__item kt-grid__item--fluid" id="kt_header_menu_wrapper">
+    <div id="kt_header_menu" class="kt-header-menu kt-header-menu-mobile  kt-header-menu--layout- ">
+
+        <ul class="kt-menu__nav " style="margin-top: -12px;">
+
+            <li class="kt-menu__item  kt-menu__item--active " aria-haspopup="true">
+                @*<a href="~/Home/Index" class="kt-menu__link ">
+                <span class="kt-menu__link-text">Dashboard</span>
+            </a>*@
+                <a href="/Home/Index" class="btn btn-sm btn-bold btn-label-brand"><span class="kt-menu__link-text">Dashboard</span></a>
+
+
+            </li>
+
+            @if (permissions != null && permissions["MD_LEAD_VIEW"] == true && permissions != null && permissions["MD_LEAD_CREATE"] == false)
+            {
+                <li class="kt-menu__item  kt-menu__item--active " aria-haspopup="true">
+                    <a href="/Lead/Manage" class="btn btn-sm btn-bold btn-label-brand"><span class="kt-menu__link-text">Leads</span></a>
+
+                </li>
+                @*<li class="kt-menu__item  kt-menu__item--active " aria-haspopup="true">
+                <a href="~/Lead/Manage" class="kt-menu__link "><span class="kt-menu__link-text">Leads</span></a>
+            </li>*@
+            }
+
+            @if (permissions != null && permissions["MD_LEAD_VIEW"] == true && permissions != null && permissions["MD_LEAD_CREATE"] == true)
+            {
+                <li class="kt-menu__item  kt-menu__item--active " aria-haspopup="true">
+                    <a data-toggle="kt-tooltip" data-placement="bottom" title="" data-original-title="Manage my leads"
+                       href="~/Lead/Manage" class="btn btn-sm btn-bold btn-label-brand"><span class="kt-menu__link-text">Leads</span></a>
+                    @*<a href="~/Lead/Manage" class="kt-menu__link "><span class="kt-menu__link-text">Leads</span></a>*@
+                    <a data-toggle="kt-tooltip" data-placement="bottom" title="" data-original-title="Create new lead"
+                       href="~/Lead/Create" class="btn btn-sm btn-bold btn-label-brand"><span class="kt-menu__link-text">+</span></a>
+                </li>
+            }
+
+            
+            <li class="kt-menu__item  kt-menu__item--active " aria-haspopup="true">
+                <a data-toggle="kt-tooltip" data-placement="bottom" title="" data-original-title="Manage my duplicate leads"
+                   href="~/Lead/Duplicates" class="btn btn-sm btn-bold btn-label-brand"><span class="kt-menu__link-text">Duplicates</span></a>
+             </li>
+             
+
+
+
+            @*<span data-toggle="kt-tooltip" data-placement="right" title="" data-original-title="Click to learn more...">
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon kt-svg-icon--brand kt-svg-icon--md1">
+                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                    <rect x="0" y="0" width="24" height="24"></rect>
+                    <circle fill="#000000" opacity="0.3" cx="12" cy="12" r="10"></circle>
+                    <rect fill="#000000" x="11" y="10" width="2" height="7" rx="1"></rect>
+                    <rect fill="#000000" x="11" y="7" width="2" height="2" rx="1"></rect>
+                </g>
+            </svg>
+        </span>*@
+
+
+        </ul>
+        <br />
+    </div>
+</div>
+
+<!-- end: Header Menu -->

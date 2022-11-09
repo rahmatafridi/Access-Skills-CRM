@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.0.4" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.2.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+    <!--<PackageReference Include="Telerik.UI.for.AspNet.Core" Version="2019.2.619" />-->
+    <PackageReference Include="Telerik.UI.for.AspNet.Core.Trial" Version="2018.3.911" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ds.core.common\ds.core.common.csproj" />
+    <ProjectReference Include="..\ds.core.comms\ds.core.comms.csproj" />
+    <ProjectReference Include="..\ds.core.emailtemplates\ds.core.emailtemplates.csproj" />
+    <ProjectReference Include="..\ds.core.uow\ds.core.uow.csproj" />
+    <ProjectReference Include="..\ds.portal.users\ds.portal.users.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Data">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1\System.Data.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

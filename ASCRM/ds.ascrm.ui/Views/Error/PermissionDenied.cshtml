@@ -1,0 +1,29 @@
+﻿
+@{
+    ViewData["Title"] = "PermissionDenied";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="kt-grid kt-grid--ver kt-grid--root kt-page">
+    <div class="kt-grid__item kt-grid__item--fluid kt-grid  kt-error-v5 text-center" style="/* background-image: url(/metronic/themes/metronic/theme/default/demo7/dist/assets/media/error/bg5.jpg); */">
+        <div class="kt-error_container">
+            @*<span class="kt-error_title">
+                <h1>Oops!</h1>
+            </span>*@
+            <p class="kt-error_subtitle" style="margin-left: 0px;">                
+                Permission denied
+            </p>
+            <p class="kt-error_description"  style="margin-left: 0px;">
+                We're sorry, the page your requested is restricted by your system rights.<br>
+                If you would like access to this area then please contact your system administrator.<br>                
+            </p>
+        </div>
+    </div>
+</div>
+
+@section Styles{
+    <!--begin::Page Custom Styles(used by this page) -->
+    @*<link href="/metronic/themes/metronic/theme/default/demo7/dist/assets/css/pages/error/error-5.css" rel="stylesheet" type="text/css" />*@
+    <link href="~/theme/assets/css/pages/error/error-5.css" rel="stylesheet" type="text/css" />
+    <!--end::Page Custom Styles -->
+}

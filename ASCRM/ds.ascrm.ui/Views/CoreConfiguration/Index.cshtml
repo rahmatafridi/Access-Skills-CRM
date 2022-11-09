@@ -1,0 +1,102 @@
+﻿
+@{
+    ViewData["Title"] = "Configuration Management";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+    var canRoleManagerViewConfig = (permissions == null) ? false : (bool)permissions["CFG_VIEW"];
+    var canRoleManagerCreateConfig = (permissions == null) ? false : (bool)permissions["CFG_CREATE"];
+    var canRoleManagerEditConfig = (permissions == null) ? false : (bool)permissions["CFG_EDIT"];
+    var canRoleManagerDeleteConfig = (permissions == null) ? false : (bool)permissions["CFG_DEL"];
+}
+ 
+
+<div class="content" id="dv_Manage_Configration">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <div class="kt-form__actions kt-portlet__foot">
+                <label style="font-size: large;font-weight: 500;margin-top:10px;margin-left:-15px;">Configuration</label>
+            </div>
+        </div>
+        <div class="kt-portlet__body">
+
+            <div class="box-header with-border">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                Key
+                            </th>
+                            <th>
+                                Value
+                            </th>
+                            <th>
+                                Description
+                            </th>
+                            <th width="200px">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="background-color: #eff3f6;">
+                            <td>
+                                <input class="form-control" v-model="Configration.config_key" v-bind:class="{ 'is-invalid': (isSubmitted && $v.Configration.config_key.$invalid) || isKeyExists }" />
+                                <span v-if="isSubmitted && !$v.Configration.config_key.required" class="form-text text-danger">Title is required</span>
+                                <span v-else-if="isSubmitted && isKeyExists" class="form-text text-danger">Title already exists</span>
+                            </td>
+                            <td>
+                                <input class="form-control" v-model="Configration.config_value" v-bind:class="{ 'is-invalid': (isSubmitted && $v.Configration.config_value.$invalid) || isValueExists}" />
+                                <span v-if="isSubmitted && !$v.Configration.config_value.required" class="form-text text-danger">Value is required</span>
+                                <span v-else-if="isSubmitted && isValueExists" class="form-text text-danger">Value already exists</span>
+                            </td>
+                            <td>
+                                <input class="form-control" type="text" v-model="Configration.config_description" />
+                            </td>
+                            <td>
+                                <button class="btn btn-success btn-sm" v-on:click="AddEditConfigration(Configration)"><i class="fa fa-plus"></i> <span v-text="buttonText"></span> </button>
+                                <button class="btn btn-warning btn-sm" v-on:click="CancelEdit()"><i class="fa fa-step-backward"></i> Cancel </button>
+                            </td>
+                        </tr>
+                        <tr v-for="config in ConfigrationList">
+                            <td v-text="config.config_key"></td>
+                            <th scope="row" v-text="config.config_value"></th>
+                            <td v-text="config.config_description"></td>
+                            <td>
+                                <button class="btn btn-info btn-sm" v-on:click="EditConfigration(config)"><i class="fa fa-tag"></i> Edit </button>
+                                <button class="btn btn-danger btn-sm" v-on:click="Delete(config.config_id)"><i class="fa fa-trash"></i> Delete </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    <script src="~/js/Admin/CoreConfiguration/ManageConfiguration.js"></script>
+}
+
+<script>
+    var _canRoleManagerViewConfig;
+    var _canRoleManagerCreateConfig;
+    var _canRoleManagerEditConfig;
+    var _canRoleManagerDeleteConfig;
+
+    $(document).ready(function () {
+        _canRoleManagerViewConfig = @canRoleManagerViewConfig.ToString().ToLower();
+        _canRoleManagerCreateConfig = @canRoleManagerCreateConfig.ToString().ToLower();
+        _canRoleManagerEditConfig = @canRoleManagerEditConfig.ToString().ToLower();
+        _canRoleManagerDeleteConfig = @canRoleManagerDeleteConfig.ToString().ToLower();
+
+        if (!_canRoleManagerViewConfig) {
+            window.location.href = '/Error/PermissionDenied';
+        }
+    });
+</script>
+

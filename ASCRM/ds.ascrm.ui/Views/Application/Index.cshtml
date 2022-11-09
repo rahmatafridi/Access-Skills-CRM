@@ -1,0 +1,122 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout_AppPortal.cshtml";
+}
+<style>
+    .link-text:hover {
+        color: #22b9ff !important;
+    }
+
+    .kt-portlet .kt-portlet__foot {
+        padding: 10px 5px 10px 10px !important;
+    }
+
+    .k-grid-header .k-filterable, .k-grid-header .k-with-icon {
+        padding-right: calc(1px + .5rem + 1.5em + .5rem);
+    }
+</style>
+
+<div class="content" id="dv_Manage_Applications">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <label id="lblUserHeader" style="font-size: large;font-weight:500;margin-left:-10px;margin-top:20px;">Online Application Form</label>
+            <div class="kt-portlet__head-toolbar">
+                <div class="form__actions kt-portlet__foot" v-if="!isSubmitted">
+                    @*<a href="~/Application/Progress" class="btn btn-sm btn-bold btn-label-brand">*@
+                    <a v-on:click="AddNewApplication" class="btn btn-sm btn-bold btn-label-brand">
+                        <i class="fa fa-plus"></i> Start a new application
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="kt-portlet__body">
+
+            <div class="box-header with-border">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                Application Date
+                            </th>
+                            <th>
+                                Time
+                            </th>
+                            <th>
+                                Submitted
+                            </th>
+                            <th>
+                                Submitted On/Completed On
+                            </th>
+                            <th width="400px">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr v-for="application in Applications">
+                            <td>
+                                <span v-text="application.CreatedOn"></span>
+                            </td>
+                            <td>
+                                <span v-text="application.CreatedTime"></span>
+                            </td>
+                            <td>
+                                <span v-text="application.IsSubmitted"></span>
+                            </td>
+                            <td>
+                                <span v-text="application.SumittedDate"></span>
+                            </td>
+                            <td v-if="!isSubmitted">
+                                <a v-bind:href="'/Application/Progress?id='+ application.encoded_app_id" v-show="application.IsSubmitted == 'No'" class="btn btn-sm btn-brand"><i class="la la-arrow-circle-right"></i>Continue/Amend Application</a>
+                            </td>
+                        </tr>
+                        @*<tr>
+                        <td>
+                            23/03/2019
+                        </td>
+                        <td>
+                            12:25:00
+                        </td>
+                        <td>
+                            No
+                        </td>
+                        <td>
+                            Yes
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-brand"><i class="la la-arrow-circle-right"></i>Continue/Amend Application</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            21/03/2019
+                        </td>
+                        <td>
+                            10:19:00
+                        </td>
+                        <td>
+                            No
+                        </td>
+                        <td>
+                            No
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-brand"><i class="la la-arrow-circle-right"></i>Continue/Amend Application</button>
+                        </td>
+                    </tr>*@
+                    </tbody>
+                </table>
+            </div>           
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    <script src="~/js/Admin/Applications/Index.js"></script>
+}

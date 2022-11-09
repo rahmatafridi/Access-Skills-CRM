@@ -1,0 +1,79 @@
+﻿<div class="form-group row">
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label class="">Registration</label>
+        <select id="ddlRegistration" class="form-control" v-model="lead.Lead_Contact_Id_Registration">
+            <option v-for="Registration in Registrations" v-bind:value="Registration.id" v-text="Registration.description"></option>
+        </select>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label class="">Agreed Payment Scheme</label>
+        <select id="ddlAgreedPaymentScheme" class="form-control" v-model="lead.Lead_Id_TrainingProvider">
+            <option v-for="TrainingProvider in TrainingProviders" v-bind:value="TrainingProvider.id" v-text="TrainingProvider.description"></option>
+        </select>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label class="">ERN Number</label>
+        <input type="text" class="form-control" v-model="lead.Lead_ERN_Number">
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label class="">Preferred Time of Contact</label>
+        <div class="input-group timepicker">
+            <input type="text" class="form-control" id="txt_PreferredTimeToContact" v-model="lead.Lead_PreferredTimeToContact">
+            <div class="input-group-append">
+                <span class="input-group-text">
+                    <i class="la la-clock-o"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="form-group row">
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label>Learner Enrolled?</label>
+        <select id="ddlLearnerEnrolled" class="form-control" v-model="lead.Lead_LearnersEnrolled">
+            <option v-for="enrolled in LearnerEnrolleds" v-bind:value="enrolled.id" v-text="enrolled.description"></option>
+        </select>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label class="">Learner Enrolment Date</label>
+        <div class="input-group date">
+            <input type="text" class="form-control" id="txtLearnerEnrolmentDate" v-model="lead.Lead_Learner_Enrolment_Date">
+            <div class="input-group-append">
+                <span class="input-group-text">
+                    <i class="la la-calendar"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label class="">Enrolment Cancelled?</label>
+        <select id="ddlEnrolmentCancelled" class="form-control" v-model="lead.Lead_Enrolment_Cancelled">
+            <option v-for="DealClosed in DealClosedOption" v-bind:value="DealClosed.id" v-text="DealClosed.description"></option>
+        </select>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label class="">Enrolment Cancelled Date</label>
+        <div class="input-group date">
+            <input type="text" class="form-control" id="txt_EnrolmentCancelledDate" v-model="lead.Lead_Enrolment_Cancelled_Date">
+            <div class="input-group-append">
+                <span class="input-group-text">
+                    <i class="la la-calendar"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="form-group row">
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label class="">Website</label>
+        <input type="text" class="form-control" v-model="lead.Lead_Contact_Website">
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label class="">Web Message</label>
+        <input type="text" class="form-control" v-model="lead.Lead_Contact_WebMessage" />
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <label>Web Subject</label>
+        <textarea class="form-control" v-model="lead.Lead_Contact_WebSubject"></textarea>
+    </div>
+</div>

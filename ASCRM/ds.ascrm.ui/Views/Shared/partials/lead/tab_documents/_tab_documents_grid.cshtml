@@ -1,0 +1,53 @@
+﻿ <!--begin::Form-->
+<div class="kt-form kt-form--fit kt-form--label-right">
+    <div class="portlet__foot">
+        <div class="form-group">
+            <div class="col-lg-12">
+                @(Html.Kendo().Grid<ds.portal.leads.Models.Documents>()
+                            .Name("DocumentsGrid")
+                            .Columns(columns =>
+                            {
+                                columns.Template("<div class='gridactionbuttonscontainer'>" +
+                                        //"<a class='kt-font-brand' style='cursor:pointer;' onclick=PerformNoteEdit('#:Document_Id#') title='Edit'><span style='text-align:center;' class='fa fa-pen'></span></a> &nbsp;&nbsp;" +
+                                        "<a class='kt-font-brand' style='cursor:pointer;' href='api/LeadApi/DownloadFile?document_Id=#:Document_Id#' title='Download'><span style = 'text-align:center;' class='fa fa-file-download'></span></a>" +
+                                        "&nbsp;&nbsp;<a class='kt-font-danger' style='cursor:pointer;'onclick=PerformDocumentDelete('#:Document_Id#') title='Delete'> <span style='text-align:center;' class='fa fa-trash-alt'></span></a></div>").Width(55).ClientHeaderTemplate(" ");
+                                columns.Bound(p => p.Document_Name).Title("Name");
+                                //columns.Bound(p => p.Document_Category).Title("Category");
+                                columns.Bound(p => p.Document_Description).Title("Description");
+                                columns.Bound(p => p.Document_CreatedByUserName).Title("By").Width("200px");
+                                columns.Bound(p => p.Document_DateCreated).Format("{0:dd/MM/yyyy HH:mm}").Title("Date").Width("180px");
+                            })
+                            .HtmlAttributes(new { style = "height: 100%;" })
+                                .Resizable(resize => resize.Columns(true))
+                            .Reorderable(x => x.Columns(true))
+                            .ColumnMenu(c => c.Columns(true))
+                            .Scrollable(scr => scr.Height(300))
+                            .Sortable()
+                            .Pageable()
+                            .NoRecords()
+                            .Filterable()
+                            .Pageable(pageable => pageable
+                            .Refresh(true)
+                            .PageSizes(true)
+                            .ButtonCount(5))
+                            .DataSource(dataSource =>
+                            dataSource
+                            .WebApi()
+                            .Model(model =>
+                            {
+                                model.Id(p => p.Document_Id);
+                            })
+                            .Events(events => events.Error("error_handler"))
+                            .Read(read => read.Action("GetAllLeadDocuments", "LeadApi", new { lead_Id = ViewBag.Lead_Id }))
+                            .PageSize(20)
+                            )
+                )
+
+
+
+
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::Form-->

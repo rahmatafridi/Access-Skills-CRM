@@ -1,0 +1,85 @@
+
+<!--begin: Head -->
+<div class="kt-user-card kt-user-card--skin-light kt-notification-item-padding-x">
+    <div class="kt-user-card__avatar">
+        @*<img class="kt-hidden-" alt="Pic" src="~/Theme/assets/media/users/300_25.jpg" />*@
+        <img class="kt-hidden-" id="userLogoImg" alt="Pic" style="min-width: 107px;min-height: 80px;">
+
+        <!--use below badge element instead the user avatar to display username's first letter(remove kt-hidden class to display it) -->
+        <span class="kt-badge kt-badge--username kt-badge--unified-success kt-badge--lg kt-badge--rounded kt-badge--bold kt-hidden">S</span>
+    </div>
+    <div class="kt-user-card__name">
+        @ViewBag.DisplayName       
+    </div>  
+    <div class="kt-user-card__badge">        
+
+        @*<span class="btn btn-label-primary btn-sm btn-bold btn-font-md">23 messages</span>*@
+    </div>
+</div>
+
+<!--end: Head -->
+
+<!--begin: Navigation -->
+<div class="kt-notification">
+    <a href="/UserProfile" title="My Profile" class="kt-notification__item">
+        <div class="kt-notification__item-icon">
+            <i class="flaticon2-calendar-3 kt-font-success"></i>
+        </div>
+        <div class="kt-notification__item-details">
+            <div class="kt-notification__item-title kt-font-bold">
+                My Profile
+            </div>
+            <div class="kt-notification__item-time">
+                Account settings and more
+            </div>
+        </div>
+    </a>
+   
+    <a href="/MyTask" title="My Tasks" class="kt-notification__item">
+        <div class="kt-notification__item-icon">
+            <i class="flaticon-list kt-font-warning"></i>
+        </div>
+        <div class="kt-notification__item-details">
+            <div class="kt-notification__item-title kt-font-bold">
+                My Tasks
+            </div>
+            <div class="kt-notification__item-time">
+                Phone, Meetings and Appointments
+            </div>
+        </div>
+    </a>
+    @*<a href="/Task"  title="My Tasks" class="kt-notification__item">
+            <div class="kt-notification__item-icon">
+                <i class="flaticon2-rocket-1 kt-font-danger"></i>
+            </div>
+            <div class="kt-notification__item-details">
+                <div class="kt-notification__item-title kt-font-bold">
+                    My Tasks
+                </div>
+                <div class="kt-notification__item-time">
+                    Latest daily tasks
+                </div>
+            </div>
+        </a>*@
+    <a href="#" class="kt-notification__item" style="display:none">
+        <div class="kt-notification__item-icon">
+            <i class="flaticon2-cardiogram kt-font-warning"></i>
+        </div>
+        <div class="kt-notification__item-details">
+            <div class="kt-notification__item-title kt-font-bold">
+                Billing
+            </div>
+            <div class="kt-notification__item-time">
+                billing & statements <span class="kt-badge kt-badge--danger kt-badge--inline kt-badge--pill kt-badge--rounded">2 pending</span>
+            </div>
+        </div>
+    </a>
+    <div class="kt-notification__custom kt-space-between">
+        <form asp-controller="Account" asp-action="Logout">
+            <button type="submit" class="btn btn-label btn-label-brand btn-sm btn-bold">Logout</button>
+        </form>
+        @*<a href="custom/user/login-v2.html" target="_blank" class="btn btn-clean btn-sm btn-bold">Upgrade Plan</a>*@
+    </div>
+</div>
+
+<!--end: Navigation -->

@@ -1,0 +1,354 @@
+﻿@model ds.portal.tasks.Models.TaskIndexViewModel
+
+@{ ViewData["Title"] = "My Tasks";
+                Layout = "~/Views/Shared/_Layout.cshtml";
+                var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+                var canViewMyTask = (permissions == null) ? true : (bool)permissions["LEAD_TASK_VIEW"];
+                var canCreateMyTask = (permissions == null) ? true : (bool)permissions["LEAD_TASK_CREATE"];
+                var canEditMyTask = (permissions == null) ? true : (bool)permissions["LEAD_TASK_EDIT"];
+                var canDeleteMyTask = (permissions == null) ? true : (bool)permissions["LEAD_TASK_DEL"]; }
+
+@(Html.Kendo().Window()
+    .Name("AddEditWindow")
+    .Position(b => b.Top(100).Left(600))
+    .Modal(true)
+    .Title("Task")
+    .MinWidth(600)
+    .Content("Loading...")
+    .Visible(false)
+    .Draggable(true)
+    .Resizable()
+)
+
+<div id="calendar" class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" style="margin-top: 28px;">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="kt-portlet" id="kt_portlet">
+                <div class="kt-portlet__head">
+                    <div class="kt-portlet__head-label">
+                        <span class="kt-portlet__head-icon">
+                            <i class="kt-menu__link-icon fa fa-calendar-alt"></i>
+                        </span>
+                        <h3 class="kt-portlet__head-title">
+                            My Tasks
+                        </h3>
+                    </div>
+                </div>
+                <div class="kt-portlet__body hidden">
+                    @(Html.Kendo().MultiSelect()
+                          .Name("Users")
+                          .DataTextField("DisplayName")
+                          .DataValueField("UserId")
+                          .TagTemplate("<span style= \"background: #: data.Color #\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span>&nbsp; #: data.DisplayName #</span>")
+                          .ItemTemplate("<span style= \"background: #: data.Color #\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span>&nbsp; #: data.DisplayName #</span>")
+                          .Placeholder("Select calendars...")
+                          .BindTo(Model.CalendarUsers)
+                          .ClearButton(false)
+                          .Enable(false)
+                          .Value(Model.CalendarUsers.Select(x => x.UserId))
+                          .HtmlAttributes(new { style = "width: 100%" })
+                    )
+
+                    <br />
+
+                    @(Html.Kendo().Scheduler<ds.portal.tasks.TaskEventViewModel>()
+                        .Name("Scheduler")
+                        .Date(Model.CalendarDate.Date)
+                        .StartTime(Model.CalendarStartTime)
+                        .AllDaySlot(false)
+                        .Height(650)
+                        .Selectable(true)
+                        .EventTemplateId("event-template")
+                        .Pdf(pdf => pdf
+                            .FileName("Tasks Export.pdf")
+                            .ProxyURL(Url.Action("Pdf_Export_Save", "Grid"))
+                        )
+                        .Toolbar(t => t.Pdf())
+                        .Views(views =>
+                        {
+                           // views.DayView(day => day.DateHeaderTemplate("<span class='k-link k-nav-day'>#=kendo.toString(date, 'ddd dd/MM')#</span>"));
+                           // views.WorkWeekView(week =>
+                           // {
+                           //     week.Selected(true);
+                           //     week.DateHeaderTemplate("<span class='k-link k-nav-day'>#=kendo.toString(date, 'ddd dd/MM')#</span>");
+                           // });
+                           // views.MonthView();
+                            views.AgendaView(agenda =>
+                            {
+                                agenda.EventTemplateId("agenda-template");
+                            });
+                        })
+                        .Resources(resource =>
+                        {
+                            resource.Add(m => m.UserId)
+                                .Title("User")
+                                .DataTextField("DisplayName")
+                                .DataValueField("UserId")
+                                .DataColorField("Color")
+                                .BindTo(Model.CalendarUsers);
+
+                        })
+                        .Events(events => events
+                            .Add("scheduler_add")
+                            .Edit("scheduler_edit")
+                            .Save("scheduler_save")
+                            .Resize("scheduler_resize")
+                            .ResizeEnd("scheduler_resizeEnd")
+                            .Move("scheduler_move")
+                            .MoveEnd("scheduler_moveEnd")
+                            .Remove("scheduler_remove")
+                        )
+                        //TODO.ShowWorkHours(true)
+                        .DataSource(d => d
+                            .WebApi()
+                            .Model(m =>
+                            {
+                                m.Id(f => f.EventID);
+                            })
+                            .Events(e => e.Error("onError"))
+                            .Read(read => read.Action("Get", "MyTaskApi"))
+                            .Create(create => create.Action("Post", "MyTaskApi"))
+                            .Update(update => update.Action("Put", "MyTaskApi", new { id = "{0}" }))
+                            .Destroy(destroy => destroy.Action("Delete", "MyTaskApi", new { id = "{0}" }))
+                        )
+                    )
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+
+    function scheduler_resize(e) {
+        e.preventDefault();
+    }
+
+    function scheduler_resizeEnd(e) {
+        e.preventDefault();
+    }
+
+    function scheduler_move(e) {
+        e.preventDefault();
+    }
+
+    function scheduler_moveEnd(e) {
+        e.preventDefault();
+    }
+
+    function scheduler_remove(e) {
+        @if (!canDeleteMyTask)
+        {
+            <text>
+                e.preventDefault();
+                toastr.error('Sorry you do not have permission to delete tasks', 'Permission Error!');
+            </text>
+        }
+    }
+
+    function scheduler_add(e) {
+        e.preventDefault();
+        @if (canCreateMyTask)
+        {
+            <text>
+                var createWindow = $("#AddEditWindow").data("kendoWindow");
+                createWindow.title('Add Task');
+                createWindow.content("loading...");
+                createWindow.refresh({
+                    url: 'MyTask/Create',
+                    data: { start: new Date(e.event.start).toISOString() }
+                });
+                createWindow.open();
+            </text>
+        }
+        else
+        {
+            <text>
+                toastr.error('Sorry you do not have permission to add tasks', 'Permission Error!');
+            </text>
+        }
+    }
+
+    function scheduler_edit(e) {
+        e.preventDefault();
+        @if (canEditMyTask)
+        {
+            <text>
+                var createWindow = $("#AddEditWindow").data("kendoWindow");
+                createWindow.title('Edit Task');
+                createWindow.content("loading...");
+                createWindow.refresh({
+                    url: 'MyTask/Edit',
+                    data: { eventId: e.event.EventID }
+                });
+                createWindow.open();
+            </text>
+        }
+        else
+        {
+            <text>
+                toastr.error('Sorry you do not have permission to edit tasks', 'Permission Error!');
+            </text>
+        }
+    }
+
+    function scheduler_save(e) {
+        //e.preventDefault();
+    }
+
+    function onError(e) {
+        var errors = $.parseJSON(e.xhr.responseText);
+
+        if (errors) {
+            alert("Errors:\n" + errors.join("\n"));
+        }
+    }
+
+    function on_scheduler_edit(task_id) {
+
+        @if (canEditMyTask)
+        {
+            <text>
+                var createWindow = $("#AddEditWindow").data("kendoWindow");
+                createWindow.title('Edit Task');
+                createWindow.content("loading...");
+                createWindow.refresh({
+                    url: 'MyTask/Edit',
+                    data: { task_id: task_id }
+                });
+                createWindow.open();
+            </text>
+        }
+        else
+        {
+            <text>
+                toastr.error('Sorry you do not have permission to edit tasks', 'Permission Error!');
+            </text>
+        }
+    }
+
+
+    function on_scheduler_goto(enclead_id) {
+
+          window.location.href = 'Lead/Edit?id=' + enclead_id + '&Act=Y';
+
+    }
+
+    function on_scheduler_completed(task_id,user_id,lead_id) {
+        //'Lead/Edit?id=' + response[count].encodeLeadId + '&Act=Y'
+        var id = lead_id;
+        $.ajax({
+                url: "/api/LeadApi/TaskDone",
+                data: { id: task_id, user_id: user_id,  lead_id: lead_id },
+                type: "GET",
+                contentType: "application/json",
+                dataType: "json"
+            }).done(function (response) {
+                if (response === true) {
+                    $("#Scheduler").data("kendoScheduler").dataSource.read();
+                } else {
+                  //  toastr.success("Task cannot be marked as done. Please try again.", "Error!");
+                }
+            }).fail(function (xhr) {
+              //  toastr.error(xhr.responseText, 'Error!');
+            });
+    }
+
+    $(document).ready(function () {
+        $("#Scheduler").kendoTooltip({
+            filter: ".k-event:not(.k-event-drag-hint)",
+            position: "top",
+            width: 250,
+            content: kendo.template($('#template').html()),
+        });
+
+        $("#Users").change(function (e) {
+            var users = $("#Users").data("kendoMultiSelect");
+
+            var filter = {
+                logic: "or",
+                filters: $.map(users.value(), function (value) {
+                    return {
+                        operator: "eq",
+                        field: "UserId",
+                        value: value
+                    };
+                })
+            };
+
+            var scheduler = $("#Scheduler").data("kendoScheduler");
+            scheduler.dataSource.filter(filter);
+        });
+
+    })
+</script>
+
+<script id="event-template" type="text/x-kendo-template">
+
+    #if(Reason == 'Booking') {#
+    <div class='event-template'>
+        <span>c #: Reason #: #: Learner #  (#: Topic #)</span>
+    </div>
+    #} else {#
+    <div class='event-template'>
+        <span>x #: Reason #: #: title #</span>
+    </div>
+    #}#
+</script>
+
+<script id="agenda-template" type="text/x-kendo-template">
+    #if(Reason == 'Booking') {#
+    <div class='event-template'>
+        <span>ccc #: Reason #: #: Learner # (#: Topic #)</span>
+    </div>
+    #} else {#
+    <div class='event-template'>
+        <span><b>#: title #</b></span><br />
+        <span>#: Reason # </span>
+        <br />
+        <a style='' class='btn btn-sm btn-label-brand' onclick='return on_scheduler_edit(#: EventID #)'>
+            Edit Task<a />
+            <a style='' class='btn btn-sm btn-label-brand' onclick='return on_scheduler_goto("#: encodeLeadId #")'>
+                Go to Lead <a />
+                <a style='' class='btn btn-sm btn-label-brand' onclick='return on_scheduler_completed(#: EventID #, #: UserId #, #: LeadId #)'> Completed <a />
+
+    </div>
+    #}#
+</script>
+
+<script id="template" type="text/x-kendo-template">
+    #var element = target;#
+    #var uid = element.attr("data-uid");#
+    #var scheduler = target.closest("[data-role=scheduler]").data("kendoScheduler");#
+    #var model = scheduler.occurrenceByUid(uid);#
+
+    #if(model) {#
+    <strong>Title:</strong> #=model.title#
+    <br />
+    <strong>Start:</strong> #=kendo.format('{0:dd/MM/yyyy HH:mm}',model.start)#
+    <br />
+    <strong>End:</strong> #=kendo.format('{0:dd/MM/yyyy HH:mm}',model.end)#
+    <br />
+    #} else {#
+    <strong>No task data is available</strong>
+    #}#
+</script>
+
+<style>
+    .event-template img {
+        float: left;
+        margin: 0 8px;
+    }
+
+    body, h1, h2, h3 {
+        margin: 0px;
+    }
+
+    @@media screen and (max-width: 1023px) {
+        div.k-window {
+            display: none !important;
+        }
+    }
+</style>

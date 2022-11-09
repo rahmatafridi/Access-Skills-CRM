@@ -1,0 +1,386 @@
+﻿@using Kendo.Mvc.UI
+
+@{
+    ViewData["Title"] = "Learner Work";
+
+    Layout = "~/Views/Shared/_Layout_Portal.cshtml";
+    var permissions = (portal.models.RoleAdmin.Permissions)ViewBag.Permissions;
+
+    var canRoleManagerWorkSubmitted = (permissions == null) ? false : (bool)permissions["AC_WS"];
+
+    var acceptDocumentTypes = ViewBag.acceptDocumentTypes;
+    var isMultipleDocumentUpload = ViewBag.isMultipleDocumentUpload;
+    var maxDocumentUpload = ViewBag.maxDocumentUpload;
+    var maxDocumentFileSize = ViewBag.maxDocumentFileSize;
+    }
+<style>
+    .link-text:hover {
+        color: #22b9ff !important;
+    }
+
+    .kt-portlet .kt-portlet__foot {
+        padding: 10px 5px 10px 10px !important;
+    }
+
+    .k-grid-header .k-filterable, .k-grid-header .k-with-icon {
+        padding-right: calc(1px + .5rem + 1.5em + .5rem);
+    }
+</style>
+
+<div class="content" id="dv_Portal_LearnerWork">
+    <div class="kt-portlet">
+        <div class="kt-portlet__head">
+            <label id="lblUserHeader" style="font-size: large;font-weight:500;margin-left:-10px;margin-top:20px;">Ready To Mark</label>
+            <div class="kt-portlet__head-toolbar">
+
+
+                <div class="form__actions kt-portlet__foot">
+                    @*<a href="~/Portal/CourseContent/Create" class="btn btn-sm btn-bold btn-label-brand">
+                            <i class="fa fa-plus"></i> Create Course Content
+                        </a>*@
+
+                </div>
+
+            </div>
+        </div>
+        <section class="content">
+            <div class="kt-portlet__body">
+                <div class="row">
+                    <div class="col-lg-9">
+
+                    </div>
+                    <div class="col-lg-3" style="margin-bottom:10px">
+                        <input type="text" autocomplete="off" class="form-control" id="searchsubmit" />
+                    </div>
+                </div>
+                @(Html.Kendo().Grid<crm.portal.CrmModel.UploadWork>
+                            ()
+                            .Name("grid_submitted")
+                            .Columns(columns =>
+                            {
+                                columns.Bound(p => p.topic_id).Hidden();
+                                columns.Bound(p => p.id).Hidden();
+
+                                columns.Bound(p => p.created_on).Format("{0:dd/MM/yyyy}").Title("Date");
+                                columns.Bound(p => p.learner_id).Title("Learner Id");
+                                columns.Bound(p => p.LearnerName).Title("Learner Name");
+                                columns.Bound(p => p.Topic).Title("Topic");
+                                columns.Template("<div class='gridactionbuttonscontainer'><a class='kt-font-brand' style='cursor:pointer;' onclick=PerformFiles('#:id#') title='Files'><span style='text-align:center;' class='fa fa-file'></span></a>" +
+                                 "</div>").Width(100).ClientHeaderTemplate("Files");
+                                 columns.Bound(p => p.due_date).ClientTemplate("#= kendo.toString(kendo.parseDate(due_date), 'dd/MM/yyyy') #").Title("Due Date"); ;
+                                columns.Template("<div class='kt-font-primary'><a class='kt-font-brand' style='cursor:pointer;' title='Activity Completed' onclick=PerformApprove('#:id#')><span style='text-align:center;' class='fa fa-check''></span></a>" +
+                                   "&nbsp;&nbsp;<a class='kt-font-warning' style='cursor:pointer;' onclick=PerformReject('#:id#') title='Resubmission Required'><span style='text-align:center;' class='fa fa-user-alt-slash'></span></a>" +
+                                    "&nbsp;&nbsp;<a class='kt-font-warning' style='cursor:pointer;' onclick=PerformUploadFile('#:topic_id#','#:learner_id#') title='Upload'><span style='text-align:center;' class='fa fa-file'></span></a>" +
+
+                                   "</div>").Width(100).ClientHeaderTemplate(" ");
+                            })
+                            .Resizable(resize => resize.Columns(true))
+                            .Reorderable(x => x.Columns(true))
+                            .ColumnMenu(c => c.Columns(true))
+                            .Sortable()
+                            .Pageable()
+                            .Filterable()
+                            .NoRecords()
+                            .Pageable(pageable => pageable
+                            .Refresh(true)
+                            .PageSizes(true)
+                            .ButtonCount(5))
+                            .DataSource(dataSource =>
+                            dataSource
+                            .WebApi()
+                            .Model(model =>
+                            {
+                                model.Id(p => p.id);
+                            })
+                            //.Events(events => events.Error("error_handler"))
+                            .Read(read => read.Action("GetLearnerWork", "WorkUploadApi", new { type = "Submitted" }))
+                            .PageSize(20)
+                            )
+                            )
+
+
+            </div>
+
+        </section>
+    </div>
+    <div class="modal fade" id="kt_modal_files1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Files</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="kt-form kt-form--label-right">
+                        <div class="row">
+                            <table class="table">
+                                <tr>
+                                    <th></th>
+                                    <th>File Name</th>
+                                    <th>File Type</th>
+                                    <th>File Size</th>
+                                </tr>
+                                <tr v-for="file in files">
+                                    <td><a class='kt-font-brand' v-on:click="downlaodFile(file.file_path)" style='cursor:pointer;' title='Files'><span style='text-align:center;' class='fa fa-download'></span></a></td>
+                                    <td> {{file.file_name}}</td>
+                                    <td>{{file.file_ext}}</td>
+                                    <td>{{file.file_size}}</td>
+
+
+                                </tr>
+                            </table>
+
+                        </div>
+
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="kt_modal_reject_reason" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Resubmission Required</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="kt-form kt-form--label-right">
+                        <div class="form-group row">
+                            <label class="col-form-label col-sm-4">Reason for rejection:</label>
+                            <div class="col-sm-8">
+                                <textarea class="form-control" v-model="rejected_reason"> </textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" v-on:click="workReject()">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="kt_modal_Create" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Upload File</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="kt-form kt-form--label-right">
+
+
+                        <div class="form-group">
+                            <label>File</label>
+                            @*<div></div>*@
+
+                            <input name="files" id="files" type="file" aria-label="files" />
+
+                            <span id="span_fileUpload" class="form-text text-muted"></span>
+                        </div>
+
+
+                        @*<div class="form-group row">
+                                <label for="recipient-name" class="col-form-label col-sm-2">Select File</label>
+                                <div class="col-sm-10">
+
+                                    <input name="files" class="form-control" multiple="multiple" id="files" type="file" aria-label="files" />
+                                </div>
+
+
+                                <div>
+                                    <span id="span_fileUpload" style="margin-left:140px;" class="form-text text-muted"></span>
+
+                                </div>
+
+                            </div>*@
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" v-on:click="Submit">Submit</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="kt_modal_approve" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Activity Completed</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="kt-form kt-form--label-right">
+                        <div class="form-group row">
+                            <label class="col-form-label ">Notes</label>
+                            <div class="col-sm-12">
+                                <textarea class="form-control" v-model="notes"> </textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" v-on:click="approve">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function formatDateEN(date) {
+        const options = { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }
+        return new Date(date).toLocaleDateString('en-GB')
+    }
+    $("#searchsubmit").keyup(function () {
+        debugger;
+        $("#grid_submitted").data("kendoGrid").refresh();
+        var type = "Submitted";
+        var id = $(this).val();
+        if (id != "") {
+            $.ajax({
+                url: "/api/WorkUploadApi/SearchWork",
+                data: { type: type, name: id },
+                type: "GET",
+                contentType: "application/json",
+                dataType: "json",
+                async: false
+            }).done(function (response) {
+                $("#grid_submitted").data("kendoGrid").dataSource.data([]);
+
+
+                let grid = $("#grid_submitted").data("kendoGrid");
+
+                for (var i = 0; i < response.Data.length; i++) {
+
+                    grid.dataSource.add({
+                        id: response.Data[i].id, created_on: formatDateEN(response.Data[i].created_on),
+                        learner_id: response.Data[i].learner_id
+                        , LearnerName: response.Data[i].LearnerName,
+                        Topic: response.Data[i].Topic
+                        , due_date: response.Data[i].due_date, Status: response.Data[i].Status
+
+
+                    });
+
+                }
+
+
+            });
+        }
+        else {
+            $("#grid_submitted").data("kendoGrid").dataSource.read();
+        }
+
+    });
+
+
+          var _acceptDocumentTypes;
+        var _allowedExtensions = [];
+        var _isMultipleDocumentUpload;
+        var _maxDocumentUpload;
+        var _maxDocumentFileSize;
+        var _companyId;
+    var _roleName;
+
+    var _canRoleManagerWorkSubmitted;
+
+       $(document).ready(function () {
+           _canRoleManagerWorkSubmitted = @canRoleManagerWorkSubmitted.ToString().ToLower();
+
+           if (!_canRoleManagerWorkSubmitted) {
+               window.location.href = '/Error/PermissionDenied';
+           }
+          //  app.mounted();
+
+           _acceptDocumentTypes = '@acceptDocumentTypes';
+           _isMultipleDocumentUpload = true;
+            _maxDocumentUpload = @maxDocumentUpload;
+            _maxDocumentFileSize = @maxDocumentFileSize;
+
+           if (_acceptDocumentTypes !== null)
+           {
+               if (_acceptDocumentTypes.includes(',')) {
+                   var item = _acceptDocumentTypes.split(',');
+                   for (var count = 0; count < item.length; count++) {
+                       if (item[count] !== "") {
+                           _allowedExtensions.push('' + item[count] + '');
+                       }
+                   }
+               }
+               else
+               {
+                   _allowedExtensions.push('' + _acceptDocumentTypes + '');
+               }
+           }
+
+           uploadFile();
+
+           $("#span_fileUpload").text("Max file size is " + _maxDocumentFileSize + " MB and allowed file types: " + _allowedExtensions.toString());
+
+           $(".attachDocuments").attr("style", "display:none")
+
+
+
+
+
+
+       });
+    function uploadFile() {
+        var _size = (_maxDocumentFileSize * 1048576);
+
+        $("#files").kendoUpload({
+            async: {
+                chunkSize: 11000,// bytes
+                autoUpload: true
+            },
+            validation: {
+                allowedExtensions: _allowedExtensions,
+                maxFileSize: _size
+            },
+            select: onSelect,
+            multiple: _isMultipleDocumentUpload
+        });
+
+
+    }
+
+    var _isValidationError = false;
+    function onSelect(e) {
+        if (e.files.length > _maxDocumentUpload) {
+            toastr.error("You can select maximum " + _maxDocumentUpload + " files.", 'Error!');
+            e.preventDefault();
+        }
+
+        var files = e.files;
+        for (var i = 0; i < files.length; i += 1) {
+            var file = files[i];
+            if (file.validationErrors && file.validationErrors.length > 0) {
+                toastr.error('Invaild file format.', 'Error!');
+                e.preventDefault();
+            }
+        }
+    }
+</script>
+
+@section Scripts{
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/vue/vuelidate.min.js"></script>
+    <script src="~/lib/vue/validators.min.js"></script>
+    @*<script src="~/js/Portal/Index.js"></script>*@
+    <script src="~/js/Portal/Assessor/LearnerWork.js"></script>
+    }
